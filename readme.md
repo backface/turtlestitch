@@ -21,5 +21,5 @@ SVG support limitations
 OS/X: turn LCD font smoothing off
 
 Beware of third-party Chrome toolbars and iFrames</span>
-<h1>readme -- puzzlepiece</h1>
+<h1>readme - puzzlepiece</h1>
 View a slideshow <a href=https://scratch.mit.edu/projects/115355399/>here</a>.
