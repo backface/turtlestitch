@@ -8,9 +8,9 @@ artefacts: projects, blocks, sprites
 URL options: #run: #open: #lang: #signup
 
 dynamic content (currently deactivated):</span>
-	<a href=http://snap.berkeley.edu/cloudmsg.txt>cloudmsg.txt</a>
+*	<a href=http://snap.berkeley.edu/cloudmsg.txt>cloudmsg.txt</a>
 	
-	<a href=http://snap.berkeley.edu/motd.txt>motd.txt</a>
+*	<a href=http://snap.berkeley.edu/motd.txt>motd.txt</a>
 
 <span>supported browsers, problems with the Android virtual keyboard
 
