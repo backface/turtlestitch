@@ -22,3 +22,4 @@ OS/X: turn LCD font smoothing off
 
 Beware of third-party Chrome toolbars and iFrames</span>
 <h1>readme -- puzzlepiece</h1>
+<script src=https://phosphorus.github.io/embed.js?id=115355399&auto-start=false&light-content=false></script>
