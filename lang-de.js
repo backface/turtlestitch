@@ -294,6 +294,10 @@ SnapTranslator.dict.de = {
 
     'move %n steps':
         'gehe %n Schritte',
+    'move %n steps by %n steps':
+        'gehe %n Schritte in je %n-er Mini-Schritten',
+     'move %n steps by %n':
+        'gehe %n Schritte in %n Mini-Schritten',
     'turn %clockwise %n degrees':
         'drehe %clockwise %n Grad',
     'turn %counterclockwise %n degrees':
