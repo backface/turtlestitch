@@ -2637,8 +2637,19 @@ StageMorph.prototype.render = function () {
     this.renderer.render(this.scene, this.camera);
 };
 
+StageMorph.prototype.isDirty = function() {
+    var w = this.root(),
+	bounds = this.bounds;
+    
+    if (w instanceof WorldMorph) {
+	return w.broken.some(area => area.intersect(bounds).area() > 0);
+    } else {
+	return false;
+    }
+};
+
 StageMorph.prototype.renderCycle = function () {
-    if (this.renderer.changed) {
+    if (this.renderer.changed || this.isDirty()) {
         this.render();
         this.changed();
         this.parentThatIsA(IDE_Morph).statusDisplay.refresh();
@@ -2649,7 +2660,7 @@ StageMorph.prototype.renderCycle = function () {
     }
     // this.render();
     // this.changed();
-}
+};
 
 StageMorph.prototype.reRender = function () {
     this.renderer.changed = true;
