@@ -1461,7 +1461,14 @@ SpriteMorph.prototype.initBlocks = function () {
         spec: 'text length of %s with size %n',
         defaults: ["hello", 21]
     };
-
+    this.blocks.reportRandomPosition =
+    {
+		    only: SpriteMorph,
+        type: 'reporter',
+        category: 'motion',
+        spec: 'random position',
+    };
+	
     // pen blocks
 
     this.blocks.isPenDown =
@@ -1818,7 +1825,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         //blocks.push(block('gotoXYIn'));
         //blocks.push(block('gotoXYBy'));
         blocks.push(block('doGotoObject'));
-        blocks.push(block('doGlide'));
+        blocks.push(block('reportRandomPosition'));
         blocks.push('-');
         blocks.push(block('changeXPosition'));
         blocks.push(block('setXPosition'));
