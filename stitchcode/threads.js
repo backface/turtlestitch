@@ -84,3 +84,15 @@ Process.prototype.doGotoObject = function (name) {
 		this.origDoGotoObject(name);
 	}
 };
+
+Process.prototype.reportRandomPosition = function () {
+	var thisObj = this.blockReceiver(),
+			stage;
+	
+	if (thisObj) {
+	  stage = thisObj.parentThatIsA(StageMorph);
+	  return new List([this.reportBasicRandom(stage.reportX(stage.left()), stage.reportX(stage.right())),
+                   this.reportBasicRandom(stage.reportY(stage.top()), stage.reportY(stage.bottom()))]); 
+  }
+		
+};
