@@ -52,7 +52,7 @@
       var world;
       window.onload = function () {
         console.log("is Retina supported: " + isRetinaSupported());
-        disableRetinaSupport();
+        // disableRetinaSupport();
         world = new WorldMorph(document.getElementById('world'));
         world.worldCanvas.focus();
         new IDE_Morph().openIn(world);

@@ -2548,7 +2548,7 @@ StageMorph.prototype.initRenderer = function () {
           this.renderer = new THREE.WebGLRenderer({
               antialias: true,
               alpha: true,
-              canvas: this.penTrails()
+              canvas: normalizeCanvas(this.penTrails())
           });
           console.log("webgl enabled");
           this.renderer_status_msg = "webgl enabled";
