@@ -185,7 +185,7 @@ SnapTranslator.dict.de = {
     'translator_e-mail':
         'jens@moenig.org, jadga.huegle@sap.com', // optional
     'last_changed':
-        '2022-01-31', // this, too, will appear in the Translators tab
+        '2022-08-03', // this, too, will appear in the Translators tab
 
     // GUI
     // control bar:
@@ -306,7 +306,7 @@ SnapTranslator.dict.de = {
     'turn %counterclockwise %n degrees':
         'drehe %counterclockwise %n Grad',
     'point in direction %dir':
-        'zeige Richtung %dir',
+        'setze Richtung auf %dir Grad',
     'point towards %dst':
         'zeige auf %dst',
     'go to x: %n y: %n':
@@ -531,12 +531,16 @@ SnapTranslator.dict.de = {
         'sende %msg %receive und warte',
     'to':
         'an',
+    'with data':
+        'mit Daten',
     'Message name':
         'Nachricht',
     'message':
         'Nachricht',
     'any message':
         'eine beliebige Nachricht',
+    'data':
+        'Daten',
     'wait %n secs':
         'warte %n Sek.',
     'wait until %b':
@@ -561,6 +565,8 @@ SnapTranslator.dict.de = {
         'stoppe %stopChoices',
     'all':
         'alle',
+    'all scenes':
+        'alle Szenen',
     'this script':
         'dieses Skript',
     'this block':
@@ -621,6 +627,8 @@ SnapTranslator.dict.de = {
         'Wie hei\u00dft Du?',
     'answer':
         'Antwort',
+    'mouse position':
+        'Mausposition',
     'mouse x':
         'Maus x-Position',
     'mouse y':
@@ -727,14 +735,46 @@ SnapTranslator.dict.de = {
         'Vektoraufzeichnung',
     '%block of block %repRing':
         '%block von Block %repRing',
+    'label':
+        'Aufschrift',
     'definition':
         'Definition',
+    'category':
+        'Kategorie',
     'custom?':
         'benutzerdefiniert?',
     'global?':
         'global?',
+    'type':
+        'Art',
+    'scope':
+        'Bereich',
+    'slots':
+        'Felder',
+    'defaults':
+        'Defaults',
+    'menus':
+        'Menüs',
+    'editables':
+        'Eingaben',
+    'set %byob of block %repRing to %s':
+        'setze %byob von Block %repRing auf %s',
+    'define %upvar %s %repRing':
+        'definiere %upvar %s %repRing',
+    'delete block %repRing':
+        'lösche Block %repRing',
+    'block':
+        'Block',
 
     // operators:
+    'sum':
+        'Summe',
+    'product':
+        'Produkt',
+    'minimum':
+        'Minimum',
+    'maximum':
+        'Maximum',
     '%n mod %n':
         '%n modulo %n',
     'round %n':
@@ -863,6 +903,8 @@ SnapTranslator.dict.de = {
         'Index',
     'append %lists':
         'verbinde %lists',
+    'combinations %lists':
+        'Kombinationen %lists',
     'reshape %l to %nums':
         'strukturiere %l in %nums',
     'add %s to %l':
@@ -1291,6 +1333,10 @@ SnapTranslator.dict.de = {
         'Ergebnisbild...',
     'save a picture of both\nthis script and its result':
         'ein Bild dieses Skripts mit\nseinem Ergebnis speichern',
+    'export script':
+        'Skript exportieren',
+    'download this script\nas an XML file':
+        'dieses Skript als XML\nDatei herunterladen',
     'ringify':
         'Umringen',
     'unringify':
@@ -1401,6 +1447,10 @@ SnapTranslator.dict.de = {
         'Kost\u00fcm umbenennen',
     'rename background':
         'Hintergrund umbenennen',
+    'get blocks':
+        'Blöcke extrahieren',
+    'get data':
+        'Daten extrahieren',
 
     // sounds
     'Play sound':
@@ -2070,6 +2120,14 @@ SnapTranslator.dict.de = {
         'Rand oben',
     'bottom':
         'Rand unten',
+    'position':
+        'Position',
+    'variables':
+        'Variablen',
+    'costume name':
+        'Kostümname',
+    'categories':
+        'Kategorien',
 
     // attributes in the SET block's dropdown
     'my anchor':
@@ -2152,6 +2210,8 @@ SnapTranslator.dict.de = {
         'ist keine erlaubte Auswahl',
     'unsupported data type':
         'Nicht unterstützter Datentyp',
+    'cannot handle zero width or height':
+        'Breite oder Höhe dürfen nicht Null sein',
     'expecting a finite number\nbut getting Infinity or NaN':
         'Erwarte eine endliche Zahl\nbekomme aber Unendlich oder eine Nicht-Zahl',
     'the predicate takes\ntoo long for a\ncustom hat block':
@@ -2171,5 +2231,8 @@ SnapTranslator.dict.de = {
     'setting the rotation center requires a costume':
         'Der Drehpunkt kann nur zusammen\nmit einem Kostüm gesetzt werden',
     'Web Audio API is not supported\nin this browser':
-        'Das Web Audio API wird von\ndiesem Browser nicht unterstützt'
+        'Das Web Audio API wird von\ndiesem Browser nicht unterstützt',
+    'several block definitions\nalready match this label':
+        'Mehrere Blöcke passen\nzu dieser Aufschrift'
+        
 };
