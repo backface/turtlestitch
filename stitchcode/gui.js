@@ -296,6 +296,16 @@ IDE_Morph.prototype.newProject = function () {
 
     SpriteMorph.prototype.useFlatLineEnds = false;
 
+    // hide sprite
+    this.stage.children[0].hide();
+    this.stage.clearAll();
+    this.stage.rotateTurtle(this.stage.children[0].heading);
+    this.createStatusDisplay();
+    // clear stitch cache now (loading projects sends turtle move commands!)
+    this.stage.clearAll();
+    this.stage.turtleShepherd.clear();
+    this.stage.reRender();
+    
     this.setProjectName('');
     this.projectNotes = '';
     this.createStageHandle();
@@ -1634,9 +1644,13 @@ IDE_Morph.prototype.setProjectName = function (string) {
     this.origCreator =  SnapCloud.username != this.creator ? this.creator : SnapCloud.username;
     this.creator = SnapCloud.username ? SnapCloud.username : "anonymous";
     this.projectName = string.replace(/['"]/g, '');
+  
+    this.controlBar.updateLabel();
 
     return name;
 };
+
+
 
 
 IDE_Morph.prototype.createSpriteBar = function () {
@@ -2458,6 +2472,8 @@ IDE_Morph.prototype.createSpriteEditor = function(){
     this.originalCreateSpriteEditor();
     this.spriteEditor.color = new Color(240, 240, 240);
     this.currentSprite.scripts.color = new Color(240, 240, 240);
+    this.spriteEditor.mouseEnterDragging = nop;
+    this.spriteEditor.contents.mouseEnterDragging =nop;	
 };
 
 /* CORRAL BAR */

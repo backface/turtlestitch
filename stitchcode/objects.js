@@ -1223,7 +1223,7 @@ SpriteMorph.prototype.setBrightness = function (num) {
 };
 
 SpriteMorph.prototype.changeBrightness = function (delta) {
-    this.setBrightness(this.getBrightness() + (+delta || 0));
+    this.setBrightness(this.getBrightness() +  (delta || 0));
 };
 
 SpriteMorph.prototype.setSaturation = function (num) {
@@ -1237,7 +1237,7 @@ SpriteMorph.prototype.getSaturation = function () {
 };
 
 SpriteMorph.prototype.changeSaturation= function (delta) {
-    this.setSaturation(this.getSaturation() + (+delta || 0));
+    this.setSaturation(this.getSaturation() + (delta || 0));
 };
 
 SpriteMorph.prototype.setHSB = function (channel, value) {
@@ -1269,7 +1269,7 @@ SpriteMorph.prototype.changeHSB = function (channel, value) {
     } else if (channel == 'saturation') {
        return this.changeSaturation(value);
     } else if (channel == 'brightness') {
-        return this.changeBrightnes(value);
+        return this.changeBrightness(value);
     }
 };
 
