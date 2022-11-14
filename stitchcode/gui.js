@@ -1996,7 +1996,7 @@ IDE_Morph.prototype.createCategories = function () {
 
         button.category = category;
         button.corner = 8;
-        button.padding = 0;
+        button.padding = 2;
         button.labelShadowOffset = new Point(-1, -1);
         button.labelShadowColor = colors[1];
         button.labelColor = myself.buttonLabelColor;
@@ -2030,7 +2030,7 @@ IDE_Morph.prototype.createCategories = function () {
             button.setPosition(new Point(
                 l + (col * xPadding + ((col - 1) * buttonWidth)),
                 t + ((row + 1) * yPadding + (row * buttonHeight) + border) +
-                    (i > 9 ? border + 2 : 0)
+                    (i > 9 ?0 : 0)
             ));
         });
 
@@ -2261,6 +2261,35 @@ IDE_Morph.prototype.projectMenu = function () {
             new Color(100, 0, 0)
         );
     }
+    
+    menu.addLine();
+    if (this.stage.globalBlocks.length) {
+        menu.addItem(
+            'Export blocks...',
+            () => this.exportGlobalBlocks(),
+            'save global custom block\ndefinitions as XML'
+        );
+        menu.addItem(
+            'Unused blocks...',
+            () => this.removeUnusedBlocks(),
+            'find unused global custom blocks' +
+                '\nand remove their definitions'
+        );
+    }
+    menu.addItem(
+        'Hide blocks...',
+        () => new BlockVisibilityDialogMorph(this.currentSprite).popUp(world)
+    );
+    menu.addItem(
+        'New category...',
+        () => this.createNewCategory()
+    );
+    if (SpriteMorph.prototype.customCategories.size) {
+        menu.addItem(
+            'Remove a category...',
+            () => this.deleteUserCategory(pos)
+        );
+    }    
 
     menu.addLine();
     menu.addItem(
@@ -2281,6 +2310,8 @@ IDE_Morph.prototype.projectMenu = function () {
         'Select categories of additional blocks to add to this project.'
     );
 
+// disable cloud
+/*
     menu.addLine();
 
 	if (shiftClicked) {
@@ -2311,6 +2342,7 @@ IDE_Morph.prototype.projectMenu = function () {
 			'logout'
 		);
 	}
+  */
     if (shiftClicked) {
         menu.addLine();
         menu.addItem(
