@@ -294,6 +294,9 @@ SpriteMorph.prototype.stopRunning = function () {
 }
 
 SpriteMorph.prototype.runningStitch = function (length, autoadjust=true) {
+  if (!isFinite(length)) {
+    throw new Error('length must not be Infinity');
+  }
 	if (length > 0) {
 		this.isRunning = true;
 		this.stitchoptions = {
@@ -302,12 +305,14 @@ SpriteMorph.prototype.runningStitch = function (length, autoadjust=true) {
     }
     this.stitchtype = 0;
 	} else {
-		this.stitchtype = 0;
-		this.stitchoptions = {};
+		throw new Error('length must be larger than zero');
 	}
 }
 
 SpriteMorph.prototype.beanStitch = function (length, autoadjust=true) {
+  if (!isFinite(length)) {
+    throw new Error('length must not be Infinity');
+  }
 	if (length > 0) {
     this.stitchtype = "bean";
 		this.isRunning = true;
@@ -316,12 +321,17 @@ SpriteMorph.prototype.beanStitch = function (length, autoadjust=true) {
       autoadjust: autoadjust
     }
 	} else {
-		this.stitchtype = 0;
-		this.stitchoptions = {};
+		throw new Error('length must be larger than zero');
 	}
 }
 
 SpriteMorph.prototype.crossStitch = function (length, width=10, center=true, autoadjust=true) {
+  if (!isFinite(length)) {
+    throw new Error('length must not be Infinity');
+  }
+  if (!isFinite(width)) {
+    throw new Error('width must not be Infinity');
+  }
 	if (length > 0 && width > 0) {
     this.stitchtype = "cross";
 		this.isRunning = true;
@@ -331,10 +341,18 @@ SpriteMorph.prototype.crossStitch = function (length, width=10, center=true, aut
       width: width,
       center: center,
     }
-	}
+	} else {
+    throw new Error('length and width must be larger than zero');
+  }
 }
 
 SpriteMorph.prototype.zigzagStitch = function (density, width=10, center=true, autoadjust=true) {
+  if (!isFinite(density)) {
+    throw new Error('length must not be Infinity');
+  }
+  if (!isFinite(width)) {
+    throw new Error('width must not be Infinity');
+  }
 	if (density > 0 && width > 0) {
     this.stitchtype = "zigzag";
 		this.isRunning = true;
@@ -344,10 +362,18 @@ SpriteMorph.prototype.zigzagStitch = function (density, width=10, center=true, a
       width: width,
       length: density,
     }
-	}
+	} else {
+    throw new Error('density and width must be larger than zero');
+  }
 }
 
 SpriteMorph.prototype.ZStitch = function (density, width=10, center=true, autoadjust=true) {
+  if (!isFinite(density)) {
+    throw new Error('length must not be Infinity');
+  }
+  if (!isFinite(width)) {
+    throw new Error('width must not be Infinity');
+  }
 	if (density > 0 && width > 0) {
     this.stitchtype = "Z";
 		this.isRunning = true;
@@ -357,11 +383,15 @@ SpriteMorph.prototype.ZStitch = function (density, width=10, center=true, autoad
       width: width,
       length: density,
     }
-	}
+	} else {
+    throw new Error('density and width must be larger than zero');
+  }
 }
 
-
 SpriteMorph.prototype.satinStitch = function (width=10, center=true, autoadjust=true) {
+  if (!isFinite(width)) {
+    throw new Error('width must not be Infinity');
+  }
 	if (width > 0) {
     this.stitchtype = "zigzag";
 		this.isRunning = true;
@@ -371,10 +401,21 @@ SpriteMorph.prototype.satinStitch = function (width=10, center=true, autoadjust=
       length: 2,
       center: center,
     }
-	}
+	} else {
+    throw new Error('width must be larger than zero');
+  }
 }
 
 SpriteMorph.prototype.tatamiStitch = function (width=100, interval=30, center=false, offset=0) {
+  if (!isFinite(width)) {
+    throw new Error('width must not be Infinity');
+  }
+  if (!isFinite(interval)) {
+    throw new Error('interval must not be Infinity');
+  }
+  if (!isFinite(offset)) {
+    throw new Error('offset must not be Infinity');
+  }
 	if (width > 0) {
     this.stitchtype = "tatami";
 		this.isRunning = true;
@@ -383,11 +424,13 @@ SpriteMorph.prototype.tatamiStitch = function (width=100, interval=30, center=fa
       width: width,
       length: 4,
       center: center,
-      interval:  Math.max(10,interval),
+      interval:  Math.max(10, interval),
       offset: Math.min(offset,interval),
       segment_count: 0,
     }
-	}
+	} else {
+    throw new Error('width must be larger than zero');
+  }
 }
 
 SpriteMorph.prototype.trimStitch = function (on = true) {
@@ -437,6 +480,9 @@ SpriteMorph.prototype.tieStitch = function () {
 
 SpriteMorph.prototype.origForward = SpriteMorph.prototype.forward;
 SpriteMorph.prototype.forward = function (steps) {
+    if (!isFinite(steps)) {
+      throw new Error('can\'t move to Infinity');
+    }
     var dest,
         dist = steps; //* this.parent.scale || 0;
         stage = this.parentThatIsA(StageMorph);
@@ -493,6 +539,13 @@ SpriteMorph.prototype.forwardBy = function (totalsteps, stepsize) {
 
 
 SpriteMorph.prototype.arcRight = function (radius, degrees) {
+    //radius = !isFinite(+radius) ? 0 : radius;
+    if (!isFinite(degrees)) {
+      throw new Error('degrees must not be Infinity');
+    }
+    if (!isFinite(radius)) {
+      throw new Error('radius must not be Infinity');
+    }
     if (degrees > 0) {    
       for (let n=0; n < Math.floor(degrees / 10.0); n++) {
           this.turn(5);
@@ -506,13 +559,18 @@ SpriteMorph.prototype.arcRight = function (radius, degrees) {
       }
     } else if (degrees < 0) {      
       this.arcLeft(radius, Math.abs(degrees))
-    } else {
-      throw new Error('degrees must not be zero');
     }
 };
 
 
 SpriteMorph.prototype.arcLeft = function (radius, degrees) {
+    //radius = !isFinite(+radius) ? 0 : radius;
+    if (!isFinite(degrees)) {
+      throw new Error('degrees must not be Infinity');
+    }
+    if (!isFinite(radius)) {
+      throw new Error('radius must not be Infinity');
+    }
     if (degrees > 0) {
       for (let n=0; n < Math.floor(degrees / 10.0); n++) {
           this.turn(-5);
@@ -526,8 +584,6 @@ SpriteMorph.prototype.arcLeft = function (radius, degrees) {
       }
     } else if (degrees < 0) {  
       this.arcRight(radius, Math.abs(degrees))
-    } else {
-      throw new Error('degrees must not be zero');
     }
 };
 
@@ -556,8 +612,6 @@ SpriteMorph.prototype.forwardSegemensWithEndCheck = function(steps, stepsize) {
         this.tatamiForwardEnd(stepsize, this.stitchoptions.width)
   }
 }
-
-
 
 SpriteMorph.prototype.beanStitchForward = function (steps) {
     this.doMoveForward(steps*this.sign);
@@ -817,8 +871,14 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
 
     if (!stage) {return; }
 
-    x = !isFinite(+x) ? 0 : +x;
-    y = !isFinite(+y) ? 0 : +y;
+    if (!isFinite(x)) {
+      throw new Error('x must not by Infinity');
+    }
+    if (!isFinite(y)) {
+      throw new Error('y must not by Infinity');
+    }
+    //x = !isFinite(+x) ? 0 : +x;
+    //y = !isFinite(+y) ? 0 : +y;
 
     var dest = new Point(x, y).subtract(new Point(this.xPosition(), this.yPosition()));
     var a = (x - this.xPosition());
@@ -925,8 +985,14 @@ SpriteMorph.prototype.gotoXYIn = function (x, y, steps) {
 
     if (!stage) {return; }
 
-    x = !isFinite(+x) ? 0 : +x;
-    y = !isFinite(+y) ? 0 : +y;
+    if (!isFinite(x)) {
+      throw new Error('x must not by Infinity');
+    }
+    if (!isFinite(y)) {
+      throw new Error('y must not by Infinity');
+    }
+    //x = !isFinite(+x) ? 0 : +x;
+    //y = !isFinite(+y) ? 0 : +y;
 
     var dest = new Point(x, y).subtract(
                   new Point(this.xPosition(), this.yPosition()));
@@ -955,14 +1021,19 @@ SpriteMorph.prototype.gotoXYIn = function (x, y, steps) {
 
 
 SpriteMorph.prototype.pointTowards = function (x, y) {
-    var stage = this.parentThatIsA(StageMorph);
-    var dest;
+  var stage = this.parentThatIsA(StageMorph);
+  var dest;
 
-    if (!stage) {return; }
+  if (!stage) {return; }
 
-    x = !isFinite(+x) ? 0 : +x;
-    y = !isFinite(+y) ? 0 : +y;
-
+  if (!isFinite(x)) {
+    throw new Error('x must not by Infinity');
+  }
+  if (!isFinite(y)) {
+    throw new Error('y must not by Infinity');
+  }
+  //x = !isFinite(+x) ? 0 : +x;
+  //y = !isFinite(+y) ? 0 : +y;
 
 	var deltaX = (x - this.xPosition()) * this.parent.scale;
 	var deltaY = (y - this.yPosition()) * this.parent.scale;
@@ -975,11 +1046,17 @@ SpriteMorph.prototype.pointTowards = function (x, y) {
 };
 
 SpriteMorph.prototype.drawText = function (text, size) {
+  if (!isFinite(size)) {
+    throw new Error('size must not by Infinity');
+  }
   size = Math.max(21, size);
   return this.drawTextScale(text, size/21.0, false);
 }
 
 SpriteMorph.prototype.drawTextDev = function (text, size, trim) {
+  if (!isFinite(size)) {
+    throw new Error('size must not by Infinity');
+  }
   size = Math.max(21, size);
   return this.drawTextScale(text, size/21.0, trim);
 }
@@ -990,6 +1067,9 @@ SpriteMorph.prototype.drawTextScale = function (text, scale, trim) {
   var myself = this;
 
   if (!stage) {return; }
+  if (!isFinite(scale)) {
+    throw new Error('scale must not by Infinity');
+  }
 
 	function doAJump(x, y) {
 		var penState = myself.isDown;
@@ -1096,17 +1176,16 @@ SpriteMorph.prototype.drawTextScale = function (text, scale, trim) {
 	}
 };
 
-
-  SpriteMorph.prototype.getTextLength = function (text, size) {
-
+SpriteMorph.prototype.getTextLength = function (text, size) {
+  if (!isFinite(size)) {
+    throw new Error('size must not by Infinity');
+  }
   scale = size/21.0;
-
   var stage = this.parentThatIsA(StageMorph);
   var dest;
   var myself = this;
 
   if (!stage) {return; }
-
 
 	if (stage.fonts) {
     var x = 0;
@@ -1153,9 +1232,12 @@ SpriteMorph.prototype.drawTextScale = function (text, scale, trim) {
 
 SpriteMorph.prototype.origSetHeading = SpriteMorph.prototype.setHeading;
 SpriteMorph.prototype.setHeading = function (degrees) {
-    var stage = this.parentThatIsA(StageMorph);
-    this.origSetHeading(degrees);
-    stage.rotateTurtle(this.heading);
+  if (!isFinite(degrees)) {
+    throw new Error('degrees must not by Infinity');
+  }
+  var stage = this.parentThatIsA(StageMorph);
+  this.origSetHeading(degrees);
+  stage.rotateTurtle(this.heading);
 };
 
 
@@ -1172,6 +1254,9 @@ SpriteMorph.prototype.setColor = function (aColor) {
 
 
 SpriteMorph.prototype.setColorRGB = function (r,g,b) {
+  if (!isFinite(a) || !isFinite(b) || !isFinite(c)) {
+    throw new Error('value must not by Infinity');
+  }
 	var a = this.color.a;
 	r = Math.max(Math.min(r, 255), 0);
 	b = Math.max(Math.min(b, 255), 0);
@@ -1180,6 +1265,9 @@ SpriteMorph.prototype.setColorRGB = function (r,g,b) {
 };
 
 SpriteMorph.prototype.setColorHSV = function (h, s, v) {
+  if (!isFinite(a) || !isFinite(b) || !isFinite(c)) {
+    throw new Error('value must not by Infinity');
+  }
 	var col = new Color();
 	h = Math.max(Math.min(h, 1), 0);
 	s = Math.max(Math.min(s, 1), 0);
@@ -1198,17 +1286,23 @@ SpriteMorph.prototype.getHue = function () {
 };
 
 SpriteMorph.prototype.setHue = function (num) {
-    var hsv = this.color.hsv(),
-        n = +num;
-    if (n < 0 || n > 360) { // wrap the hue
-        n = (n < 0 ? 360 : 0) + n % 360;
-    }
-    hsv[0] = n / 360;
-    this.setColorHSV(hsv[0],hsv[1],hsv[2]);
+ if (!isFinite(num)) {
+    throw new Error('value must not by Infinity');
+  }
+  var hsv = this.color.hsv(),
+      n = +num;
+  if (n < 0 || n > 360) { // wrap the hue
+      n = (n < 0 ? 360 : 0) + n % 360;
+  }
+  hsv[0] = n / 360;
+  this.setColorHSV(hsv[0],hsv[1],hsv[2]);
 };
 
 SpriteMorph.prototype.changeHue = function (delta) {
-    this.setHue(this.getHue() + (+delta || 0));
+ if (!isFinite(delta)) {
+    throw new Error('value must not by Infinity');
+  }
+  this.setHue(this.getHue() + (+delta || 0));
 };
 
 SpriteMorph.prototype.getBrightness = function () {
@@ -1216,10 +1310,12 @@ SpriteMorph.prototype.getBrightness = function () {
 };
 
 SpriteMorph.prototype.setBrightness = function (num) {
-    var hsv = this.color.hsv();
-    hsv[2] = Math.max(Math.min(+num || 0, 100), 0) / 100; // shade doesn't wrap
-    this.setColorHSV(hsv[0],hsv[1],hsv[2]);
-
+ if (!isFinite(num)) {
+    throw new Error('value must not by Infinity');
+  }
+  var hsv = this.color.hsv();
+  hsv[2] = Math.max(Math.min(+num || 0, 100), 0) / 100; // shade doesn't wrap
+  this.setColorHSV(hsv[0],hsv[1],hsv[2]);
 };
 
 SpriteMorph.prototype.changeBrightness = function (delta) {
@@ -1227,9 +1323,12 @@ SpriteMorph.prototype.changeBrightness = function (delta) {
 };
 
 SpriteMorph.prototype.setSaturation = function (num) {
-    var hsv = this.color.hsv();
-    hsv[1] = Math.max(Math.min(+num || 0, 100), 0) / 100; // shade doesn't wrap
-    this.setColorHSV(hsv[0],hsv[1],hsv[2]);
+ if (!isFinite(num)) {
+    throw new Error('value must not by Infinity');
+  }
+  var hsv = this.color.hsv();
+  hsv[1] = Math.max(Math.min(+num || 0, 100), 0) / 100; // shade doesn't wrap
+  this.setColorHSV(hsv[0],hsv[1],hsv[2]);
 };
 
 SpriteMorph.prototype.getSaturation = function () {
@@ -1274,6 +1373,9 @@ SpriteMorph.prototype.changeHSB = function (channel, value) {
 };
 
 SpriteMorph.prototype.setOpacity = function (value) {
+  if (!isFinite(value)) {
+    throw new Error('value must not by Infinity');
+  }
 	value = Math.max(Math.min(value, 100), 0);
 	this.color.a = value / 100;
     this.setColor(this.color);
@@ -1284,7 +1386,10 @@ SpriteMorph.prototype.getOpacity = function (value) {
 };
 
 SpriteMorph.prototype.changeOpacity= function (delta) {
-    this.setOpacity(this.getOpacity() + (+delta || 0));
+  if (!isFinite(delta)) {
+    throw new Error('value must not by Infinity');
+  }
+  this.setOpacity(this.getOpacity() + (+delta || 0));
 };
 
 SpriteMorph.prototype.setColorHex = function (hex) {
@@ -1332,12 +1437,15 @@ SpriteMorph.prototype.getPenSize = function (){
 }
 
 SpriteMorph.prototype.setSize = function (size) {
-    var stage = this.parentThatIsA(StageMorph);
-    if (!isNaN(size)) {
-        this.size = Math.min(Math.max(+size, 0.0001), 1000);
-    }
-    stage.setPenSize(this.size);
-    stage.turtleShepherd.setPenSize(this.size);
+  if (!isFinite(size)) {
+    throw new Error('value must not by Infinity');
+  }
+  var stage = this.parentThatIsA(StageMorph);
+  if (!isNaN(size)) {
+      this.size = Math.min(Math.max(+size, 0.0001), 1000);
+  }
+  stage.setPenSize(this.size);
+  stage.turtleShepherd.setPenSize(this.size);
 };
 
 
