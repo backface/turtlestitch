@@ -1,5 +1,5 @@
 
-Process.prototype.proxy = 'https://turtlestitch.org:8080';
+Process.prototype.proxy = 'https://cors-proxy.turtlestitch.org';
 Process.prototype.enableJS = true;
 
 Process.prototype.reportMouseX = function () {
