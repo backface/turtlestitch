@@ -1265,7 +1265,7 @@ SpriteMorph.prototype.setColorRGB = function (r,g,b) {
 };
 
 SpriteMorph.prototype.setColorHSV = function (h, s, v) {
-  if (!isFinite(a) || !isFinite(b) || !isFinite(c)) {
+  if (!isFinite(h) || !isFinite(s) || !isFinite(v)) {
     throw new Error('value must not by Infinity');
   }
 	var col = new Color();
