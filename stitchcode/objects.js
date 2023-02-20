@@ -1254,7 +1254,7 @@ SpriteMorph.prototype.setColor = function (aColor) {
 
 
 SpriteMorph.prototype.setColorRGB = function (r,g,b) {
-  if (!isFinite(a) || !isFinite(b) || !isFinite(c)) {
+  if (!isFinite(r) || !isFinite(b) || !isFinite(g)) {
     throw new Error('value must not by Infinity');
   }
 	var a = this.color.a;
