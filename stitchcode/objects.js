@@ -491,6 +491,25 @@ SpriteMorph.prototype.forward = function (steps) {
     oldx = this.xPosition();
     oldy = this.yPosition();
 
+    var oldPosition = new Point(oldx,oldy);
+    var destInStage;
+    if (dist >= 0) {
+        destInStage = oldPosition.distanceAngle(dist, this.heading);
+    } else {
+        destInStage = oldPosition.distanceAngle(Math.abs(dist),  (this.heading - 180));
+    }	
+	
+    var deltaX = destInStage.x - oldPosition.x;
+    var deltaY = destInStage.y - oldPosition.y;
+
+    this.parts.forEach(part => part.gotoXY(part.xPosition()+deltaX, part.yPosition()+deltaY,false,true));
+    if (this.isTemporary) {
+        if (dist != 0) {
+	    this.setPosition(dest,true);
+	}
+        return;
+    }
+	
     if (dist >= 0) {
         dest = this.position().distanceAngle(dist, this.heading);
     } else {
@@ -829,7 +848,7 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
 	}
 
 	if (dist != 0) {
-		this.setPosition(dest);
+		this.setPosition(dest,true);
 
     // this is a quick hack but delaying the rerender seems to get rid of the
     // grey square that shows as a rendering error (still don't know where it
@@ -894,6 +913,15 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
     angle = angle + 90;
     //if (angle==-90) angle = 270;
 
+    var deltaXinStage = x -this.xPosition();
+    var deltaYinStage = y - this.yPosition();
+    this.parts.forEach(part => part.gotoXY(part.xPosition()+deltaXinStage, part.yPosition()+deltaYinStage,false,true));
+
+    if (this.isTemporary) {
+        this.origGotoXY(x, y, true, noShadow);
+        return;
+    }
+	
     if ( Math.round(dist,5) <= 0.0001) {
 		  // jump in place - don't add / ignore
 		  //console.log("jump in place - don't add / ignore",  this.isDown,this.xPosition(), this.yPosition(), dist);
@@ -930,7 +958,7 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
 				this.gotoXY(x,y);
 			}
 		} else {
-			this.origGotoXY(x, y, justMe);
+			this.origGotoXY(x, y, true);
 
       // dont' stitch if is zero value length
       // - shoud we filter out all noShadows?
