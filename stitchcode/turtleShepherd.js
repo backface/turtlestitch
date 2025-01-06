@@ -843,6 +843,70 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
     return expUintArr;
 };
 
+TurtleShepherd.prototype.toPES = function(name="noname") {
+    var expArr = [];
+
+    function writeString(str, length=null, padWithSpace=true) {
+        if(length === null) {
+            length = str.length;
+        }
+		for(var i = 0; i<length; i++) {
+			if (i < str.length) {
+				expArr.push(str[i].charCodeAt(0));
+			} else {
+				if (padWithSpace) {
+					expArr.push(0x20);
+				} else {
+					expArr.push(0x00);
+				}
+			}
+		}
+	}
+
+    function writeInt16Le(value) {
+        expArr.push((value >> 0) & 0xFF);
+        expArr.push((value >> 8) & 0xFF);
+    }
+
+    // identification and version
+	writeString("#PES0001");
+	
+	// remaining PES v1 header section
+	expArr.push(0x16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	// from here on, it's all PEC
+	
+	// PEC header
+	writeString("LA:" + name.substr(0, 8), 19, true); // 20 bytes name, typically truncated at 8 chars, padded with spaces
+	expArr.push(0x0D); // carriage return
+	writeString("", 12, true);
+	expArr.push(0xFF, 0x00);
+	expArr.push(48/8); // icon width: 48; divided by 8 (pixels per byte)
+	expArr.push(38); // icon height: 38
+	writeString("", 12, true);
+    // number of thread colors minus one, 0xFF means 0 colors;
+    // assume thread color and therefore write value 0 here
+    expArr.push(0);
+    // color index of that one thread color    
+    expArr.push(1);
+    // fill the remaining space reserved for colors
+	writeString("", 462, true);
+
+    // PEC block
+    expArr.push(0, 0, 0, 0, 0, 0x31, 0xFF, 0xF0);
+    width = 42; // FIXME
+    height = 42; // FIXME
+    writeInt16Le(width);
+    writeInt16Le(height);
+    writeInt16Le(0x1E0);
+    writeInt16Le(0x1B0);
+    // to be continued ...
+
+    expUintArr = new Uint8Array(expArr.length);
+    for (i=0;i<expArr.length;i++) {
+        expUintArr[i] = expArr[i];
+    }
+    return expUintArr;
+}
 
 TurtleShepherd.prototype.getStitchesAsArr = function () {
   stitches = [];
