@@ -868,19 +868,43 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
         expArr.push((value >> 8) & 0xFF);
     }
 
+    function writeInt24Le(value) {
+        expArr.push((value >> 0) & 0xFF);
+        expArr.push((value >> 8) & 0xFF);
+        expArr.push((value >> 16) & 0xFF);
+    }
+
+    function writeInt32Le(value) {
+        expArr.push((value >> 0) & 0xFF);
+        expArr.push((value >> 8) & 0xFF);
+        expArr.push((value >> 16) & 0xFF);
+        expArr.push((value >> 24) & 0xFF);
+    }
+
+    function updateInt24Le(value, pos) {
+        expArr[pos] = (value >> 0) & 0xFF;
+        expArr[pos+1] = (value >> 8) & 0xFF;
+        expArr[pos+2] = (value >> 16) & 0xFF;
+    }
+
     // identification and version
 	writeString("#PES0001");
 	
 	// remaining PES v1 header section
-	expArr.push(0x16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	// from here on, it's all PEC
+	writeInt32Le(0x16); // location of PEC block
 	
+	writeInt16Le(0);
+	writeInt16Le(0);
+	writeInt16Le(0);
+	expArr.push(0xFF, 0xFF, 0, 0); // end of the header
+	// from here on, it's all PEC
+
 	// PEC header
 	writeString("LA:" + name.substr(0, 8), 19, true); // 20 bytes name, typically truncated at 8 chars, padded with spaces
 	expArr.push(0x0D); // carriage return
 	writeString("", 12, true);
 	expArr.push(0xFF, 0x00);
-	expArr.push(48/8); // icon width: 48; divided by 8 (pixels per byte)
+	expArr.push(6); // icon width: 48; divided by 8 (pixels per byte)
 	expArr.push(38); // icon height: 38
 	writeString("", 12, true);
     // number of thread colors minus one, 0xFF means 0 colors;
@@ -892,14 +916,26 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
 	writeString("", 462, true);
 
     // PEC block
-    expArr.push(0, 0, 0, 0, 0, 0x31, 0xFF, 0xF0);
-    width = 42; // FIXME
-    height = 42; // FIXME
+    stitchBlockStartPos = expArr.length;
+    expArr.push(0, 0);
+    stitchBlockLenPos = expArr.length; // recall byte position where we place the spaceholder
+    writeInt24Le(0); // spaceholder for stitch block length
+    expArr.push(0x31, 0xFF, 0xF0);
+    width = 1000; // FIXME (is this in multiple of 0.1mm?)
+    height = 1000; // FIXME (is this in multiple of 0.1mm?)
     writeInt16Le(width);
     writeInt16Le(height);
     writeInt16Le(0x1E0);
     writeInt16Le(0x1B0);
-    // to be continued ...
+    // pecEncode(); // TODO: implement
+    // calculate stitch block length value and update in the binary data
+    stitchBlockLen = expArr.length - stitchBlockStartPos;
+    updateInt24Le(stitchBlockLen, stitchBlockLenPos);
+
+    // PEC thumbnail images for every color (use blank for now)
+    for (i=0;i<6*38*2;i++) {
+        expArr.push(0);
+    }
 
     expUintArr = new Uint8Array(expArr.length);
     for (i=0;i<expArr.length;i++) {
