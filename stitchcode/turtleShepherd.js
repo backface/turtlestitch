@@ -886,6 +886,28 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
         expArr[pos+1] = (value >> 8) & 0xFF;
         expArr[pos+2] = (value >> 16) & 0xFF;
     }
+    
+    function pecEncode() {
+        // PES stitch list
+        // TODO: implement proper functionality
+        
+        /*
+        // FIXME: cannot access this.cache here!
+		for (var i=0; i < this.cache.length; i++) {
+		    // TODO: step through this code!
+			if (this.cache[i].cmd == "color") {
+			} else if (this.cache[i].cmd == "pensize") {
+			} else if (this.cache[i].cmd == "move") {
+			} else {
+			}
+		}
+		*/
+
+        // Mockery with dx and dy coordinates (in short form)
+        expArr.push(0x04, 0x04, 0x05, 0x05, 0x06, 0x06, 0x07, 0x07, 0x08, 0x08);
+
+        expArr.push(0xFF); // file end
+    }
 
     // identification and version
 	writeString("#PES0001");
@@ -927,14 +949,19 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
     writeInt16Le(height);
     writeInt16Le(0x1E0);
     writeInt16Le(0x1B0);
-    // pecEncode(); // TODO: implement
+    pecEncode(); // TODO: implement proper functionality
     // calculate stitch block length value and update in the binary data
     stitchBlockLen = expArr.length - stitchBlockStartPos;
     updateInt24Le(stitchBlockLen, stitchBlockLenPos);
 
-    // PEC thumbnail images for every color (use blank for now)
+    // PEC thumbnail images for every color (use chessboard alike pattern for now)
+    patternByte = 0xAA;
     for (i=0;i<6*38*2;i++) {
-        expArr.push(0);
+        if(i % 6 == 0) {
+            // swap pattern bytes
+            patternByte = (patternByte == 0xAA) ? 0x55 : 0xAA;
+        }
+        expArr.push(patternByte);
     }
 
     expUintArr = new Uint8Array(expArr.length);
