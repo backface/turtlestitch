@@ -5,6 +5,7 @@
     Embroidery function for Javscript
     ------------------------------------------------------------------
     Copyright (C) 2016-2021 Michael Aschauer
+    Copyright (C) 2025 maehw
 
 */
 
@@ -886,28 +887,6 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
         expArr[pos+1] = (value >> 8) & 0xFF;
         expArr[pos+2] = (value >> 16) & 0xFF;
     }
-    
-    function pecEncode() {
-        // PES stitch list
-        // TODO: implement proper functionality
-        
-        /*
-        // FIXME: cannot access this.cache here!
-		for (var i=0; i < this.cache.length; i++) {
-		    // TODO: step through this code!
-			if (this.cache[i].cmd == "color") {
-			} else if (this.cache[i].cmd == "pensize") {
-			} else if (this.cache[i].cmd == "move") {
-			} else {
-			}
-		}
-		*/
-
-        // Mockery with dx and dy coordinates (in short form)
-        expArr.push(0x04, 0x04, 0x05, 0x05, 0x06, 0x06, 0x07, 0x07, 0x08, 0x08);
-
-        expArr.push(0xFF); // file end
-    }
 
     // identification and version
 	writeString("#PES0001");
@@ -922,12 +901,15 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
 	// from here on, it's all PEC
 
 	// PEC header
+	const iconWidth = 48;
+	const iconWidthBytes = iconWidth/8; // icon width in bytes: icon width in pixels divided by 8 pixels per byte
+	const iconHeight = 38; // icon height (in pixels)
 	writeString("LA:" + name.substr(0, 8), 19, true); // 20 bytes name, typically truncated at 8 chars, padded with spaces
 	expArr.push(0x0D); // carriage return
 	writeString("", 12, true);
 	expArr.push(0xFF, 0x00);
-	expArr.push(6); // icon width: 48; divided by 8 (pixels per byte)
-	expArr.push(38); // icon height: 38
+	expArr.push(iconWidthBytes); 
+	expArr.push(iconHeight);
 	writeString("", 12, true);
     // number of thread colors minus one, 0xFF means 0 colors;
     // assume thread color and therefore write value 0 here
@@ -949,14 +931,44 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
     writeInt16Le(height);
     writeInt16Le(0x1E0);
     writeInt16Le(0x1B0);
-    pecEncode(); // TODO: implement proper functionality
+
+    // Perform actual encoding of PEC stitch list subsection
+    // TODO: implement proper functionality
+	for (var i=0; i < this.cache.length; i++) {
+	    // TODO: step through this code!
+		if (this.cache[i].cmd == "color") {
+		} else if (this.cache[i].cmd == "pensize") {
+		} else if (this.cache[i].cmd == "move") {
+		} else {
+		}
+	}
+    // Mockery with dx and dy coordinates (in short form)
+    // delta of 0x0A represents 10 units of 0.1 mm each, i.e. 1 mm
+    // delta of 0x76 represents -10 units (MSBit 0; then 7 bit two's complement) of 0.1 mm each, i.e. 1 mm
+    for (var i=0; i<20; i++) {
+        expArr.push(0x0A, 0x0A); // go diagonally
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x0A, 0x00); // go x only
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x00, 0x0A); // go y only
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x76, 0x00); // go -x only
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x00, 0x76); // go -y only
+    }
+    expArr.push(0xFF); // file end
+
     // calculate stitch block length value and update in the binary data
     stitchBlockLen = expArr.length - stitchBlockStartPos;
     updateInt24Le(stitchBlockLen, stitchBlockLenPos);
 
     // PEC thumbnail images for every color (use chessboard alike pattern for now)
     patternByte = 0xAA;
-    for (i=0;i<6*38*2;i++) {
+    for (i=0;i<iconWidthBytes*iconHeight*2;i++) {
         if(i % 6 == 0) {
             // swap pattern bytes
             patternByte = (patternByte == 0xAA) ? 0x55 : 0xAA;
