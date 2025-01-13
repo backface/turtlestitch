@@ -933,18 +933,64 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
     writeInt16Le(0x1B0);
 
     // Perform actual encoding of PEC stitch list subsection
+    lastStitch = null;
+    hasFirst = false;
+    scale = this.scale;
     // TODO: implement proper functionality
 	for (var i=0; i < this.cache.length; i++) {
-	    // TODO: step through this code!
 		if (this.cache[i].cmd == "color") {
-		} else if (this.cache[i].cmd == "pensize") {
 		} else if (this.cache[i].cmd == "move") {
-		} else {
+            stitch = this.cache[i];
+            if (!hasFirst) {
+                x0 = Math.round(stitch.x * scale);
+                y0 = -Math.round(stitch.y * scale);
+
+                dx = x0;
+                dy = y0;
+                lastStitch = {cmd: "move", x: x0, y: y0, penDown: stitch.penDown}             
+                hasFirst = true;
+            } else if (hasFirst) {
+                x1 = Math.round(stitch.x * scale);
+                y1 = -Math.round(stitch.y * scale);
+                x0 = Math.round(lastStitch.x * scale);
+                y0 = -Math.round(lastStitch.y * scale);
+
+                dx = x1 - x0
+                dy = y1 - y0
+            }
+            
+            // check whether to encode in short or long form;
+            // jump and trim stitches are probably not handled correctly at the moment (FIXME!)
+            dmax = Math.max(Math.abs(dx), Math.abs(dy));
+
+            if(stitch.penDown && dmax < 127) {
+                // short form (1 byte) indicated by MSBit=0; 7 bit for delta
+                expArr.push(dx & 0x7F, dy & 0x7F);
+                
+            } else if(dmax < 2047) {
+                // long form (2 bytes) indicated by MSBit=1; 12 bit for delta
+                let msBits = 0x80;
+                //if(!stitch.penDown) {
+                //    msBits |= 0x10; // make it a jump stitch (FIXME: doesn't work as expected)
+                //}
+                expArr.push(msBits | ((dx >> 8) & 0x0F));
+                expArr.push(dx & 0xFF);
+                expArr.push(msBits | ((dy >> 8) & 0x0F));
+                expArr.push(dy & 0xFF);
+            } else {
+            
+                // TODO: cannot encode; break this down into multiple stitches?!
+                //       are there other ways of communicating errors to the user?
+                console.log("PES/PEC export: cannot encode stitch!");
+            }
+
+            lastStitch = stitch;
 		}
 	}
     // Mockery with dx and dy coordinates (in short form)
     // delta of 0x0A represents 10 units of 0.1 mm each, i.e. 1 mm
     // delta of 0x76 represents -10 units (MSBit 0; then 7 bit two's complement) of 0.1 mm each, i.e. 1 mm
+    /*
     for (var i=0; i<20; i++) {
         expArr.push(0x0A, 0x0A); // go diagonally
     }
@@ -960,6 +1006,7 @@ TurtleShepherd.prototype.toPES = function(name="noname") {
     for (var i=0; i<20; i++) {
         expArr.push(0x00, 0x76); // go -y only
     }
+    */
     expArr.push(0xFF); // file end
 
     // calculate stitch block length value and update in the binary data
