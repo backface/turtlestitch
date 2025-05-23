@@ -1,4 +1,4 @@
-VERSION="2.7.19"
+VERSION="2.7.20-dev - mooddle-dev"
 
 // get debug mode
 url = new URL(window.location.href);
