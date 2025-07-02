@@ -1892,11 +1892,17 @@ SpriteMorph.prototype.initBlocks = function () {
         category: 'other'
     };
 
-  	this.blocks.reportPi = {
-  		type: 'reporter',
-  		category: 'operators',
-  		spec: 'PI',
-  	};
+    this.blocks.reportPi = {
+  	type: 'reporter',
+  	category: 'operators',
+  	spec: 'PI',
+    };
+    this.blocks.receiveInteraction = {
+        type: 'hat',
+        category: 'control',
+        spec: 'when stage is %interaction',
+        defaults: ['clicked']
+    };	
 };
 
 SpriteMorph.prototype.initBlocks();
@@ -3421,4 +3427,11 @@ SpriteMorph.prototype.palette = function (category) {
       };
     }
     return this.paletteCache[category];
+};
+
+StageMorph.prototype.mouseClickLeft = function () {
+	let sprite = detect(
+                     this.children,
+                     morph => morph instanceof SpriteMorph);
+    return sprite.receiveUserInteraction('clicked');
 };
