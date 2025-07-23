@@ -306,3 +306,60 @@ WorldMorph.prototype.updateBroken = function () {
         
     this.broken = [];
 };
+
+HandMorph.prototype.oldInit = HandMorph.prototype.init;
+HandMorph.init = function (aWorld) {
+	this.oldInit(aWorld);
+	this.lastClickPosition = null; 
+};
+
+HandMorph.prototype.oldProcessMouseDown = HandMorph.prototype.processMouseDown;
+HandMorph.prototype.processMouseDown = function (event) {
+	this.oldProcessMouseDown(event);
+	this.lastClickPosition = this.position();
+};
+
+HandMorph.prototype.processMouseUp = function () {
+    var morph = this.morphAtPointer(),
+        context,
+        contextMenu,
+        expectedClick;
+
+    this.destroyTemporaries();
+    if (this.children.length !== 0) {
+        this.drop();
+    } else {
+        if (this.mouseButton === 'left') {
+			morph = this.morphAtPointer();
+			if (!(morph instanceof StageMorph)) {
+				expectedClick = 'mouseClickLeft';
+			} else {
+			    if (this.lastClickPosition.distanceTo(this.position()) < 5) {
+                    expectedClick = 'mouseClickLeft';
+			    } else {
+				    expectedClick = 'mouseLeave';
+			    }
+			} 
+        } else {
+            expectedClick = 'mouseClickRight';
+            if (this.mouseButton && this.contextMenuEnabled) {
+                context = morph;
+                contextMenu = context.contextMenu();
+                while ((!contextMenu) &&
+                        context.parent) {
+                    context = context.parent;
+                    contextMenu = context.contextMenu();
+                }
+                if (contextMenu) {
+                    contextMenu.popUpAtHand(this.world);
+                }
+            }
+        }
+        while (!morph[expectedClick]) {
+            morph = morph.parent;
+		}
+        morph[expectedClick](this.bounds.origin);
+	}
+	this.mouseButton = null;
+	
+};
