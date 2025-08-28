@@ -1,4 +1,4 @@
-VERSION="2.7.20-dev - mooddle-dev"
+VERSION="2.8-dev"
 
 // get debug mode
 url = new URL(window.location.href);
@@ -7,11 +7,12 @@ var DEBUG = (searchParams.get("debug") == "true")
 
 // Force flat design
 IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign;
+IDE_Morph.prototype.setDefaultTheme = IDE_Morph.prototype.setBrightTheme;
 
 // ad some padding
 IDE_Morph.prototype.originalInit = IDE_Morph.prototype.init;
-IDE_Morph.prototype.init = function(isAutoFill) {
-    this.originalInit();
+IDE_Morph.prototype.init = function(config) {
+    this.originalInit(config);
     this.padding = 1;
 	/*
 	 this.droppedText(
@@ -25,6 +26,7 @@ IDE_Morph.prototype.init = function(isAutoFill) {
 	this.cloud = new BeetleCloud('/api', this);
 };
 
+
 //  change logo
 IDE_Morph.prototype.originalCreateLogo = IDE_Morph.prototype.createLogo;
 IDE_Morph.prototype.createLogo = function () {
@@ -36,10 +38,13 @@ IDE_Morph.prototype.createLogo = function () {
   this.logo.fixLayout();
 };
 
+
+
 IDE_Morph.prototype.createPalette = function (forSearching) {
     // assumes that the logo pane has already been created
     // needs the categories pane for layout
-    var myself = this;
+    var myself = this,
+	    vScrollAction;
 
     if (this.palette) {
         this.palette.destroy();
@@ -77,6 +82,19 @@ IDE_Morph.prototype.createPalette = function (forSearching) {
     this.palette.acceptsDrops = true;
     this.palette.enableAutoScrolling = false;
     this.palette.contents.acceptsDrops = false;
+	
+    if (this.scene.unifiedPalette) {
+        this.palette.adjustScrollBars = function () {
+            ScrollFrameMorph.prototype.adjustScrollBars.call(this);
+            myself.categories.refresh();
+        };
+
+        vScrollAction = this.palette.vBar.action;
+        this.palette.vBar.action = function (num) {
+            vScrollAction(num);
+            myself.categories.buttons.forEach(each => each.refresh());
+        };
+    }	
 
     this.palette.reactToDropOf = function (droppedMorph, hand) {
         if (droppedMorph instanceof DialogBoxMorph) {
@@ -87,8 +105,8 @@ IDE_Morph.prototype.createPalette = function (forSearching) {
             droppedMorph.destroy();
             myself.removeSprite(droppedMorph.object);
         } else if (droppedMorph instanceof CostumeIconMorph) {
-            myself.currentSprite.wearCostume(null);
-            droppedMorph.perish();
+            //myself.currentSprite.wearCostume(null);
+            droppedMorph.perish(myself.isAnimating ? 200 : 0);
         } else if (droppedMorph instanceof BlockMorph) {
             myself.stage.threads.stopAllForBlock(droppedMorph);
             if (hand && hand.grabOrigin.origin instanceof ScriptsMorph) {
@@ -96,9 +114,22 @@ IDE_Morph.prototype.createPalette = function (forSearching) {
                 hand.grabOrigin.origin.lastDroppedBlock = droppedMorph;
                 hand.grabOrigin.origin.recordDrop(hand.grabOrigin);
             }
-            droppedMorph.perish();
+            droppedMorph.perish(myself.isAnimating ? 200 : 0);
+            myself.currentSprite.recordUserEdit(
+                'scripts',
+                'block',
+                'delete',
+                droppedMorph.abstractBlockSpec()
+            );
         } else {
-            droppedMorph.perish();
+            droppedMorph.perish(myself.isAnimating ? 200 : 0);
+            if (droppedMorph instanceof CommentMorph) {
+                myself.currentSprite.recordUserEdit(
+                    'scripts',
+                    'comment',
+                    'delete'
+                );
+            }
         }
     };
 
@@ -109,11 +140,14 @@ IDE_Morph.prototype.createPalette = function (forSearching) {
         }
     };
 
+    this.palette.droppedImage = (aCanvas, name, embeddedData) => {
+        this.droppedImage(aCanvas, name, embeddedData, 'palette');
+    };
+	
     this.palette.setWidth(this.logo.width());
     this.add(this.palette);
     return this.palette;
 };
-
 
 
 IDE_Morph.prototype.resourceURLOrig  = IDE_Morph.prototype.resourceURL;
@@ -159,7 +193,6 @@ IDE_Morph.prototype.applySavedTurtleStitchSettings = function () {
   backgroundColor = this.getSetting('backgroundColor')
   defaultPenColor = this.getSetting('defaultPenColor')
 
-  console.log("apply settings");
 
   if(hidegrid) {
     this.stage.scene.grid.toggle();
@@ -275,7 +308,9 @@ IDE_Morph.prototype.newProject = function () {
     if (location.hash.substr(0, 6) !== '#lang:') {
         location.hash = '';
     }
+
     this.openProject(project);
+
 
     StageMorph.prototype.dimensions = new Point(480, 360);
     StageMorph.prototype.hiddenPrimitives = {};
@@ -312,7 +347,8 @@ IDE_Morph.prototype.newProject = function () {
 };
 
 
-IDE_Morph.prototype.openProject = function (project) {
+IDE_Morph.prototype.openProject = function (project, purgeCustomizedPrims) {
+	var scn = project.currentScene || project.scenes.at(1);
     if (this.isAddingScenes) {
         project.scenes.itemsArray().forEach(scene => {
             scene.name = this.newSceneName(scene.name, scene);
@@ -321,10 +357,15 @@ IDE_Morph.prototype.openProject = function (project) {
     } else {
         this.scenes = project.scenes;
     }
+    this.performerMode = false;
+    if (purgeCustomizedPrims) {
+        scn.blocks = SpriteMorph.prototype.primitiveBlocks();
+    }	
     this.switchToScene(
-        project.currentScene || project.scenes.at(1),
+        scn,
         true,  // refresh album
         null, // msg
+        null, // data
         true // pause generic WHEN hat blocks
     );
     this.createStageHandle();
@@ -368,9 +409,9 @@ IDE_Morph.prototype.exportProject = function (name) {
 
 
 IDE_Morph.prototype.origRawOpenProjectString = IDE_Morph.prototype.rawOpenProjectString;
-IDE_Morph.prototype.rawOpenProjectString = function (str) {
-    this.origRawOpenProjectString(str);
-
+IDE_Morph.prototype.rawOpenProjectString = function (str,noPrims) {
+    this.origRawOpenProjectString(str,noPrims);
+	
     // hide sprite
     this.stage.children[0].hide();
     this.stage.clearAll();
@@ -380,6 +421,7 @@ IDE_Morph.prototype.rawOpenProjectString = function (str) {
     this.stage.clearAll();
     this.stage.turtleShepherd.clear();
     this.stage.reRender();
+
 };
 
 
@@ -1044,7 +1086,7 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
         );
         // prevent rotation and draggability controls from
         // showing for the stage
-        if (this.currentSprite === this.stage) {
+        if (this.currentSprite === this.stage) { 
             this.spriteBar.children.forEach(child => {
                 if (child instanceof PushButtonMorph) {
                     child.hide();
@@ -1060,7 +1102,8 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
 
 // IDE_Morph resizing
 IDE_Morph.prototype.setExtent = function (point) {
-    var padding = new Point(430, 110),
+    var cnf = this.config,
+		padding = new Point(430, 110),
         minExt,
         ext,
         maxWidth,
@@ -1087,7 +1130,12 @@ IDE_Morph.prototype.setExtent = function (point) {
             );
         }
     }
-    ext = point.max(minExt);
+    if (this.performerMode) {
+        ext = point;
+    } else {
+        ext = point.max(minExt);
+    }
+	
 
     // adjust stage ratio if necessary
     maxWidth = ext.x -
@@ -1500,10 +1548,16 @@ IDE_Morph.prototype.fixLayout = function (situation) {
     // situation is a string, i.e.
     // 'selectSprite' or 'refreshPalette' or 'tabEditor'
     var padding = this.padding,
+        cnf = this.config,
+        border = cnf.border || 0,
+        flag,
         maxPaletteWidth;
 
     Morph.prototype.trackChanges = false;
 
+    this.logo.setLeft(this.left() + border);
+    this.logo.setTop(this.top() + border);
+	
     if (situation !== 'refreshPalette') {
         // controlBar
         this.controlBar.setPosition(this.logo.topRight());
@@ -1512,8 +1566,13 @@ IDE_Morph.prototype.fixLayout = function (situation) {
 
         // categories
         this.categories.setLeft(this.logo.left());
-        this.categories.setTop(this.logo.bottom()+1);
+        this.categories.setTop(
+            cnf.hideControls ? this.top() + border : this.logo.bottom()
+        );
         this.categories.setWidth(this.paletteWidth);
+        if (this.categories.scroller) {
+            this.categories.scroller.setWidth(this.paletteWidth);
+        }
     }
 
     // palette
@@ -1886,14 +1945,22 @@ IDE_Morph.prototype.createCategories = function () {
             : changePalette,
         categoryQueryAction = this.scene.unifiedPalette ? queryTopCategory
             : queryCurrentCategory;
+        shift = this.config.noDefaultCat ? 4 : 0,
+        flag = true;			
 
     if (this.categories) {
+		flag = this.categories.isVisible;
         this.categories.destroy();
     }
     this.categories = new Morph();
     this.categories.color = this.groupColor;
     this.categories.bounds.setWidth(this.paletteWidth);
     this.categories.buttons = [];
+	this.categories.isVisible = flag;
+	
+    this.categories.droppedImage = (aCanvas, name, embeddedData) => {
+        this.droppedImage(aCanvas, name, embeddedData, 'categories');
+    };	
 
     this.categories.refresh = function () {
         this.buttons.forEach(cat => {
@@ -1908,7 +1975,7 @@ IDE_Morph.prototype.createCategories = function () {
         var dict = myself.currentSprite.emptyCategories();
         dict.variables = dict.variables || dict.lists || dict.other;
         this.buttons.forEach(cat => {
-            if (dict[cat.category]) {
+            if (Object.hasOwn(dict, cat.category) && (dict[cat.category])) {
                 cat.enable();
             } else {
                 cat.disable();
@@ -1961,11 +2028,12 @@ IDE_Morph.prototype.createCategories = function () {
 
         button.category = category;
         button.corner = 8;
-        button.padding = 2;
-        button.labelShadowOffset = new Point(0,0);
-        button.labelShadowColor = colors[1];
+        button.padding = 0;
+        button.labelShadowOffset = new Point(-1, -1);
+        button.labelShadowColor = IDE_Morph.prototype.isBright ?
+            CLEAR : colors[1];
         button.labelColor = myself.buttonLabelColor;
-        if (MorphicPreferences.isFlat) {
+        if (IDE_Morph.prototype.isBright) {
             button.labelPressColor = WHITE;
         }
         button.fixLayout();
@@ -1979,7 +2047,7 @@ IDE_Morph.prototype.createCategories = function () {
         var labelWidth = 168,
             colors = [
                 myself.frameColor,
-                myself.frameColor.darker(MorphicPreferences.isFlat ? 5 : 50),
+                myself.frameColor.darker(IDE_Morph.prototype.isBright ? 5 : 50),
                 color
             ],
             button;
@@ -1996,13 +2064,15 @@ IDE_Morph.prototype.createCategories = function () {
             true // has preview
         );
 
+
         button.category = category;
         button.corner = 8;
         button.padding = 0;
         button.labelShadowOffset = new Point(-1, -1);
-        button.labelShadowColor = colors[1];
+        button.labelShadowColor = IDE_Morph.prototype.isBright ?
+            CLEAR : colors[1];
         button.labelColor = myself.buttonLabelColor;
-        if (MorphicPreferences.isFlat) {
+        if (IDE_Morph.prototype.isBright) {
             button.labelPressColor = WHITE;
         }
         button.fixLayout();
@@ -2016,26 +2086,35 @@ IDE_Morph.prototype.createCategories = function () {
         var buttonWidth = myself.categories.children[0].width(),
             buttonHeight = myself.categories.children[0].height(),
             more = SpriteMorph.prototype.customCategories.size,
-            border = 10,
-            xPadding = 5,
-            yPadding = 3,
+            border = 3,
+            xPadding = (200 // myself.logo.width()
+                - border
+                - buttonWidth * 2) / 3,
+            yPadding = 2,
             l = myself.categories.left(),
             t = myself.categories.top(),
             scroller,
             row,
             col,
             i;
-
+		
         myself.categories.children.forEach((button, i) => {
             row = i < 8 ? i % 4 : i - 4;
             col = (i < 4 || i > 7) ? 1 : 2;
             button.setPosition(new Point(
                 l + (col * xPadding + ((col - 1) * buttonWidth)),
-                t + ((row + 1) * yPadding + (row * buttonHeight) + border) +
-                    (i > 9 ? border + 2 : 0)
+                t + (((row - shift) + 1) * yPadding + ((row - shift) *
+                        buttonHeight) + border) +
+                    (i > 7 ? border + 2 : 0)
             ));
         });
 
+        if (shift) { // hide the built-in category buttons
+            for (i = 0; i < 8; i += 1) {
+                myself.categories.children[i].hide();
+            }
+        }
+		
         if (more > 6) {
             scroller = new ScrollFrameMorph(null, null, myself.sliderColor);
             scroller.setColor(myself.groupColor);
@@ -2053,8 +2132,8 @@ IDE_Morph.prototype.createCategories = function () {
             myself.categories.add(scroller);
             myself.categories.scroller = scroller;
             myself.categories.setHeight(
-                (4 + 1) * yPadding
-                    + 4 * buttonHeight
+                (4 + 1 - shift) * yPadding
+                    + (4 - shift) * buttonHeight
                     + 6 * (yPadding + buttonHeight) + border + 2
                     + 2 * border
             );
@@ -2128,35 +2207,7 @@ IDE_Morph.prototype.projectMenu = function () {
     menu.addItem('Open...', 'openProjectsBrowser');
     menu.addItem(
         'Import...',
-        function () {
-            var inp = document.createElement('input');
-            if (myself.filePicker) {
-                document.body.removeChild(myself.filePicker);
-                myself.filePicker = null;
-            }
-            inp.type = 'file';
-            inp.style.color = "transparent";
-            inp.style.backgroundColor = "transparent";
-            inp.style.border = "none";
-            inp.style.outline = "none";
-            inp.style.position = "absolute";
-            inp.style.top = "0px";
-            inp.style.left = "0px";
-            inp.style.width = "0px";
-            inp.style.height = "0px";
-            inp.addEventListener(
-                "change",
-                function () {
-                    document.body.removeChild(inp);
-                    myself.filePicker = null;
-                    world.hand.processDrop(inp.files);
-                },
-                false
-            );
-            document.body.appendChild(inp);
-            myself.filePicker = inp;
-            inp.click();
-        },
+        'importLocalFile',
         'file menu import hint' // looks up the actual text in the translator
     );
     menu.addLine();
@@ -2267,16 +2318,16 @@ IDE_Morph.prototype.projectMenu = function () {
     menu.addLine();
     menu.addItem(
         'Libraries...',
-        function() {
+        () => {
             if (location.protocol === 'file:') {
-                myself.importLocalFile();
+                this.importLocalFile();
                 return;
             }
-            myself.getURL(
-                myself.resourceURL('libraries', 'LIBRARIES'),
-                function (txt) {
-                    var libraries = myself.parseResourceFile(txt);
-                    new LibraryImportDialogMorph(myself, libraries).popUp();
+            this.getURL(
+                this.resourceURL('libraries', 'LIBRARIES.json'),
+                txt => {
+                    var libraries = this.parseResourceFile(txt);
+                    new LibraryImportDialogMorph(this, libraries).popUp();
                 }
             );
         },
@@ -2499,11 +2550,9 @@ IDE_Morph.prototype.refreshPalette = function (shouldIgnorePosition) {
 };
 
 // Language
-
 IDE_Morph.prototype.originalSetLanguage = IDE_Morph.prototype.setLanguage;
 IDE_Morph.prototype.setLanguage = function(lang, callback) {
     var myself = this;
-
     myself.originalSetLanguage(lang, function () {
         var translation = document.getElementById('bb-language'),
             src = 'stitchcode/locales/lang-' + lang + '.js',
@@ -2517,13 +2566,12 @@ IDE_Morph.prototype.setLanguage = function(lang, callback) {
         translation = document.createElement('script');
         translation.id = 'bb-language';
         translation.onload = function () {
-            myInnerSelf.reflectLanguage(lang, callback);
+            myself.reflectLanguage(lang, callback);
         };
         document.head.appendChild(translation);
         translation.src = src;
     });
 };
-
 
 IDE_Morph.prototype.setStageExtent = function (aPoint) {
     var myself = this,
@@ -3341,9 +3389,11 @@ IDE_Morph.prototype.switchToScene = function (
     scene,
     refreshAlbum,
     msg,
+    data,
     pauseHats
 ) {
-    var appMode = this.isAppMode;
+    var appMode = this.isAppMode,
+	    listeners;
     if (!scene || !scene.stage) {
         return;
     }
@@ -3358,16 +3408,30 @@ IDE_Morph.prototype.switchToScene = function (
     this.stage.destroy();
     this.add(scene.stage);
     this.stage = scene.stage;
+	this.stage.messageCallbacks = listeners;
     this.sprites = scene.sprites;
     if (pauseHats) {
         this.stage.pauseGenericHatBlocks();
     }
     // this.createCorral(!refreshAlbum); // keep scenes
+	scene.applyGlobalSettings();
     this.selectSprite(this.scene.currentSprite, true);
     // this.corral.album.updateSelection();
     this.fixLayout();
 
-    scene.applyGlobalSettings();
+    if (!SpriteMorph.prototype.allCategories().includes(this.currentCategory)) {
+        this.currentCategory = 'motion';
+    }
+    if (!this.setUnifiedPalette(scene.unifiedPalette)) {
+        this.createCategories();
+        this.createPaletteHandle();
+        this.categories.fixLayout();
+        this.fixLayout();
+        this.flushBlocksCache();
+        this.categories.refreshEmpty();
+        this.currentSprite.palette(this.currentCategory);
+        this.refreshPalette(true);
+    }    
 
     this.toggleAppMode(appMode);
     this.controlBar.stopButton.refresh();

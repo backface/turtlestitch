@@ -8,7 +8,7 @@
     written by Jens Mönig
     jens@moenig.org
 
-    Copyright (C) 2010-2023 by Jens Mönig
+    Copyright (C) 2010-2025 by Jens Mönig
 
     This file is part of Snap!.
 
@@ -49,6 +49,7 @@
             (f) resize event
             (g) combined mouse-keyboard events
             (h) text editing events
+            (i) indicating unsaved changes
         (4) stepping
         (5) creating new kinds of morphs
             (a) drawing the shape
@@ -490,6 +491,19 @@
     currently pressed mouse button, which is either 'left' or 'right'.
     You can use this to let users interact with 3D environments.
 
+    Mouse move and click events are only triggered when and as long as the
+    mouse pointer is within a morph's bounds. If you wish to confine and
+    retain mouse interaction to a particular morph while a mouse button is
+    pressed you can call the morph's
+    
+        lockMouseFocus()
+
+    method, preferrably in one of its mouseDown methods. Afterwards the
+    ensuing mouse events will be routed to the locked morph even after the
+    mouse pointer has left its bounds, and the mouseLeave event will not
+    occur until the mouse button is released again. This is useful for
+    creating sliders and handle widgets for resizing, moving, rotating etc.
+
     The
 
         mouseEnterDragging(morph)
@@ -854,6 +868,19 @@
 
     they are different so that Morphs which contain both multi-line and
     single-line text elements can hold them apart.
+
+
+    (i) indicating unsaved changes
+    ------------------------------
+    Before closing a browser tab with a Morphic world any top level morph
+    can signal unsaved changes by implementing a
+    
+        hasUnsavedChanges()
+    
+    method, which returns a Boolean value indicating whether it is safe to
+    destroy. If any top level morph indicates unsaved changes the browser
+    pops up a dialog box warning about unsaved changes and prompting for user
+    confirmation to close it.
 
 
     (4) stepping
@@ -1228,6 +1255,24 @@
 
     are implemented.
 
+    Animations can also be used to schedule a function execution just once
+    in lockstep with the Morphic scheduler, avoiding the setTimeout() pattern.
+    A syntactic shortcut for single-time scheduling exists in the WorldMorph's
+
+        schedule()
+
+    method.
+
+    For usage examples look at how TriggerMorph implements
+
+        bubbleHelp()
+
+    or at MenuItemMorph's
+
+        delaySubmenu()
+
+    method.
+
 
     (10) minifying morphic.js
     -------------------------
@@ -1306,7 +1351,7 @@
 
 /*jshint esversion: 11, bitwise: false*/
 
-var morphicVersion = '2023-November-07';
+var morphicVersion = '2025-March-20';
 var modules = {}; // keep track of additional loaded modules
 var useBlurredShadows = true;
 
@@ -1617,7 +1662,7 @@ function embedMetadataPNG(aCanvas, aString) {
             embedTag
         );
     try {
-        bPart.splice(-12, 0, ...newChunk);
+        bPart = bPart.slice(0, -12).concat( newChunk.split(""), bPart.slice( -12));
         parts[1] = btoa(bPart.join(""));
     } catch (err) {
         console.log(err);
@@ -2130,8 +2175,10 @@ Color.prototype.toRGBstring = function () {
 
 Color.fromString = function (aString) {
     // I parse rgb/rgba strings into a Color object
-    var components = aString.split(/[\(),]/).slice(1,5);
-    return new Color(components[0], components[1], components[2], components[3]);
+    var components = aString.split(/[\(),]/),
+        channels = aString.startsWith('rgba') ?
+            components.slice(1, 5) : components.slice(0, 4);
+    return new Color(+channels[0], +channels[1], +channels[2], +channels[3]);
 };
 
 // Color copying:
@@ -3088,6 +3135,16 @@ Node.prototype.allChildren = function () {
     return result;
 };
 
+Node.prototype.allChildrenExcept = function (callback) {
+    // includes myself, stops at nodes that satisfy the callback predicate
+    var result = [this];
+    if (callback(this)) {return []; }
+    this.children.forEach(child => {
+        result = result.concat(child.allChildrenExcept(callback));
+    });
+    return result;
+};
+
 Node.prototype.forAllChildren = function (aFunction) {
     if (this.children.length > 0) {
         this.children.forEach(child => child.forAllChildren(aFunction));
@@ -3835,6 +3892,7 @@ Morph.prototype.penTrails = function () {
     // obtained canvas will be around at the next display cycle,
     // so they might also wish to set the receiver's "isCachingImage"
     // property to "true".
+    this.isCachingImage = true;
     return this.getImage();
 };
 
@@ -4721,6 +4779,17 @@ Morph.prototype.escalateEvent = function (functionName, arg) {
     }
 };
 
+Morph.prototype.lockMouseFocus = function () {
+    // while the mouse button is pressed let me handle mouseMove events
+    // and the next mouseUp event, and don't fire the mouseLeave event.
+    // Use for widgets that are dragged around, e.g. resize handles,
+    // dials, sliders etc.
+    var hand = this.world().hand;
+    hand.inputTarget = this;
+    hand.clickTarget = this;
+    hand.mouseOverList = hand.mouseOverList.concat(this.allParents());
+};
+
 // Morph eval:
 
 Morph.prototype.evaluateString = function (code) {
@@ -4832,6 +4901,7 @@ HandleMorph.prototype.init = function (
     this.target = target || null;
     this.minExtent = new Point(minX || 0, minY || 0);
     this.inset = new Point(insetX || 0, insetY || insetX || 0);
+    this.offset = null;
     this.type =  type || 'resize'; // also: 'move', 'moveCenter', 'movePivot'
     this.isHighlighted = false;
     HandleMorph.uber.init.call(this);
@@ -5001,60 +5071,6 @@ HandleMorph.prototype.renderHandleOn = function (
     }
 };
 
-// HandleMorph stepping:
-
-HandleMorph.prototype.step = null;
-
-HandleMorph.prototype.mouseDownLeft = function (pos) {
-    var world = this.root(),
-        offset;
-
-    if (!this.target) {
-        return null;
-    }
-    if (this.type.indexOf('move') === 0) {
-        offset = pos.subtract(this.center());
-    } else {
-        offset = pos.subtract(this.bounds.origin);
-    }
-
-    this.step = () => {
-        var newPos, newExt;
-        if (world.hand.mouseButton) {
-            newPos = world.hand.bounds.origin.copy().subtract(offset);
-            if (this.type === 'resize') {
-                newExt = newPos.add(
-                    this.extent().add(this.inset)
-                ).subtract(this.target.bounds.origin);
-                newExt = newExt.max(this.minExtent);
-                this.target.setExtent(newExt);
-
-                this.setPosition(
-                    this.target.bottomRight().subtract(
-                        this.extent().add(this.inset)
-                    )
-                );
-            } else if (this.type === 'moveCenter') {
-                this.target.setCenter(newPos);
-            } else if (this.type === 'movePivot') {
-                this.target.setPivot(newPos);
-                this.setCenter(this.target.rotationCenter());
-            } else { // type === 'move'
-                this.target.setPosition(
-                    newPos.subtract(this.target.extent())
-                        .add(this.extent())
-                );
-            }
-        } else {
-            this.step = null;
-        }
-    };
-
-    if (!this.target.step) {
-        this.target.step = nop;
-    }
-};
-
 // HandleMorph dragging and dropping:
 
 HandleMorph.prototype.rootForGrab = function () {
@@ -5071,6 +5087,47 @@ HandleMorph.prototype.mouseEnter = function () {
 HandleMorph.prototype.mouseLeave = function () {
     this.isHighlighted = false;
     this.changed();
+};
+
+HandleMorph.prototype.mouseDownLeft = function (pos) {
+    if (!this.target) {
+        return null;
+    }
+    if (this.type.indexOf('move') === 0) {
+        this.offset = pos.subtract(this.center());
+    } else {
+        this.offset = pos.subtract(this.bounds.origin);
+    }
+    this.lockMouseFocus();
+};
+
+HandleMorph.prototype.mouseMove = function (pos) {
+    var newPos, newExt;
+
+    newPos = pos.subtract(this.offset);
+    if (this.type === 'resize') {
+        newExt = newPos.add(
+            this.extent().add(this.inset)
+        ).subtract(this.target.bounds.origin);
+        newExt = newExt.max(this.minExtent);
+        this.target.setExtent(newExt);
+
+        this.setPosition(
+            this.target.bottomRight().subtract(
+                this.extent().add(this.inset)
+            )
+        );
+    } else if (this.type === 'moveCenter') {
+        this.target.setCenter(newPos);
+    } else if (this.type === 'movePivot') {
+        this.target.setPivot(newPos);
+        this.setCenter(this.target.rotationCenter());
+    } else { // type === 'move'
+        this.target.setPosition(
+            newPos.subtract(this.target.extent())
+                .add(this.extent())
+        );
+    }
 };
 
 // HandleMorph menu:
@@ -5987,44 +6044,14 @@ BoxMorph.prototype.render = function (ctx) {
 BoxMorph.prototype.outlinePath = function (ctx, corner, inset) {
     var w = this.width(),
         h = this.height(),
-        radius = Math.min(corner, (Math.min(w, h) - inset) / 2),
-        offset = radius + inset;
+        radius = Math.min(corner, (Math.min(w, h) - inset) / 2);
 
-    // top left:
-    ctx.arc(
-        offset,
-        offset,
-        radius,
-        radians(-180),
-        radians(-90),
-        false
-    );
-    // top right:
-    ctx.arc(
-        w - offset,
-        offset,
-        radius,
-        radians(-90),
-        radians(-0),
-        false
-    );
-    // bottom right:
-    ctx.arc(
-        w - offset,
-        h - offset,
-        radius,
-        radians(0),
-        radians(90),
-        false
-    );
-    // bottom left:
-    ctx.arc(
-        offset,
-        h - offset,
-        radius,
-        radians(90),
-        radians(180),
-        false
+    ctx.roundRect(
+        inset,
+        inset,
+        w - (inset * 2),
+        h - (inset * 2),
+        radius
     );
 };
 
@@ -6691,23 +6718,17 @@ DialMorph.prototype.render = function (ctx) {
     ctx.fill();
 };
 
-// DialMorph stepping:
-
-DialMorph.prototype.step = null;
+// DialMorph events:
 
 DialMorph.prototype.mouseDownLeft = function (pos) {
-    var world = this.root();
+    this.lockMouseFocus();
+};
 
-    this.step = () => {
-        if (world.hand.mouseButton) {
-            this.setValue(
-            	this.getValueOf(world.hand.bounds.origin),
-             	world.currentKey !== 16 // snap to tick
-            );
-        } else {
-            this.step = null;
-        }
-    };
+DialMorph.prototype.mouseMove = function (pos) {
+    this.setValue(
+        this.getValueOf(pos),
+        this.world().currentKey !== 16 // snap to tick
+    );
 };
 
 // DialMorph menu:
@@ -6799,75 +6820,15 @@ CircleBoxMorph.prototype.autoOrientation = function () {
 };
 
 CircleBoxMorph.prototype.render = function (ctx) {
-    var w = this.width(),
-        h = this.height(),
-        radius;
-
     if (this.autoOrient) {
         this.autoOrientation();
     }
+    var w = this.width(),
+        h = this.height(),
+        radius = this.orientation === 'vertical' ? w / 2 : h / 2;
 
-    if (this.orientation === 'vertical') {
-        radius = w / 2;
-        ctx.beginPath();
-
-        // top semi-circle
-        ctx.arc(
-            radius,
-            radius,
-            radius,
-            radians(180),
-            radians(0),
-            false
-        );
-
-        // right line
-        ctx.lineTo(
-            w,
-            h - radius
-        );
-
-        // bottom semi-circle
-        ctx.arc(
-            radius,
-            h - radius,
-            radius,
-            radians(0),
-            radians(180),
-            false
-        );
-
-    } else {
-        radius = h / 2;
-        ctx.beginPath();
-
-        // left semi-circle
-        ctx.arc(
-            radius,
-            radius,
-            radius,
-            radians(90),
-            radians(-90),
-            false
-        );
-
-        // top line
-        ctx.lineTo(
-            w - radius,
-            0
-        );
-
-        // right semi-circle
-        ctx.arc(
-            w - radius,
-            radius,
-            radius,
-            radians(-90),
-            radians(90),
-            false
-        );
-    }
-    ctx.closePath();
+    ctx.beginPath();
+    ctx.roundRect(0, 0, w, h, radius);
     ctx.fillStyle = this.color.toString();
     ctx.fill();
 };
@@ -7098,9 +7059,9 @@ SliderButtonMorph.prototype.mouseClickLeft = function () {
     this.rerender();
 };
 
-SliderButtonMorph.prototype.mouseMove = function () {
-    // prevent my parent from getting picked up
-    nop();
+SliderButtonMorph.prototype.mouseMove = function (pos) {
+    // delegate event to the slider
+    this.escalateEvent('mouseMove', pos);
 };
 
 // SliderMorph ///////////////////////////////////////////////////
@@ -7404,49 +7365,43 @@ SliderMorph.prototype.numericalSetters = function () {
     return list;
 };
 
-// SliderMorph stepping:
-
-SliderMorph.prototype.step = null;
+// SliderMorph events:
 
 SliderMorph.prototype.mouseDownLeft = function (pos) {
-    var world;
-
-    if (!this.button.bounds.containsPoint(pos)) {
-        this.offset = new Point(); // return null;
-    } else {
+    if (this.button.bounds.containsPoint(pos)) {
         this.offset = pos.subtract(this.button.bounds.origin);
+    } else {
+        this.offset = new Point();
+        this.button.userState = 'pressed';
+        this.button.rerender();
     }
-    world = this.root();
+    this.button.lockMouseFocus();
+    this.mouseMove(pos);
+};
 
-    this.step = () => {
-        var mousePos, newX, newY;
-        if (world.hand.mouseButton) {
-            mousePos = world.hand.bounds.origin;
-            if (this.orientation === 'vertical') {
-                newX = this.button.bounds.origin.x;
-                newY = Math.max(
-                    Math.min(
-                        mousePos.y - this.offset.y,
-                        this.bottom() - this.button.height()
-                    ),
-                    this.top()
-                );
-            } else {
-                newY = this.button.bounds.origin.y;
-                newX = Math.max(
-                    Math.min(
-                        mousePos.x - this.offset.x,
-                        this.right() - this.button.width()
-                    ),
-                    this.left()
-                );
-            }
-            this.button.setPosition(new Point(newX, newY));
-            this.updateValue();
-        } else {
-            this.step = null;
-        }
-    };
+SliderMorph.prototype.mouseMove = function (pos) {
+    var newX, newY;
+    if (this.orientation === 'vertical') {
+        newX = this.button.bounds.origin.x;
+        newY = Math.max(
+            Math.min(
+                pos.y - this.offset.y,
+                this.bottom() - this.button.height()
+            ),
+            this.top()
+        );
+    } else {
+        newY = this.button.bounds.origin.y;
+        newX = Math.max(
+            Math.min(
+                pos.x - this.offset.x,
+                this.right() - this.button.width()
+            ),
+            this.left()
+        );
+    }
+    this.button.setPosition(new Point(newX, newY));
+    this.updateValue();
 };
 
 // MouseSensorMorph ////////////////////////////////////////////////////
@@ -10035,16 +9990,10 @@ TriggerMorph.prototype.rootForGrab = function () {
 // TriggerMorph bubble help:
 
 TriggerMorph.prototype.bubbleHelp = function (contents) {
-    var world = this.world();
-    this.schedule = new Animation(
-        nop,
-        nop,
-        0,
-        500,
-        nop,
-        () => this.popUpbubbleHelp(contents)
+    this.schedule = this.world().schedule(
+        () => this.popUpbubbleHelp(contents),
+        500
     );
-    world.animations.push(this.schedule);
 };
 
 TriggerMorph.prototype.popUpbubbleHelp = function (contents) {
@@ -10277,16 +10226,10 @@ MenuItemMorph.prototype.isShowingSubmenu = function () {
 // MenuItemMorph submenus:
 
 MenuItemMorph.prototype.delaySubmenu = function () {
-    var world = this.world();
-    this.schedule = new Animation(
-        nop,
-        nop,
-        0,
-        500,
-        nop,
-        () => this.popUpSubmenu()
+    this.schedule = this.world().schedule(
+        () => this.popUpSubmenu(),
+        500
     );
-    world.animations.push(this.schedule);
 };
 
 MenuItemMorph.prototype.popUpSubmenu = function () {
@@ -11254,6 +11197,8 @@ HandMorph.prototype.init = function (aWorld) {
     this.mouseOverList = [];
     this.mouseOverBounds = [];
     this.morphToGrab = null;
+    this.inputTarget = null;
+    this.clickTarget = null;
     this.grabPosition = null;
     this.grabOrigin = null;
     this.temporaries = [];
@@ -11462,8 +11407,11 @@ HandMorph.prototype.processMouseDown = function (event) {
     if (this.children.length !== 0) {
         this.drop();
         this.mouseButton = null;
+        this.inputTarget = null;
+        this.clickTarget = null;
     } else {
         morph = this.morphAtPointer();
+        this.clickTarget = morph;
         if (this.world.activeMenu) {
             if (!contains(
                     morph.allParents(),
@@ -11480,7 +11428,9 @@ HandMorph.prototype.processMouseDown = function (event) {
             }
         }
         if (this.world.cursor) {
-            if (morph !== this.world.cursor.target) {
+            if (morph !== this.world.cursor.target &&
+                    !morph.parentThatIsA(MenuItemMorph)
+            ) {
                 this.world.stopEditing();
             }
         }
@@ -11547,11 +11497,10 @@ HandMorph.prototype.processTouchEnd = function (event) {
 };
 
 HandMorph.prototype.processMouseUp = function () {
-    var morph = this.morphAtPointer(),
+    var morph = this.inputTarget || this.morphAtPointer(),
         context,
         contextMenu,
         expectedClick;
-
     this.destroyTemporaries();
     if (this.children.length !== 0) {
         this.drop();
@@ -11576,9 +11525,19 @@ HandMorph.prototype.processMouseUp = function () {
         while (!morph[expectedClick]) {
             morph = morph.parent;
         }
-        morph[expectedClick](this.bounds.origin);
+        if (this.clickTarget && this.clickTarget.allParents().includes(morph)) {
+            morph[expectedClick](this.bounds.origin);
+            if (this.inputTarget &&
+                !this.inputTarget.bounds.containsPoint(this.bounds.origin) &&
+                this.inputTarget.mouseLeave
+            ) {
+                this.inputTarget.mouseLeave();
+            }
+        }
     }
     this.mouseButton = null;
+    this.inputTarget = null;
+    this.clickTarget = null;
 };
 
 HandMorph.prototype.processDoubleClick = function () {
@@ -11614,17 +11573,22 @@ HandMorph.prototype.processMouseMove = function (event) {
     this.setPosition(pos);
 
     // determine the new mouse-over-list:
-    mouseOverNew = this.morphAtPointer().allParents();
+    mouseOverNew = this.morphAtPointer().allParents().concat(
+        this.inputTarget ? this.inputTarget.allParents() : []
+    );
     mouseOverBoundsNew = mouseOverNew.filter(m => m.isVisible &&
         m.visibleBounds().containsPoint(this.bounds.origin) &&
             !m.holes.some(any =>
                 any.translateBy(m.position()).containsPoint(this.bounds.origin))
     );
-
     if (!this.children.length && this.mouseButton) {
-        topMorph = this.morphAtPointer();
-        morph = topMorph.rootForGrab();
-        if (topMorph.mouseMove) {
+        topMorph = this.inputTarget || this.morphAtPointer();
+        morph = topMorph.rootForGrab();			
+        if (this.clickTarget &&
+            this.clickTarget.allParents().includes(topMorph) &&
+            topMorph.mouseMove
+        ) {
+
             topMorph.mouseMove(pos, this.mouseButton);
             if (this.mouseButton === 'right') {
                 this.contextMenuEnabled = false;
@@ -12224,6 +12188,25 @@ WorldMorph.prototype.initRetina = function () {
     this.setHeight(canvasHeight);
 };
 
+// WorldMorph scheduling:
+
+WorldMorph.prototype.schedule = function (callback, timeout) {
+    // run a function once after a given time in msecs in lockstep
+    // with the Morphic scheduler, answer an Animation object
+    // if timeout is omitted the callback is executed at the next
+    // display cycle
+    var schedule = new Animation(
+        nop, // setter
+        nop, // getter
+        0, // delta
+        timeout || 0, // duration msecs
+        nop, // easing
+        callback || nop // onComplete
+    );
+    this.animations.push(schedule);
+    return schedule;
+};
+
 // WorldMorph global pixel access:
 
 WorldMorph.prototype.getGlobalPixelColor = function (point) {
@@ -12469,7 +12452,12 @@ WorldMorph.prototype.initEventListeners = function () {
         false
     );
 
-    window.onbeforeunload = (evt) => {
+    window.cachedOnbeforeunload = window.onbeforeunload;
+    this.onbeforeunloadListener = (evt) => {
+        if (!this.hasUnsavedEdits()) return;
+        if (window.cachedOnbeforeunload) {
+            window.cachedOnbeforeunload.call(null, evt);
+        }
         var e = evt || window.event,
             msg = "Are you sure you want to leave?";
         // For IE and Firefox
@@ -12479,6 +12467,14 @@ WorldMorph.prototype.initEventListeners = function () {
         // For Safari / chrome
         return msg;
     };
+     window.addEventListener("beforeunload", this.onbeforeunloadListener);
+};
+
+WorldMorph.prototype.hasUnsavedEdits = function () {
+    // any top-level morph can implement an hasUnsavedEdits() method
+    return this.children.some(any =>
+        any.hasUnsavedEdits && any.hasUnsavedEdits()
+    );
 };
 
 WorldMorph.prototype.mouseDownLeft = nop;
@@ -12925,4 +12921,9 @@ WorldMorph.prototype.togglePreferences = function () {
 WorldMorph.prototype.toggleHolesDisplay = function () {
     MorphicPreferences.showHoles = !MorphicPreferences.showHoles;
     this.rerender();
+};
+
+WorldMorph.prototype.destroy = function () {
+    window.removeEventListener("onbeforeunload", this.onbeforeunloadListener);
+    WorldMorph.uber.destroy.call(this);
 };

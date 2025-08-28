@@ -306,3 +306,75 @@ WorldMorph.prototype.updateBroken = function () {
         
     this.broken = [];
 };
+
+
+HandMorph.prototype.oldInit = HandMorph.prototype.init;
+HandMorph.init = function (aWorld) {
+	this.oldInit(aWorld);
+	this.lastClickPosition = null; 
+};
+
+HandMorph.prototype.oldProcessMouseDown = HandMorph.prototype.processMouseDown;
+HandMorph.prototype.processMouseDown = function (event) {
+	this.oldProcessMouseDown(event);
+	this.lastClickPosition = this.position();
+};
+
+HandMorph.prototype.processMouseUp = function () {
+    var morph = this.morphAtPointer(),
+        context,
+        contextMenu,
+        expectedClick;
+
+    this.destroyTemporaries();
+    if (this.children.length !== 0) {
+        this.drop();
+    } else {
+        if (this.mouseButton === 'left') {
+			morph = this.morphAtPointer();
+			if (!(morph instanceof StageMorph)) {
+				console.log('click on elsewhere!');
+				expectedClick = 'mouseClickLeft';
+			} else {
+			    if (this.lastClickPosition.distanceTo(this.position()) < 5) {
+					console.log('click on stage');
+                    expectedClick = 'mouseClickLeft';
+			    } else {
+					console.log('mouse move on stage');
+				    expectedClick = 'mouseLeave';
+			    }
+			}
+        } else {
+            expectedClick = 'mouseClickRight';
+            if (this.mouseButton && this.contextMenuEnabled) {
+                context = morph;
+                contextMenu = context.contextMenu();
+                while ((!contextMenu) &&
+                        context.parent) {
+                    context = context.parent;
+                    contextMenu = context.contextMenu();
+                }
+                if (contextMenu) {
+                    contextMenu.popUpAtHand(this.world);
+                }
+            }
+        }
+        while (!morph[expectedClick]) {
+            morph = morph.parent;
+		}
+        if (this.clickTarget && this.clickTarget.allParents().includes(morph)) {
+            morph[expectedClick](this.bounds.origin);
+            if (this.inputTarget &&
+                !this.inputTarget.bounds.containsPoint(this.bounds.origin) &&
+                this.inputTarget.mouseLeave
+            ) {
+                this.inputTarget.mouseLeave();
+            }
+        }
+	}
+    this.mouseButton = null;
+    this.inputTarget = null;
+    this.clickTarget = null;
+	
+};
+

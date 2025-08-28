@@ -69,11 +69,11 @@ MorphicPreferences, FrameMorph, HandleMorph, DialogBoxMorph, StringMorph, isNil,
 SpriteMorph, Context, Costume, BlockEditorMorph, SymbolMorph, IDE_Morph, Sound,
 SyntaxElementMorph, MenuMorph, SpriteBubbleMorph, SpeechBubbleMorph, CellMorph,
 ListWatcherMorph, BoxMorph, Variable, isSnapObject, useBlurredShadows,
-CostumeIconMorph, SoundIconMorph, localize*/
+CostumeIconMorph, SoundIconMorph, localize, display*/
 
 /*jshint esversion: 6*/
 
-modules.tables = '2022-January-28';
+modules.tables = '2023-August-17';
 
 var Table;
 var TableCellMorph;
@@ -323,6 +323,7 @@ TableCellMorph.prototype.getData = function () {
 
 TableCellMorph.prototype.render = function (ctx) {
     var dta = this.labelString || this.dataRepresentation(this.data),
+        raw = this.getData(),
         fontSize = SyntaxElementMorph.prototype.fontSize,
         empty = TableMorph.prototype.highContrast ? 'rgb(220, 220, 220)'
                 : 'transparent',
@@ -344,8 +345,11 @@ TableCellMorph.prototype.render = function (ctx) {
         x,
         y;
 
-    this.isDraggable = (this.data instanceof Context) ||
-        (this.data instanceof Costume) || (this.data instanceof Sound);
+    this.isDraggable = !SpriteMorph.prototype.disableDraggingData &&
+        ((raw instanceof Context) ||
+            (raw instanceof Costume) ||
+            (raw instanceof Sound));
+
     ctx.fillStyle = background;
     if (this.shouldBeList()) {
         BoxMorph.prototype.outlinePath.call(
@@ -400,6 +404,9 @@ TableCellMorph.prototype.dataRepresentation = function (dta) {
             dta
         ).fullImage();
     } else if (dta instanceof Array) {
+        if (dta[0] instanceof Array && isString(dta[0][0])) {
+            return display(dta[0]);
+        }
         return this.dataRepresentation(dta[0]);
     } else if (dta instanceof Variable) {
         return this.dataRepresentation(dta.value);
@@ -479,19 +486,19 @@ TableCellMorph.prototype.mouseLeave = function () {
 };
 
 TableCellMorph.prototype.selectForEdit = function () {
-    if (this.data instanceof Context) {
+    if (this.getData() instanceof Context) {
         return this.selectContextForEdit();
     }
-    if (this.data instanceof Costume) {
+    if (this.getData() instanceof Costume) {
         return this.selectCostumeForEdit();
     }
-    if (this.data instanceof Sound) {
+    if (this.getData() instanceof Sound) {
         return this.selectSoundForEdit();
     }
 };
 
 TableCellMorph.prototype.selectContextForEdit = function () {
-    var script = this.data.toBlock(),
+    var script = this.getData().toUserBlock(),
         prepare = script.prepareToBeGrabbed,
         ide = this.parentThatIsA(IDE_Morph) ||
             this.world().childThatIsA(IDE_Morph);
@@ -511,7 +518,7 @@ TableCellMorph.prototype.selectContextForEdit = function () {
 };
 
 TableCellMorph.prototype.selectCostumeForEdit = function () {
-    var cst = this.data.copy(),
+    var cst = this.getData().copy(),
         icon,
         prepare,
         ide = this.parentThatIsA(IDE_Morph)||
@@ -535,7 +542,7 @@ TableCellMorph.prototype.selectCostumeForEdit = function () {
 };
 
 TableCellMorph.prototype.selectSoundForEdit = function () {
-    var snd = this.data.copy(),
+    var snd = this.getData().copy(),
         icon,
         prepare,
         ide = this.parentThatIsA(IDE_Morph)||
