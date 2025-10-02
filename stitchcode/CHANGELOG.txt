@@ -1,4 +1,9 @@
 
+* 2025-10-02 (2.7.20)
+  - add "zoom in" and "zoom out" blocks
+  - reverse/refactor naming of camera zoom functions
+
+* missing some entries (see gitlog)
 
 * 2023-07-16  (2.7.17)
   - geometryBlocks and VectorAndFill library updates (Simon)
