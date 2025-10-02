@@ -1344,7 +1344,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     var zoomInButton = new PushButtonMorph(
             null,
             function () {
-                stage.camera.zoomOut();
+                stage.camera.zoomIn();
                 stage.renderer.changed = true; },
             '+'
             );
@@ -1353,7 +1353,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     var zoomOutButton = new PushButtonMorph(
             null,
             function () {
-                stage.camera.zoomIn();
+                stage.camera.zoomOut();
                 stage.renderer.changed = true;
             },
             ' - '

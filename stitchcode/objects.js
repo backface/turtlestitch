@@ -1486,6 +1486,20 @@ SpriteMorph.prototype.wait = function(millis)
     while(curDate-date < millis);
 }
 
+SpriteMorph.prototype.zoomIn = function () {
+    const stage = this.parentThatIsA(StageMorph);
+    if (!stage || !stage.camera) return;
+    stage.camera.zoomIn();       // matches "+" button in gui.js
+    stage.renderer.changed = true;
+};
+
+SpriteMorph.prototype.zoomOut = function () {
+    const stage = this.parentThatIsA(StageMorph);
+    if (!stage || !stage.camera) return;
+    stage.camera.zoomOut();        // matches "-" button in gui.js
+    stage.renderer.changed = true;
+};
+
 
 //SpriteMorph.prototype.thumbnail = function (extentPoint) {};
 //SpriteMorph.prototype.drawNew = function () { this.hide() }
@@ -1892,6 +1906,20 @@ SpriteMorph.prototype.initBlocks = function () {
         category: 'other'
     };
 
+    this.blocks.zoomIn =
+    {
+        type: 'command',
+        spec: 'zoom in',
+        category: 'other'
+    };
+
+     this.blocks.zoomOut =
+    {
+        type: 'command',
+        spec: 'zoom out',
+        category: 'other'
+    };    
+
   	this.blocks.reportPi = {
   		type: 'reporter',
   		category: 'operators',
@@ -2141,6 +2169,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
 
   } else if (cat === 'other') {
         blocks.push(block('zoomToFit'));
+        blocks.push(block('zoomIn'));
+        blocks.push(block('zoomOut'));
 
 	} else if (cat === 'colors') {
         blocks.push(block('setColor'));
@@ -2861,11 +2891,11 @@ StageMorph.prototype.initCamera = function () {
 
         // We need to implement zooming ourselves for parallel projection
 
-        myself.camera.zoomIn = function () {
+        myself.camera.zoomOut = function () {
             this.zoomFactor /= 1.1;
             this.applyZoom();
         };
-        myself.camera.zoomOut = function () {
+        myself.camera.zoomIn = function () {
             this.zoomFactor *= 1.1;
             this.applyZoom();
         };
@@ -3020,9 +3050,9 @@ StageMorph.prototype.referencePos = null;
 StageMorph.prototype.mouseScroll = function (y, x) {
     if (this.renderer.isParallelProjection) {
         if (y > 0) {
-            this.camera.zoomOut();
-        } else if (y < 0) {
             this.camera.zoomIn();
+        } else if (y < 0) {
+            this.camera.zoomOut();
         }
     } else {
         if (y > 0) {
