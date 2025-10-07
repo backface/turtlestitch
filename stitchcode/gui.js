@@ -2422,7 +2422,7 @@ IDE_Morph.prototype.snapMenu = function () {
     menu.addItem(
         'Reference manual',
         function () {
-            window.open('help/SnapManual.pdf', 'SnapReferenceManual');
+            window.open('https://snap.berkeley.edu/snap/help/SnapManual.pdf', 'SnapReferenceManual');
         }
     );
     menu.addItem(
