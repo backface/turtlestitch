@@ -1527,6 +1527,7 @@ SpriteMorph.prototype.resetAll = function () {
 	myself.isRunning = false;
 	myself.setColor(StageMorph.prototype.defaultPenColor);
 	myself.parentThatIsA(StageMorph).setPenSize(1);
+  myself.parentThatIsA(StageMorph).camera.reset();
 	myself.scale = 0.1;
 	myself.gotoXY(0,0);
 	myself.setHeading(90);
