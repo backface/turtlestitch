@@ -1,3 +1,9 @@
+
+
+* 2025-10-08 (2.11.0-dev)
+  - upgrade and merge to Snap! 11 (thx to Simon)
+  - remove unused three files
+
 * 2025-10-07 (2.7.21)
   - add camera reset to reset block
   - change link to snap manual to external (snap website)

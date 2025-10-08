@@ -1,2 +1,4 @@
-git pull upstream +refs/tags/v6.9.0:master
-git pull upstream +refs/tags/v5.4.5:master
+git pull upstream +refs/tags/v11.0.4
+git pull upstream +refs/tags/v7.1.3
+git pull upstream +refs/tags/v6.9.0
+git pull upstream +refs/tags/v5.4.5
