@@ -153,7 +153,7 @@ IDE_Morph.prototype.createPalette = function (forSearching) {
 IDE_Morph.prototype.resourceURLOrig  = IDE_Morph.prototype.resourceURL;
 IDE_Morph.prototype.resourceURL = function () {
     var args = Array.prototype.slice.call(arguments, 0);
-    if (args[0] == "Backgrounds" || args[0] == "Examples")
+    if (args[0] == "Backgrounds" || args[0] == "Examples" || args[0] == "libraries" )
         return 'stitchcode/' + args[0] + '/' + args[1];
     else {
         return args.join('/');
@@ -2067,7 +2067,7 @@ IDE_Morph.prototype.createCategories = function () {
 
         button.category = category;
         button.corner = 8;
-        button.padding = 0;
+        button.padding = 2;
         button.labelShadowOffset = new Point(-1, -1);
         button.labelShadowColor = IDE_Morph.prototype.isBright ?
             CLEAR : colors[1];
@@ -2103,7 +2103,7 @@ IDE_Morph.prototype.createCategories = function () {
                 l + (col * xPadding + ((col - 1) * buttonWidth)),
                 t + (((row - shift) + 1) * yPadding + ((row - shift) *
                         buttonHeight) + border) +
-                    (i > 9 ? border + 2 : 0)
+                        0 // (i > 7 ? border + 2 : 0)
             ));
         });
 
@@ -2134,6 +2134,7 @@ IDE_Morph.prototype.createCategories = function () {
                     + 4 * buttonHeight
                     + 6 * (yPadding + buttonHeight) + border + 2
                     + 2 * border
+                    + 5
             );
         } else {
             myself.categories.setHeight(
@@ -2143,6 +2144,7 @@ IDE_Morph.prototype.createCategories = function () {
                         (more * (yPadding + buttonHeight) + border + 2)
                             : 0)
                     + 2 * border
+                    + 5
             );
         }
     }
