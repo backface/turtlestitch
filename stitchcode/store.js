@@ -1,4 +1,4 @@
-SnapSerializer.prototype.app = 'TurtleStitch 2.7, http://www.turtlestitch.org';
+SnapSerializer.prototype.app = 'TurtleStitch 2.11, http://www.turtlestitch.org';
 SnapSerializer.prototype.thumbnailSize = new Point(480, 360);
 
 // Project instance creation:
@@ -86,9 +86,10 @@ SnapSerializer.prototype.loadProjectModel = function (xmlNode, ide, remixID) {
     // show a warning if the origin apps differ
 
     var appInfo = xmlNode.attributes.app,
-        app = appInfo ? appInfo.split(' ')[0] : null,
-        scenesModel = xmlNode.childNamed('scenes'),
-        project = new Project();
+    app = appInfo ? appInfo.split(' ')[0] : null,
+    appVersion = appInfo ? parseFloat(appInfo.split(' ')[1]) || 0 : 0,
+    scenesModel = xmlNode.childNamed('scenes'),
+    project = new Project();
 
     if (ide && app && app !== this.app.split(' ')[0]) {
         ide.inform(
@@ -132,12 +133,12 @@ SnapSerializer.prototype.loadProjectModel = function (xmlNode, ide, remixID) {
 
 // =============================================
 
-SnapSerializer.prototype.loadScene = function (xmlNode, remixID) {
+SnapSerializer.prototype.loadScene = function (xmlNode, appVersion, remixID) {
     // private
     var scene = new Scene(),
         model,
         nameID;
-
+    //console.log('appversion:',appVersion);
     this.scene = scene;
 
     model = {scene: xmlNode };
@@ -249,17 +250,38 @@ SnapSerializer.prototype.loadScene = function (xmlNode, remixID) {
     scene.enableSublistIDs =
         model.stage.attributes.sublistIDs === 'true';
 
+    
     model.hiddenPrimitives = model.scene.childNamed('hidden');
     if (model.hiddenPrimitives) {
-        model.hiddenPrimitives.contents.split(' ').forEach(
-            sel => {
-                if (sel) {
-                    scene.hiddenPrimitives[sel] = true;
+        hidden = model.hiddenPrimitives.contents.split(' ').filter(word =>
+            word.length > 0);
+        if (hidden.length) {
+            hidden.forEach(
+                sel => {
+                    var selector, migration;
+                    if (sel) {
+                        migration = SpriteMorph.prototype.blockMigrations[sel];
+                        selector = migration ? migration.selector : sel;
+                        scene.hiddenPrimitives[selector] = true;
+                    }
                 }
-            }
-        );
-    }
+            );
 
+            // hide new primitives that have been added to the palette
+            // since the project has been last saved
+            SpriteMorph.prototype.newPrimitivesSince(appVersion).forEach(
+                sel => {
+                    var selector, migration;
+                    if (sel) {
+                        migration = SpriteMorph.prototype.blockMigrations[sel];
+                        selector = migration ? migration.selector : sel;
+                        scene.hiddenPrimitives[selector] = true;
+                    }
+                }
+            );
+        }
+    }
+	
     model.codeHeaders = model.scene.childNamed('headers');
     if (model.codeHeaders) {
         model.codeHeaders.children.forEach(
@@ -285,6 +307,12 @@ SnapSerializer.prototype.loadScene = function (xmlNode, remixID) {
     }
     this.loadObject(scene.stage, model.stage);
 
+    model.primitives = model.scene.childNamed('primitives');
+    if (model.primitives && !this.noPrims) {
+        SpriteMorph.prototype.initBlocks();
+        this.loadCustomizedPrimitives(scene.stage, model.primitives);
+        scene.blocks = SpriteMorph.prototype.blocks;
+    }
     /* Sprites */
 
     model.sprites = model.stage.require('sprites');
