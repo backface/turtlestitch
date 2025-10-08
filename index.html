@@ -48,30 +48,30 @@
 
 		<!-- turtlestitch additions -->
 		<script type="text/javascript" src="stitchcode/turtleShepherd.js?version=2021-12-14"></script>
-		<script type="text/javascript" src="stitchcode/morphic.js?version=2021-12-14"></script>
+		<script type="text/javascript" src="stitchcode/morphic.js?version=2025-10-07"></script>
 		<script type="text/javascript" src="stitchcode/symbols.js?version=2021-12-14"></script>
 		<script type="text/javascript" src="stitchcode/blocks.js?version=2021-12-14"></script>
 		<script type="text/javascript" src="stitchcode/widgets.js?version=2023-05-10"></script>
 		<script type="text/javascript" src="stitchcode/threads.js?version=2022-12-05"></script>
-		<script type="text/javascript" src="stitchcode/objects.js?version=2025-10-02"></script>
-		<script type="text/javascript" src="stitchcode/turtlecloud.js?version=2024-11-13"></script>
-		<script type="text/javascript" src="stitchcode/gui.js?version=2025-10-02"></script>
-		<script type="text/javascript" src="stitchcode/store.js?version=2023-05-10"></script>
+		<script type="text/javascript" src="stitchcode/objects.js?version=2025-10-07"></script>
+		<script type="text/javascript" src="stitchcode/turtlecloud.js?version=2025-10-07"></script>
+		<script type="text/javascript" src="stitchcode/gui.js?version=2025-10-07"></script>
+		<script type="text/javascript" src="stitchcode/store.js?version=2025-10-07"></script>
 
 		<script type="text/javascript">
 		var world;
-		window.onload = function () {
-		console.log("is Retina supported: " + isRetinaSupported());
-		disableRetinaSupport();
-		world = new WorldMorph(document.getElementById('world'));
-		world.worldCanvas.focus();
-		new IDE_Morph().openIn(world);
-		loop();
+			window.onload = function () {
+			console.log("is Retina supported: " + isRetinaSupported());
+			disableRetinaSupport();
+			world = new WorldMorph(document.getElementById('world'));
+			world.worldCanvas.focus();
+			new IDE_Morph().openIn(world);
+			loop();
 		};
 
 		function loop() {
-		requestAnimationFrame(loop);
-		world.doOneCycle();
+			requestAnimationFrame(loop);
+			world.doOneCycle();
 		}
 		</script>
 	</head>
