@@ -410,7 +410,7 @@ IDE_Morph.prototype.exportProject = function (name) {
 
 IDE_Morph.prototype.origRawOpenProjectString = IDE_Morph.prototype.rawOpenProjectString;
 IDE_Morph.prototype.rawOpenProjectString = function (str, noPrims) {
-    this.origRawOpenProjectString(st, noPrims);
+    this.origRawOpenProjectString(str, noPrims);
 	
     // hide sprite
     this.stage.children[0].hide();
