@@ -33,18 +33,6 @@
   {
     "fileName": "~",
     "name": "~"
-  },  
-  {
-    "fileName": "deepseekBlocks.xml",
-    "name": "Deepseek",
-    "description": "Deepseek blocks provide AI accessibility to users.",
-    "searchData": [
-		"answer of _",
-		"TurtleStitch code of _"
-    ],
-    "categories": [
-	  "deepseek"
-    ]
   },    
   {
     "fileName": "../../libraries/code2blocks_module.xml",
@@ -252,6 +240,46 @@
     "fileName": "~",
     "name": "~"
   },
+  {
+    "fileName": "deepseekBlocks.xml",
+    "name": "Deepseek",
+    "description": "Deepseek blocks provide AI accessibility to users.",
+    "searchData": [
+		"answer of _",
+		"TurtleStitch code of _"
+    ],
+    "categories": [
+	  "deepseek"
+    ]
+  },    
+  {
+    "fileName": "snapython.xml",
+    "name": "Python Blocks",
+    "description": "Python blocks can be used with original blocks in a hybrid way to teach Python along with Turtlestitch.",
+    "searchData": [
+		"initSnapython",
+		"import _",
+		"print _",
+		"input _"
+    ],
+    "categories": [
+	  "sensing",
+	  "operators",
+	  "lists"
+    ]
+  },  
+  {
+    "fileName": "~",
+    "name": "~"
+  },
+  {
+    "fileName": "~",
+    "name": "~"
+  },
+  {
+    "fileName": "~",
+    "name": "~"
+  },  
   {
     "fileName": "../../libraries/iteration-composition.xml",
     "name": "Iteration, composition",

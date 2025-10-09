@@ -1546,22 +1546,22 @@ SpriteMorph.prototype.resetStitchSettings = function () {
 // Block specs
 SpriteMorph.prototype.origPrimitiveBlocks = SpriteMorph.prototype.primitiveBlocks;
 SpriteMorph.prototype.primitiveBlocks = function () {
-	var primitiveBlocks = this.origPrimitiveBlocks();
-    primitiveBlocks.reportProxiedURL = {
+	var myPrimitiveBlocks = this.origPrimitiveBlocks();
+    myPrimitiveBlocks.reportProxiedURL = {
 		type: 'reporter',
         spec: 'proxied URL %s',
         category: 'sensing',
         defaults: ["snap.berkley.edu"]
 	};	
 
-    primitiveBlocks.resetAll =
+    myPrimitiveBlocks.resetAll =
     {
 		only: SpriteMorph,
         type: 'command',
         spec: 'reset',
         category: 'control'
     };
-    primitiveBlocks.forwardBy =
+    myPrimitiveBlocks.forwardBy =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1569,7 +1569,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'move %n steps by %n steps',
         defaults: [100,10]
     };	
-    primitiveBlocks.forwardByNr =
+    myPrimitiveBlocks.forwardByNr =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1577,7 +1577,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'move %n steps in %n',
         defaults: [100,10]
     };
-    primitiveBlocks.gotoXYBy =
+    myPrimitiveBlocks.gotoXYBy =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1585,7 +1585,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'go to x: %n y: %n by %n',
         defaults: [0, 0, 10]
     };
-    primitiveBlocks.gotoXYIn =
+    myPrimitiveBlocks.gotoXYIn =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1593,7 +1593,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'go to x: %n y: %n in %n',
         defaults: [0, 0, 10]
     };
-    primitiveBlocks.arcRight =
+    myPrimitiveBlocks.arcRight =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1601,7 +1601,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'arc $turnRight radius: %n degrees: %n',
         defaults: [50, 30]
     };
-    primitiveBlocks.arcLeft =
+    myPrimitiveBlocks.arcLeft =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1609,7 +1609,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'arc $turnLeft radius: %n degrees: %n',
         defaults: [50, 30]
     };
-    primitiveBlocks.pointTowards =
+    myPrimitiveBlocks.pointTowards =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1617,7 +1617,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'point towards x: %n y: %n',
         defaults: [0, 0]
     };
-    primitiveBlocks.drawTextScale =
+    myPrimitiveBlocks.drawTextScale =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1625,7 +1625,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'draw text: %s scale: %n',
         defaults: ["hello", 2]
     };
-    primitiveBlocks.drawText =
+    myPrimitiveBlocks.drawText =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1633,7 +1633,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'draw text %s with size %n',
         defaults: ["hello", 21]
     };
-    primitiveBlocks.drawTextDev =
+    myPrimitiveBlocks.drawTextDev =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1641,7 +1641,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'draw text %s with size %n trim %b',
         defaults: ["hello", 2, true]
     };
-    primitiveBlocks.getTextLength =
+    myPrimitiveBlocks.getTextLength =
     {
 		    only: SpriteMorph,
         type: 'reporter',
@@ -1649,7 +1649,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'text length of %s with size %n',
         defaults: ["hello", 21]
     };
-    primitiveBlocks.reportRandomPosition =
+    myPrimitiveBlocks.reportRandomPosition =
     {
 		    only: SpriteMorph,
         type: 'reporter',
@@ -1659,7 +1659,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
 
     // pen blocks
 
-    primitiveBlocks.isPenDown =
+    myPrimitiveBlocks.isPenDown =
     {
 		only: SpriteMorph,
         type: 'predicate',
@@ -1667,7 +1667,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'pen down?',
     };
 
-    primitiveBlocks.getPenSize  =
+    myPrimitiveBlocks.getPenSize  =
     {
 		only: SpriteMorph,
         type: 'reporter',
@@ -1677,14 +1677,14 @@ SpriteMorph.prototype.primitiveBlocks = function () {
 
 	// pen color blocks
 
-	primitiveBlocks.setColor = {
+	myPrimitiveBlocks.setColor = {
 		only: SpriteMorph,
 		type: 'command',
 		category: 'colors',
 		spec: 'set color to %clr'
 	};
 
-    primitiveBlocks.setColorRGB =
+    myPrimitiveBlocks.setColorRGB =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1693,7 +1693,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [0, 255, 0]
     };
 
-    primitiveBlocks.setColorHex =
+    myPrimitiveBlocks.setColorHex =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1702,7 +1702,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: ['#ff0000']
     };
 
-    primitiveBlocks.setColorHSV =
+    myPrimitiveBlocks.setColorHSV =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1711,7 +1711,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [0.3, 0.7, 0.6]
     };
 
-    primitiveBlocks.setOpacity =
+    myPrimitiveBlocks.setOpacity =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1720,7 +1720,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [100]
     };
 
-    primitiveBlocks.changeOpacity =
+    myPrimitiveBlocks.changeOpacity =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1729,7 +1729,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [10]
     };
 
-    primitiveBlocks.getOpacity =
+    myPrimitiveBlocks.getOpacity =
     {
 		only: SpriteMorph,
         type: 'reporter',
@@ -1737,7 +1737,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'opacity',
     };
 
-	primitiveBlocks.getColorRGB =
+	myPrimitiveBlocks.getColorRGB =
     {
 		only: SpriteMorph,
         type: 'reporter',
@@ -1745,7 +1745,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'RGB color',
     };
 
-	primitiveBlocks.getColorHSV =
+	myPrimitiveBlocks.getColorHSV =
     {
 		only: SpriteMorph,
         type: 'reporter',
@@ -1753,7 +1753,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         spec: 'HSV color',
     };
 
-	primitiveBlocks.getColorHex =
+	myPrimitiveBlocks.getColorHex =
     {
 		only: SpriteMorph,
         type: 'reporter',
@@ -1762,14 +1762,14 @@ SpriteMorph.prototype.primitiveBlocks = function () {
     };
 
 	// color
-    primitiveBlocks.pickHue =
+    myPrimitiveBlocks.pickHue =
     {
 		only: SpriteMorph,
         type: 'command',
         spec: 'set color by hue %huewheel',
         category: 'colors'
     };
-    primitiveBlocks.setHSB =
+    myPrimitiveBlocks.setHSB =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1777,7 +1777,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         category: 'colors',
         defaults: ['hue', 50]
     };
-    primitiveBlocks.changeHSB =
+    myPrimitiveBlocks.changeHSB =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1785,7 +1785,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         category: 'colors',
         defaults: ['hue', 10]
     };
-    primitiveBlocks.getHSB =
+    myPrimitiveBlocks.getHSB =
     {
 		only: SpriteMorph,
         type: 'reporter',
@@ -1795,7 +1795,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
 
     // Embroidery blocks
 
-    primitiveBlocks.stopRunning =
+    myPrimitiveBlocks.stopRunning =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1803,7 +1803,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         category: 'embroidery',
     };
 
-    primitiveBlocks.runningStitch =
+    myPrimitiveBlocks.runningStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1812,7 +1812,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [10]
     };
 
-    primitiveBlocks.beanStitch =
+    myPrimitiveBlocks.beanStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1821,7 +1821,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [10]
     };
 
-    primitiveBlocks.crossStitch =
+    myPrimitiveBlocks.crossStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1830,7 +1830,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [10, 10, true]
     };
 
-    primitiveBlocks.zigzagStitch =
+    myPrimitiveBlocks.zigzagStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1839,7 +1839,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [20, 20, true]
     };
 
-    primitiveBlocks.ZStitch =
+    myPrimitiveBlocks.ZStitch =
     {
 		only: SpriteMorph,
         type: 'command',
@@ -1848,7 +1848,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [20, 10, true]
     };
 
-    primitiveBlocks.satinStitch =
+    myPrimitiveBlocks.satinStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1857,7 +1857,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [20, true]
     };
 
-    primitiveBlocks.tatamiStitch =
+    myPrimitiveBlocks.tatamiStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1866,7 +1866,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [100, 40, true]
     };
 
-    primitiveBlocks.tieStitch =
+    myPrimitiveBlocks.tieStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1874,7 +1874,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         category: 'embroidery',
     };
 
-    primitiveBlocks.jumpStitch =
+    myPrimitiveBlocks.jumpStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1883,7 +1883,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [true]
     };
 
-    primitiveBlocks.trimStitch =
+    myPrimitiveBlocks.trimStitch =
     {
 		    only: SpriteMorph,
         type: 'command',
@@ -1893,39 +1893,25 @@ SpriteMorph.prototype.primitiveBlocks = function () {
 
 	// more blocks
 
-    primitiveBlocks.zoomToFit =
+    myPrimitiveBlocks.zoomToFit =
     {
         type: 'command',
         spec: 'zoom to fit',
         category: 'other'
     };
 
-    primitiveBlocks.zoomIn =
-    {
-        type: 'command',
-        spec: 'zoom in',
-        category: 'other'
-    };
-
-    primitiveBlocks.zoomOut =
-    {
-        type: 'command',
-        spec: 'zoom out',
-        category: 'other'
-    };    
-
-  	primitiveBlocks.reportPi = {
+  	myPrimitiveBlocks.reportPi = {
   		type: 'reporter',
   		category: 'operators',
   		spec: 'PI',
   	};
-	primitiveBlocks.receiveInteraction = {
+	myPrimitiveBlocks.receiveInteraction = {
         type: 'hat',
         category: 'control',
         spec: 'when stage is %interaction',
         defaults: ['clicked']
     };	
-	return primitiveBlocks;
+	return myPrimitiveBlocks;
 };
 
 
@@ -2075,12 +2061,13 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push('-');
         blocks.push(block('bounceOffEdge'));
         blocks.push('-');
+        blocks.push(block('getPosition'));
         blocks.push(watcherToggle('xPosition'));
-        blocks.push(block('xPosition'));
+        blocks.push(block('xPosition', this.inheritsAttribute('x position')));
         blocks.push(watcherToggle('yPosition'));
-        blocks.push(block('yPosition'));
+        blocks.push(block('yPosition', this.inheritsAttribute('y position')));
         blocks.push(watcherToggle('direction'));
-        blocks.push(block('direction'));
+        blocks.push(block('direction', this.inheritsAttribute('direction')));
 
     } else if (cat === 'looks') {
 
@@ -2111,16 +2098,9 @@ SpriteMorph.prototype.blockTemplates = function (
 
         // for debugging: ///////////////
 
-        if (this.world().isDevMode) {
+        if (devMode) {
             blocks.push('-');
-            txt = new TextMorph(localize(
-                'development mode \ndebugging primitives:'
-            ));
-            txt.fontSize = 9;
-            txt.setColor(this.paletteTextColor);
-            blocks.push(txt);
-            blocks.push('-');
-            blocks.push(block('reportCostumes'));
+            blocks.push(this.devModeText());
             blocks.push('-');
             blocks.push(block('log'));
             blocks.push(block('alert'));

@@ -1,4 +1,4 @@
-VERSION="2.11.0-dev"
+VERSION="2.11.0-dev2"
 
 // get debug mode
 url = new URL(window.location.href);
@@ -2029,7 +2029,7 @@ IDE_Morph.prototype.createCategories = function () {
         button.category = category;
         button.corner = 8;
         button.padding = 2;
-        button.labelShadowOffset = new Point(0,0);
+        button.labelShadowOffset = new Point(-1, -1);
         button.labelShadowColor = IDE_Morph.prototype.isBright ?
             CLEAR : colors[1];
         button.labelColor = myself.buttonLabelColor;

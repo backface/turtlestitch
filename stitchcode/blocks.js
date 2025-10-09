@@ -51,6 +51,7 @@ HueSlotMorph.prototype.getUserColor = function () {
     };
 };
 
+
 // labelPart() proxy
 SyntaxElementMorph.prototype.originalLabelPart = SyntaxElementMorph.prototype.labelPart;
 SyntaxElementMorph.prototype.labelPart = function (spec) {
