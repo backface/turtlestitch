@@ -211,6 +211,8 @@ tempDict = {
     '实现X射线效果 ...',
   'turn off X-RAY ...':
     '关闭X射线 ...',
+  'when stage is %interaction':
+    '当舞台被 %interaction',
 };
 
 // Add attributes to original SnapTranslator.dict.de
