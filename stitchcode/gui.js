@@ -23,7 +23,7 @@ IDE_Morph.prototype.init = function(config) {
 	//this.isAnimating = false;
     this.paletteWidth = 250; // initially same as logo width
     //MorphicPreferences.globalFontFamily = 'Sans, Helvetica, Arial';
-	this.cloud = new BeetleCloud('/api', this);
+	// this.cloud = new BeetleCloud('/api', this);
 };
 
 
@@ -304,10 +304,6 @@ IDE_Morph.prototype.newProject = function () {
 
     project.addDefaultScene();
 
-    this.source = this.cloud.username ? 'cloud' : null;
-    if (location.hash.substr(0, 6) !== '#lang:') {
-        location.hash = '';
-    }
 
     this.openProject(project);
 
@@ -368,6 +364,17 @@ IDE_Morph.prototype.openProject = function (project, purgeCustomizedPrims) {
         null, // data
         true // pause generic WHEN hat blocks
     );
+
+    // hide sprite
+    this.stage.children[0].resetAll();
+    this.stage.clearAll();
+    this.stage.rotateTurtle(this.stage.children[0].heading);
+    this.createStatusDisplay();
+    // clear stitch cache now (loading projects sends turtle move commands!)
+    this.stage.clearAll();
+    this.stage.turtleShepherd.clear();
+    this.stage.reRender();
+
     this.createStageHandle();
     this.flushBlocksCache();
     this.refreshPalette(true);
@@ -787,6 +794,38 @@ IDE_Morph.prototype.createControlBar = function () {
     turtlestitchButton = button;
     this.controlBar.add(turtlestitchButton);
     this.controlBar.turtlestitchButton = turtlestitchButton; // for menu positioning
+
+
+    // cloudButton
+    button = new ToggleButtonMorph(
+        null, //colors,
+        this, // the IDE is the target
+        'cloudMenu',
+        [
+            new SymbolMorph('cloudOutline', 11),
+            new SymbolMorph('cloud', 11)
+        ],
+        () => !isNil(this.cloud.username) // query
+    );
+
+    button.hasNeutralBackground = true;
+    button.corner = 12;
+    button.color = colors[0];
+    button.highlightColor = colors[1];
+    button.pressColor = colors[0];
+    button.labelMinExtent = new Point(36, 18);
+    button.padding = 0;
+    button.labelShadowOffset = new Point(-1, -1);
+    button.labelShadowColor = colors[1];
+    button.labelColor = this.buttonLabelColor;
+    button.contrast = this.buttonContrast;
+    // button.hint = 'cloud operations';
+    button.fixLayout();
+    button.refresh();
+    cloudButton = button;
+    this.controlBar.add(cloudButton);
+    this.controlBar.cloudButton = cloudButton; // for menu positioning & refresh
+        
     this.controlBar.fixLayout();
 
     this.controlBar.fixLayout = function () {
@@ -828,6 +867,10 @@ IDE_Morph.prototype.createControlBar = function () {
 
         projectButton.setCenter(myself.controlBar.center());
         projectButton.setRight(settingsButton.left() - padding);
+
+        cloudButton.setCenter(myself.controlBar.center());
+        cloudButton.setLeft(turtlestitchButton.right() + padding);
+
 
         this.refreshSlider();
         this.updateLabel();
@@ -891,7 +934,7 @@ IDE_Morph.prototype.createControlBar = function () {
         this.label.fixLayout();
         this.add(this.label);
         this.label.setCenter(this.center());
-        this.label.setLeft(this.turtlestitchButton.right() + padding);
+        this.label.setLeft(this.cloudButton.right() + padding + 5);
     };
 };
 
@@ -1685,31 +1728,31 @@ IDE_Morph.prototype.setProjectName = function (string) {
 };
 */
 
-IDE_Morph.prototype.setProjectName = function (string) {
-    var projectScene = this.scenes.at(1),
-        name = this.newSceneName(string, projectScene);
-    if (name !== projectScene.name) {
-        projectScene.name = name;
-        projectScene.stage.version = Date.now();
-        this.recordUnsavedChanges();
-        if (projectScene === this.scene) {
-            this.controlBar.updateLabel();
-        }
-    }
+// IDE_Morph.prototype.setProjectName = function (string) {
+//     var projectScene = this.scenes.at(1),
+//         name = this.newSceneName(string, projectScene);
+//     if (name !== projectScene.name) {
+//         projectScene.name = name;
+//         projectScene.stage.version = Date.now();
+//         this.recordUnsavedChanges();
+//         if (projectScene === this.scene) {
+//             this.controlBar.updateLabel();
+//         }
+//     }
 
-    if (string.replace(/['"]/g, '') != this.projectName || SnapCloud.username != this.creator) {
-      this.remixHistory = this.creator + ":" + this.projectName + ";"  + this.remixHistory
-      this.origName =  this.projectName;
-    }
-    this.origName =  this.projectName;
-    this.origCreator =  SnapCloud.username != this.creator ? this.creator : SnapCloud.username;
-    this.creator = SnapCloud.username ? SnapCloud.username : "anonymous";
-    this.projectName = string.replace(/['"]/g, '');
+//     if (string.replace(/['"]/g, '') != this.projectName || SnapCloud.username != this.creator) {
+//       this.remixHistory = this.creator + ":" + this.projectName + ";"  + this.remixHistory
+//       this.origName =  this.projectName;
+//     }
+//     this.origName =  this.projectName;
+//     this.origCreator =  SnapCloud.username != this.creator ? this.creator : SnapCloud.username;
+//     this.creator = SnapCloud.username ? SnapCloud.username : "anonymous";
+//     this.projectName = string.replace(/['"]/g, '');
   
-    this.controlBar.updateLabel();
+//     this.controlBar.updateLabel();
 
-    return name;
-};
+//     return name;
+// };
 
 
 
@@ -2345,25 +2388,7 @@ IDE_Morph.prototype.projectMenu = function () {
 			);
 		menu.addLine();
 	}
-	if (!SnapCloud.username) {
-		menu.addItem(
-			'Login',
-			function () { window.open('/login'); }
-			);
-		menu.addItem(
-			'Create an account',
-			function () { window.open('/signup'); }
-			);
-		menu.addItem(
-			'Reset Password...',
-			function () { window.open('/forgot_password'); }
-			);
-	} else {
-		menu.addItem(
-			localize('Logout') + ' / ' + SnapCloud.username,
-			'logout'
-		);
-	}
+
     if (shiftClicked) {
         menu.addLine();
         menu.addItem(
@@ -2805,354 +2830,61 @@ DialogBoxMorph.prototype.promptOrder = function (
 };
 
 
-IDE_Morph.prototype.uploadOrder = function () {
-    var myself = this,
-        world = this.world();
-
-    if (window.location.hostname.endsWith("localhost")) {
-		 SHOP_URL = 'http://shop.stitchcode.localhost/ext.php';
-	} else {
-		SHOP_URL = 'http://shop.stitchcode.com/ext.php';
-	}
-
-	if (myself.stage.turtleShepherd.hasSteps()) {
-		new DialogBoxMorph(
-			this,
-			function(userdata) {
-				expUintArr = this.stage.turtleShepherd.toDST();
-				blob_dst = new Blob([expUintArr], {type: 'application/octet-stream'});
-				expUintArr = this.stage.turtleShepherd.toEXP();
-				blob_exp = new Blob([expUintArr], {type: 'application/octet-stream'});
-
-				var fd = new FormData;
-				var name = (this.projectName ? this.projectName : 'turtlestitch')
-				fd.append('public', userdata.choice_pub);
-				fd.append('filename', name + ".dst");
-				fd.append('projectname', name);
-				fd.append('source', 'turtlestitch');
-				fd.append('url', window.location.href);
-				fd.append('dstfile', blob_dst, name + ".dst");
-				fd.append('expfile', blob_exp, name + ".exp");
-				if (SnapCloud.username)
-					fd.append('username', SnapCloud.username);
-
-				var request = new XMLHttpRequest();
-
-				request.onreadystatechange = function () {
-					if (request.readyState === 4) {
-						if (request.responseText) {
-							try {
-								var response = JSON.parse(request.responseText);
-								if (!response.error) {
-									new  DialogBoxMorph().informWithLink(
-									'Upload success',
-									'Your embroidery was successully uploaded.\n\n Procceed to order opening a new window.\n'
-									+ 'If it does not open automatically, click here:' ,
-									response.url,
-									world);
-									window.open(response.url);
-								}
-							} catch(e) {
-								new  DialogBoxMorph().inform(
-									'Upload Error',
-									'Sorry. There was an Error during upload: \n' + request.responseText,
-									world);
-							}
-
-
-						} else {
-							new  DialogBoxMorph().inform(
-								'Upload Error',
-								'Sorry. There was an Error during upload: \n'
-								+ request.responseText + "\n"
-								+ request.status + ' - ' + request.statusText,
-								world);
-						}
-					}
-				};
-
-				//url = url + ((/\?x=/).test(url) ? "&" : "?") + (new Date()).getTime();
-				request.open('POST', SHOP_URL, true);
-				request.send(fd);
-			}, // fntion
-			this
-		).promptOrder(
-			'Upload Order',
-			'http://snap.berkeley.edu/tos.html',
-			'Terms of Service...',
-			'',
-			'',
-			'Upload project as public (domain)',
-			'I have read and agree\nto the Terms of Service',
-			world,
-			null, //new SymbolMorph("turtle"), //icon
-			null // msg
-		);
-	} else {
-		new  DialogBoxMorph().inform(
-			'Upload Error',
-			'No stitches to upload, please (re)generate a drawing first!',
-			world);
-	}
-};
-
-DialogBoxMorph.prototype.informWithLink = function (
-    title,
-    textString,
-    url,
-    world,
-    pic
-) {
-	var lnk = new AlignmentMorph('row', 1);
-    var txt = new TextMorph(
-			textString,
-			this.fontSize,
-			this.fontStyle,
-			true,
-			false,
-			'center',
-			null,
-			null,
-			MorphicPreferences.isFlat ? null : new Point(1, 1),
-			new Color(255, 255, 255)
-		),
-	  bdy = new AlignmentMorph('column', this.padding),
-      myself = this;
-
-	function linkButton(label, url) {
-        var btn = new PushButtonMorph(
-            myself,
-            function () {
-                window.open(url);
-            },
-            '  ' + localize(label) + '  '
-        );
-        btn.fontSize = 10;
-        btn.corner = myself.buttonCorner;
-        btn.edge = myself.buttonEdge;
-        btn.outline = myself.buttonOutline;
-        btn.outlineColor = myself.buttonOutlineColor;
-        btn.outlineGradient = myself.buttonOutlineGradient;
-        btn.padding = myself.buttonPadding;
-        btn.contrast = myself.buttonContrast;
-        // btn.fixLayout();
-        btn.fixLayout();
-        return btn;
-    }
-
-    if (!this.key) {
-        this.key = 'inform' + title + textString;
-    }
-
-    this.labelString = title;
-    this.createLabel();
-    if (pic) {this.setPicture(pic); }
-
-    if (textString) {
-         bdy.add(txt)
-    }
-
-    if (url) {
-		lnk.add(linkButton(url, url));
-		bdy.add(lnk);
-	}
-
-	bdy.fixLayout();
-
-	this.addBody(bdy);
-
-  this.addButton('ok', 'OK');
-  // this.fixLayout();
-  this.fixLayout();
-  this.popUp(world);
-};
-
-ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
-    this.projectList = pl[0] ? pl : [];
-    this.projectList.sort((x, y) =>
-        x.projectname.toLowerCase() < y.projectname.toLowerCase() ? -1 : 1
-    );
-
-    this.listField.destroy();
-    this.listField = new ListMorph(
-        this.projectList,
-        this.projectList.length > 0 ?
-            (element) => {return element.projectname || element; }
-                : null,
-        [ // format: display shared project names bold
-            [
-                'bold',
-                proj => proj.ispublic
-            ],
-            [
-                'italic',
-                proj => proj.ispublished
-            ]
-        ],
-        () => this.ok()
-    );
-    this.fixListFieldItemColors();
-    this.listField.fixLayout = nop;
-    this.listField.edge = InputFieldMorph.prototype.edge;
-    this.listField.fontSize = InputFieldMorph.prototype.fontSize;
-    this.listField.typeInPadding = InputFieldMorph.prototype.typeInPadding;
-    this.listField.contrast = InputFieldMorph.prototype.contrast;
-    this.listField.render = InputFieldMorph.prototype.render;
-    this.listField.drawRectBorder = InputFieldMorph.prototype.drawRectBorder;
-
-    this.listField.action = (item) => {
-        if (item === undefined) {return; }
-        if (this.nameField) {
-            this.nameField.setContents(item.projectname || '');
-        }
-        if (this.task === 'open' || this.task === 'add') {
-            this.notesText.text = item.notes || '';
-            this.notesText.rerender();
-            this.notesField.contents.adjustBounds();
-            this.preview.texture = '';
-            this.preview.rerender();
-            // we ask for the thumbnail when selecting a project
-            this.ide.cloud.getThumbnail(
-                null, // username is implicit
-                item.projectname,
-                thumbnail => {
-                    this.preview.texture = thumbnail;
-                    this.preview.cachedTexture = null;
-                    this.preview.rerender();
-                });
-            new SpeechBubbleMorph(new TextMorph(
-                localize('last changed') + '\n' + item.updated + item.ispublic + item.Public,
-                null,
-                null,
-                null,
-                null,
-                'center'
-            )).popUp(
-                this.world(),
-                this.preview.rightCenter().add(new Point(2, 0))
-            );
-        }
-        if (item.ispublic) {
-            this.shareButton.hide();
-            this.unshareButton.show();
-        } else {
-            this.unshareButton.hide();
-            this.shareButton.show();
-        }
-        this.buttons.fixLayout();
-        this.fixLayout();
-        this.publishButton.hide();
-        this.edit();
-
-    };
-    this.body.add(this.listField);
-    if (this.task === 'open' || this.task === 'add') {
-        this.recoverButton.hide();
-        this.tagsField.hide();
-        this.tagsLabelField.hide();
-        this.unshareButton.hide();
-        this.shareButton.hide();
-        this.unpublishButton.hide();
-    }
-    this.deleteButton.show();
-    this.buttons.fixLayout();
-    this.fixLayout();
-    if (this.task === 'open' || this.task === 'add') {
-        this.clearDetails();
-    }
-};
-
-/*
-
-
-ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
-    var myself = this;
-    this.projectList = pl || [];
-    this.projectList.sort(function (x, y) {
-        return x.ProjectName.toLowerCase() < y.ProjectName.toLowerCase() ?
-                 -1 : 1;
-    });
-
-    this.listField.destroy();
-    this.listField = new ListMorph(
-        this.projectList,
-        this.projectList.length > 0 ?
-                function (element) {
-                    return element.ProjectName || element;
-                } : null,
-        [ // format: display shared project names bold
-            [
-                'bold',
-                function (proj) {return proj.Public === 'true'; }
-            ]
-        ],
-        function () {myself.ok(); }
-    );
-    this.fixListFieldItemColors();
-    this.listField.fixLayout = nop;
-    this.listField.edge = InputFieldMorph.prototype.edge;
-    this.listField.fontSize = InputFieldMorph.prototype.fontSize;
-    this.listField.typeInPadding = InputFieldMorph.prototype.typeInPadding;
-    this.listField.contrast = InputFieldMorph.prototype.contrast;
-    // this.listField.fixLayout = InputFieldMorph.prototype.fixLayout;
-    this.listField.drawRectBorder = InputFieldMorph.prototype.drawRectBorder;
-
-    this.listField.action = function (item) {
-        if (item === undefined) {return; }
-        if (myself.nameField) {
-            myself.nameField.setContents(item.ProjectName || '');
-        }
-        if (myself.task === 'open') {
-            myself.notesText.text = item.Notes || '';
-            // myself.notesText.fixLayout();
-            myself.notesText.fixLayout();
-            myself.notesField.contents.adjustBounds();
-            myself.preview.texture = item.Thumbnail || null;
-            myself.preview.cachedTexture = null;
-            // myself.preview.fixLayout();
-            myself.preview.fixLayout();
-            (new SpeechBubbleMorph(new TextMorph(
-                localize('last changed') + '\n' + item.Updated,
-                null,
-                null,
-                null,
-                null,
-                'center'
-            ))).popUp(
-                myself.world(),
-                myself.preview.rightCenter().add(new Point(2, 0))
-            );
-        }
-        if (item.Public === 'true') {
-            myself.shareButton.hide();
-            myself.unshareButton.show();
-        } else {
-            myself.unshareButton.hide();
-            myself.shareButton.show();
-        }
-        myself.buttons.fixLayout();
-        myself.fixLayout();
-        myself.edit();
-    };
-    this.body.add(this.listField);
-    this.shareButton.show();
-    this.unshareButton.hide();
-    this.deleteButton.show();
-    this.buttons.fixLayout();
-    this.fixLayout();
-    if (this.task === 'open') {
-        this.clearDetails();
-    }
-};
-
-*/
 ProjectDialogMorph.prototype.fixLayoutOrig = ProjectDialogMorph.prototype.fixLayout;
 ProjectDialogMorph.prototype.initOrig = ProjectDialogMorph.prototype.init;
 ProjectDialogMorph.prototype.saveProjectOrig = ProjectDialogMorph.prototype.saveProject;
 
+ProjectDialogMorph.prototype.originalBuildContents = ProjectDialogMorph.prototype.buildContents;
+ProjectDialogMorph.prototype.buildContents = function () {
+    var notification;
+
+    this.originalBuildContents();
+    this.tagsLabelField = new TextMorph("Tags (New cloud projects only):");
+    this.body.add(this.tagsLabelField);
+    this.notesLabelField = new TextMorph("Notes");
+    this.notesLabelField.edge = InputFieldMorph.prototype.edge;
+    this.body.add(this.notesLabelField);
+    this.tagsField = new InputFieldMorph("");
+    this.tagsField.edge = InputFieldMorph.prototype.edge;
+    this.tagsField.contrast = InputFieldMorph.prototype.contrast;
+    this.tagsField.fixLayout = InputFieldMorph.prototype.fixLayout;
+    this.body.add(this.tagsField);
+    this.tagsField.hide();
+    this.tagsLabelField.hide(); 
+    this.recoverButton.hide();
+    this.unpublishButton.hide();   
+    this.publishButton.hide();
+    this.fixLayout();
+ 
+    this.notesField.setWidth(this.preview.width());
+
+    if (this.ide.cloudMsg) {
+        notification = new TextMorph(
+                this.ide.cloudMsg,
+                10,
+                null, // style
+                false, // bold
+                null, // italic
+                null, // alignment
+                null, // width
+                null, // font name
+                new Point(1, 1), // shadow offset
+                new Color(255, 255, 255) // shadowColor
+                );
+        notification.refresh = nop;
+        this.srcBar.add(notification);
+    }
+    if (notification) {
+        this.setExtent(new Point(840, 590).add(notification.extent()));
+    } else {
+        this.setExtent(new Point(840, 590));
+    }
+    this.fixLayout();
+    
+};
 
 ProjectDialogMorph.prototype.fixLayout = function () {
-	this.fixLayoutOrig();
+  this.fixLayoutOrig();
   var th = fontHeight(this.titleFontSize) + this.titlePadding * 2,
       thin = this.padding / 2,
       oldFlag = Morph.prototype.trackChanges;
@@ -3160,17 +2892,36 @@ ProjectDialogMorph.prototype.fixLayout = function () {
   if (this.preview) {
     this.preview.setHeight(310);
   }
+  
   if (this.body && this.tagsField) {
     this.notesLabelField.setTop(this.preview.bottom() + thin);
     this.notesLabelField.setLeft(this.preview.left() + 1);
     this.notesField.setTop(this.notesLabelField.bottom());
     this.notesField.setLeft(this.preview.left());
     this.notesField.setHeight(this.body.bottom() - this.notesLabelField.bottom() - thin);
-
   }
   this.changed();
 }
 
+
+ProjectDialogMorph.prototype.setSourceOrig = ProjectDialogMorph.prototype.setSource;
+ProjectDialogMorph.prototype.setSource = function (source) {
+    this.setSourceOrig(source)
+    this.recoverButton.hide();
+    this.unpublishButton.hide();   
+    this.publishButton.hide();
+    this.fixLayout();
+}
+
+ProjectDialogMorph.prototype.installCloudProjectListOrig  = ProjectDialogMorph.prototype.installCloudProjectList;
+ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
+    this.installCloudProjectListOrig(pl)
+    this.recoverButton.hide();
+    this.unpublishButton.hide();   
+    this.publishButton.hide();
+    this.fixLayout();
+
+}
 
 ProjectDialogMorph.prototype.init = function (ide, task) {
 	this.initOrig (ide, task);
@@ -3186,6 +2937,7 @@ ProjectDialogMorph.prototype.saveProject = function () {
 
 StageMorph.prototype.backgroundColor = new Color(255,255,255);
 StageMorph.prototype.defaultPenColor = new Color(0,0,0,1);
+
 
 IDE_Morph.prototype.userSetBackgroundColor = function () {
     new DialogBoxMorph(
@@ -3441,15 +3193,15 @@ IDE_Morph.prototype.switchToScene = function (
     }
 };
 
-IDE_Morph.prototype.openProjectName = function (name) {
-    var str;
-    if (name) {
-        this.showMessage('opening project\n' + name);
-        this.setProjectName(name);
-        str = localStorage['-snap-project-' + name];
-        this.openProjectString(str);
-    }
-};
+// IDE_Morph.prototype.openProjectName = function (name) {
+//     var str;
+//     if (name) {
+//         this.showMessage('opening project\n' + name);
+//         this.setProjectName(name);
+//         str = localStorage['-snap-project-' + name];
+//         this.openProjectString(str);
+//     }
+// };
 
 
 

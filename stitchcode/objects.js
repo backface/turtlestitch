@@ -1891,7 +1891,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         category: 'embroidery',
     };
 
-	// more blocks
+	  // more blocks
 
     myPrimitiveBlocks.zoomToFit =
     {
@@ -1900,18 +1900,32 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         category: 'other'
     };
 
+    myPrimitiveBlocks.zoomIn =
+    {
+        type: 'command',
+        spec: 'zoom in',
+        category: 'other'
+    };
+    
+    myPrimitiveBlocks.zoomOut =
+    {
+        type: 'command',
+        spec: 'zoom out',
+        category: 'other'
+    };    
+
   	myPrimitiveBlocks.reportPi = {
   		type: 'reporter',
   		category: 'operators',
   		spec: 'PI',
   	};
-	myPrimitiveBlocks.receiveInteraction = {
+	  myPrimitiveBlocks.receiveInteraction = {
         type: 'hat',
         category: 'control',
         spec: 'when stage is %interaction',
         defaults: ['clicked']
     };	
-	return myPrimitiveBlocks;
+	  return myPrimitiveBlocks;
 };
 
 
@@ -1962,11 +1976,11 @@ SpriteMorph.prototype.blockTemplates = function (
             return null;
         }
         var info = SpriteMorph.prototype.blocks[selector];
-		if (!info) {
-			console.log('fail at:');
-			console.log(info);
-			return null;
-		}		
+      if (!info) {
+        console.log('fail at:');
+        console.log(info);
+        return null;
+      }		
         return new ToggleMorph(
             'checkbox',
             this,
