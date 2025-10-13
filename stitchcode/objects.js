@@ -530,7 +530,6 @@ SpriteMorph.prototype.forwardByNr = function (totalsteps, steps) {
       this.sign = 1;
     }
     stepsize = totalsteps / steps;
-    console.log(stepsize, steps)
     this.forwardSegemensWithEndCheck(steps, stepsize)
 };
 
@@ -543,7 +542,6 @@ SpriteMorph.prototype.forwardBy = function (totalsteps, stepsize) {
     }
     steps = Math.floor(totalsteps / stepsize);
     rest = totalsteps - (steps * stepsize);
-    console.log(stepsize, steps)
     this.forwardSegemensWithEndCheck(steps, stepsize)
 
   	if (rest > 0) {
