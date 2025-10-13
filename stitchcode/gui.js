@@ -2839,19 +2839,6 @@ ProjectDialogMorph.prototype.buildContents = function () {
     var notification;
 
     this.originalBuildContents();
-    this.tagsLabelField = new TextMorph("Tags (New cloud projects only):");
-    this.body.add(this.tagsLabelField);
-    this.notesLabelField = new TextMorph("Notes");
-    this.notesLabelField.edge = InputFieldMorph.prototype.edge;
-    this.body.add(this.notesLabelField);
-    this.tagsField = new InputFieldMorph("");
-    this.tagsField.edge = InputFieldMorph.prototype.edge;
-    this.tagsField.contrast = InputFieldMorph.prototype.contrast;
-    this.tagsField.fixLayout = InputFieldMorph.prototype.fixLayout;
-    this.body.add(this.tagsField);
-    this.tagsField.hide();
-    this.tagsLabelField.hide(); 
-    this.recoverButton.hide();
     this.unpublishButton.hide();   
     this.publishButton.hide();
     this.fixLayout();
@@ -2885,20 +2872,8 @@ ProjectDialogMorph.prototype.buildContents = function () {
 
 ProjectDialogMorph.prototype.fixLayout = function () {
   this.fixLayoutOrig();
-  var th = fontHeight(this.titleFontSize) + this.titlePadding * 2,
-      thin = this.padding / 2,
-      oldFlag = Morph.prototype.trackChanges;
-
   if (this.preview) {
     this.preview.setHeight(310);
-  }
-  
-  if (this.body && this.tagsField) {
-    this.notesLabelField.setTop(this.preview.bottom() + thin);
-    this.notesLabelField.setLeft(this.preview.left() + 1);
-    this.notesField.setTop(this.notesLabelField.bottom());
-    this.notesField.setLeft(this.preview.left());
-    this.notesField.setHeight(this.body.bottom() - this.notesLabelField.bottom() - thin);
   }
   this.changed();
 }
@@ -2907,7 +2882,7 @@ ProjectDialogMorph.prototype.fixLayout = function () {
 ProjectDialogMorph.prototype.setSourceOrig = ProjectDialogMorph.prototype.setSource;
 ProjectDialogMorph.prototype.setSource = function (source) {
     this.setSourceOrig(source)
-    this.recoverButton.hide();
+    //this.recoverButton.hide();
     this.unpublishButton.hide();   
     this.publishButton.hide();
     this.fixLayout();
@@ -2916,23 +2891,24 @@ ProjectDialogMorph.prototype.setSource = function (source) {
 ProjectDialogMorph.prototype.installCloudProjectListOrig  = ProjectDialogMorph.prototype.installCloudProjectList;
 ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
     this.installCloudProjectListOrig(pl)
-    this.recoverButton.hide();
-    this.unpublishButton.hide();   
-    this.publishButton.hide();
+    if (this.task === 'open' || this.task === 'add') {
+        this.recoverButton.hide();
+        this.unpublishButton.hide();   
+        this.publishButton.hide();        
+    }
+
     this.fixLayout();
 
 }
 
-ProjectDialogMorph.prototype.init = function (ide, task) {
-	this.initOrig (ide, task);
-	this.tagsText = "Tags?";
-}
+// ProjectDialogMorph.prototype.init = function (ide, task) {
+// 	this.initOrig (ide, task);
+// }
 
-ProjectDialogMorph.prototype.saveProjectOrig = ProjectDialogMorph.prototype.saveProject;
-ProjectDialogMorph.prototype.saveProject = function () {
-	this.ide.tags = this.tagsField.contents().text.text;
-  this.saveProjectOrig();
-};
+// ProjectDialogMorph.prototype.saveProjectOrig = ProjectDialogMorph.prototype.saveProject;
+// ProjectDialogMorph.prototype.saveProject = function () {
+//   this.saveProjectOrig();
+// };
 
 
 StageMorph.prototype.backgroundColor = new Color(255,255,255);
