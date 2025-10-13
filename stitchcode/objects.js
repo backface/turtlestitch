@@ -500,7 +500,7 @@ SpriteMorph.prototype.forward = function (steps) {
     if (dist != 0) {
 
   		if (dist < 0) {
-    		this.sign = -1;									//this.sign is used to indicate whether the turtle would go forward or backward
+    		this.sign = -1;		//this.sign is used to indicate whether the turtle would go forward or backward
     		dist = Math.abs(dist);
     	} else {
     		this.sign = 1;
@@ -523,13 +523,27 @@ SpriteMorph.prototype.forward = function (steps) {
 
 
 SpriteMorph.prototype.forwardByNr = function (totalsteps, steps) {
+    if (totalsteps < 0) {
+      this.sign = -1;	
+      totalsteps = Math.abs(totalsteps);
+    } else {
+      this.sign = 1;
+    }
     stepsize = totalsteps / steps;
+    console.log(stepsize, steps)
     this.forwardSegemensWithEndCheck(steps, stepsize)
 };
 
 SpriteMorph.prototype.forwardBy = function (totalsteps, stepsize) {
+    if (totalsteps < 0) {
+      this.sign = -1;	
+      totalsteps = Math.abs(totalsteps);
+    } else {
+      this.sign = 1;
+    }
     steps = Math.floor(totalsteps / stepsize);
     rest = totalsteps - (steps * stepsize);
+    console.log(stepsize, steps)
     this.forwardSegemensWithEndCheck(steps, stepsize)
 
   	if (rest > 0) {
