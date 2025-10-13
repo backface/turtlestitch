@@ -408,6 +408,23 @@ var SnapCloud = new BeetleCloud(
 IDE_Morph.prototype.openIn = function (world) {
     var hash, myself = this, urlLanguage = null;
 
+    window.onmessage = function (event) {
+        // make the API accessible from outside an iframe
+        var ide = myself;
+        if (!isNil(event.data.selector)) {
+            window.top.postMessage(
+                {
+                    selector: event.data.selector,
+                    response: ide[event.data.selector].apply(
+                        ide,
+                        event.data.params
+                    )
+                },
+                '*'
+            );
+        }
+    };
+    
     SnapCloud.checkCredentials(
             function (user) {
                 if (user.username) {
@@ -496,19 +513,74 @@ IDE_Morph.prototype.openIn = function (world) {
             } else {
                 this.droppedText(getURL(hash));
             }
-        } else if (location.hash.substr(0, 5) === '#run:') {
+        } else if (location.hash.substr(0, 5) === '#run:')  {
+            dict = '';
             hash = location.hash.substr(5);
+
+            //decoding if hash is an encoded URI
             if (hash.charAt(0) === '%'
                     || hash.search(/\%(?:[0-9a-f]{2})/i) > -1) {
                 hash = decodeURIComponent(hash);
             }
-            if (hash.substr(0, 8) === '<project>') {
-                this.rawOpenProjectString(hash);
+            idx = hash.indexOf("&");
+
+            // supporting three URL cases
+
+            // xml project
+            if (hash.substr(0, 8) === '<project') {
+                this.rawOpenProjectString(
+                    hash.slice(0,hash.indexOf('</project>') + 10)
+                );
+                applyFlags(
+                    myself.cloud.parseDict(
+                        hash.substr(hash.indexOf('</project>') + 10)
+                    )
+                );
+            // no project, only flags
+            } else if (idx == 0){
+                applyFlags(myself.cloud.parseDict(hash));
+            // xml file path
+            // three path types allowed:
+            //  (1) absolute (http...),
+            //  (2) relative to site ("/path") or
+            //  (3) relative to folder ("path")
             } else {
-                this.rawOpenProjectString(getURL(hash));
+                this.shield = new Morph();
+                this.shield.alpha = 0;
+                this.shield.setExtent(this.parent.extent());
+                this.parent.add(this.shield);
+                this.showMessage('Fetching project...');
+                if (idx > 0) {
+                    dict = myself.cloud.parseDict(hash.substr(idx));
+                    hash = hash.slice(0,idx);
+                }
+                this.getURL(
+                    hash,
+                    projectData => {
+                        var msg;
+                        this.nextSteps([
+                            () => msg = this.showMessage('Opening project...'),
+                            () => {
+                                if (projectData.indexOf('<snapdata') === 0) {
+                                    this.rawOpenCloudDataString(projectData);
+                                } else if (
+                                    projectData.indexOf('<project') === 0
+                                ) {
+                                    this.rawOpenProjectString(projectData);
+                                }
+                                this.hasChangedMedia = true;
+                            },
+                            () => {
+                                this.shield.destroy();
+                                this.shield = null;
+                                msg.destroy();
+                                // this.toggleAppMode(true);
+                                applyFlags(dict);
+                            }
+                        ]);
+                    }
+                );
             }
-            this.toggleAppMode(true);
-            this.runScripts();
         } else if (location.hash.substr(0, 9) === '#present:') {
             this.shield = new Morph();
             this.shield.color = this.color;
