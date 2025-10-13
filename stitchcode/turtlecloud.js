@@ -393,6 +393,11 @@ BeetleCloud.prototype.getThumbnail = function (username, projectName, callBack, 
                 
 };
 
+BeetleCloud.prototype.disable = function () {
+    this.disabled = true;
+    this.username = null;
+};
+
 Cloud = BeetleCloud;
 
 var SnapCloud = new BeetleCloud(
@@ -679,6 +684,66 @@ IDE_Morph.prototype.openIn = function (world) {
             this.createCloudAccount();
         }
     }
+    
+    function applyFlags(dict) {
+        if (dict.noCloud) {
+            myself.cloud.disable();
+        }
+        if (dict.embedMode) {
+            myself.setEmbedMode();
+        }
+        if (dict.editMode) {
+            myself.toggleAppMode(false);
+        } else {
+            myself.toggleAppMode(true);
+        }
+        if (!dict.noRun) {
+            autoRun();
+        }
+        if (dict.hideControls) {
+            myself.controlBar.hide();
+            window.noExitWarning = true;
+        }
+        if (dict.noExitWarning) {
+            window.noExitWarning = true;
+        }
+        if (dict.blocksZoom) {
+            myself.savingPreferences = false;
+            myself.setBlocksScale(Math.max(1,Math.min(dict.blocksZoom, 12)));
+            myself.savingPreferences = true;
+        }
+
+        // only force my world to get focus if I'm not in embed mode
+        // to prevent the iFrame from involuntarily scrolling into view
+        if (!myself.isEmbedMode) {
+            world.worldCanvas.focus();
+        }
+    }
+
+    function autoRun () {
+        // if we're going to run the project anyway, remove the embed
+        // overlay in case we're in embedMode
+        if (myself.embedOverlay) {
+            myself.embedPlayButton.destroy();
+            myself.embedOverlay.destroy();
+        }
+        // wait until all costumes and sounds are loaded
+        if (isLoadingAssets()) {
+            myself.world().animations.push(
+                new Animation(nop, nop, 0, 200, nop, autoRun)
+            );
+        } else {
+            myself.runScripts();
+        }
+    }
+    
+    function isLoadingAssets() {
+        return myself.sprites.asArray().concat([myself.stage]).some(any =>
+            (any.costume ? any.costume.loaded !== true : false) ||
+            any.costumes.asArray().some(each => each.loaded !== true) ||
+            any.sounds.asArray().some(each => each.loaded !== true)
+        );
+    }    
 
     if (this.userLanguage) {
         this.setLanguage(this.userLanguage, interpretUrlAnchors);
