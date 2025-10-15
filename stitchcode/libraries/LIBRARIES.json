@@ -22,6 +22,95 @@
 	  }
 	}
   },   
+ {
+    "fileName": "beetle.xml",
+    "name": "3D Beetle Geometry",
+    "description": "Generate 3D geometry by extruding points, lines or polygons along a path in 3D space.",
+    "searchData": [
+      "reset",
+      "go home",
+      "move _ steps",
+      "go to _",
+      "set _ position to _",
+      "change absolute _ by _",
+      "change relative _ by _",
+      "_ position",
+      "rotate _ by _",
+      "set _ rotation to _",
+      "point to _",
+      "_ rotation",
+      "start extruding _",
+      "stop extruding",
+      "log sprite positions in _",
+      "shape points",
+      "set shape offset to _",
+      "set _ scale to _",
+      "change _ scale by _",
+      "_ scale",
+      "push position",
+      "pop position",
+      "beetle view"
+    ],
+    "categories": [
+      "3D Beetle"
+    ],
+    "translations": {
+      "ca": {
+        "name": "Geometria 3D de l'escarbat",
+        "description": "Crea geometria 3D extruint punts, línies o polígons al llarg d'un camí dins l'espai 3D.",
+        "searchData": [
+          "reinicia",
+          "torna a casa",
+          "mou-te _ passos",
+          "vés a _",
+          "fixa la coordenada _ a _",
+          "augmenta la coordenada _ en _",
+          "mou-te en la _ pròpia _ passos",
+          "posició _",
+          "gira sobre _ propi en _ graus",
+          "fixa l'angle _ propi a _",
+          "apunta cap a _",
+          "angle _",
+          "comença a extrudir amb _ de base",
+          "deixa d'extrudir",
+          "enregistra les posicions de la tortuga _",
+          "punts de la base",
+          "fixa el desplaçament de la base a _",
+          "fixa l'escala de _ a _",
+          "augmenta l'escala de _ en _",
+          "escala de _",
+          "enregistra posició actual",
+          "torna a la posició enregistrada",
+          "vista de l'escarbat"
+        ],
+        "searchData": [
+          "reinicia",
+          "torna a casa",
+          "mou-te _ passos",
+          "vés a _",
+          "fixa la coordenada _ a _",
+          "augmenta la coordenada _ en _",
+          "mou-te en la _ pròpia _ passos",
+          "posició _",
+          "gira sobre _ propi en _ graus",
+          "fixa l'angle _ propi a _",
+          "apunta cap a _",
+          "angle _",
+          "comença a extrudir amb _ de base",
+          "deixa d'extrudir",
+          "enregistra les posicions de la tortuga _",
+          "punts de la base",
+          "fixa el desplaçament de la base a _",
+          "fixa l'escala de _ a _",
+          "augmenta l'escala de _ en _",
+          "escala de _",
+          "enregistra posició actual",
+          "torna a la posició enregistrada",
+          "vista de l'escarbat"
+        ]
+      }
+    }
+  },  
   {
     "fileName": "~",
     "name": "~"
@@ -984,95 +1073,6 @@
       "ca": {
         "name": "Connector S4A",
         "description": "Connector de Snap! a per totes les plaques compatibles amb firmata: UNO, Nano, Mega, Leonardo, Micro, Due, 101, ESP8266, NodeMCU... per controlar dinàmicament les seves funcionalitats. Necessita que la placa tingui el Firmata carregat prèviament."
-      }
-    }
-  },
-  {
-    "fileName": "../../libraries/beetle.xml",
-    "name": "3D Beetle Geometry",
-    "description": "Generate 3D geometry by extruding points, lines or polygons along a path in 3D space.",
-    "searchData": [
-      "reset",
-      "go home",
-      "move _ steps",
-      "go to _",
-      "set _ position to _",
-      "change absolute _ by _",
-      "change relative _ by _",
-      "_ position",
-      "rotate _ by _",
-      "set _ rotation to _",
-      "point to _",
-      "_ rotation",
-      "start extruding _",
-      "stop extruding",
-      "log sprite positions in _",
-      "shape points",
-      "set shape offset to _",
-      "set _ scale to _",
-      "change _ scale by _",
-      "_ scale",
-      "push position",
-      "pop position",
-      "beetle view"
-    ],
-    "categories": [
-      "3D Beetle"
-    ],
-    "translations": {
-      "ca": {
-        "name": "Geometria 3D de l'escarbat",
-        "description": "Crea geometria 3D extruint punts, línies o polígons al llarg d'un camí dins l'espai 3D.",
-        "searchData": [
-          "reinicia",
-          "torna a casa",
-          "mou-te _ passos",
-          "vés a _",
-          "fixa la coordenada _ a _",
-          "augmenta la coordenada _ en _",
-          "mou-te en la _ pròpia _ passos",
-          "posició _",
-          "gira sobre _ propi en _ graus",
-          "fixa l'angle _ propi a _",
-          "apunta cap a _",
-          "angle _",
-          "comença a extrudir amb _ de base",
-          "deixa d'extrudir",
-          "enregistra les posicions de la tortuga _",
-          "punts de la base",
-          "fixa el desplaçament de la base a _",
-          "fixa l'escala de _ a _",
-          "augmenta l'escala de _ en _",
-          "escala de _",
-          "enregistra posició actual",
-          "torna a la posició enregistrada",
-          "vista de l'escarbat"
-        ],
-        "searchData": [
-          "reinicia",
-          "torna a casa",
-          "mou-te _ passos",
-          "vés a _",
-          "fixa la coordenada _ a _",
-          "augmenta la coordenada _ en _",
-          "mou-te en la _ pròpia _ passos",
-          "posició _",
-          "gira sobre _ propi en _ graus",
-          "fixa l'angle _ propi a _",
-          "apunta cap a _",
-          "angle _",
-          "comença a extrudir amb _ de base",
-          "deixa d'extrudir",
-          "enregistra les posicions de la tortuga _",
-          "punts de la base",
-          "fixa el desplaçament de la base a _",
-          "fixa l'escala de _ a _",
-          "augmenta l'escala de _ en _",
-          "escala de _",
-          "enregistra posició actual",
-          "torna a la posició enregistrada",
-          "vista de l'escarbat"
-        ]
       }
     }
   },
