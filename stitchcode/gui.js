@@ -1,4 +1,4 @@
-VERSION="2.11.0-dev4-api"
+VERSION="2.11.0-dev5-api"
 
 // get debug mode
 url = new URL(window.location.href);
@@ -3186,5 +3186,66 @@ IDE_Morph.prototype.inform = function (title, message) {
         title,
         localize(message),
         this.world()
+    );
+};
+
+
+// IDE_Morph cloud interface
+
+IDE_Morph.prototype.initializeCloud = function () {
+    var world = this.world();
+    new DialogBoxMorph(
+        null,
+        user => this.cloud.login(
+            user.username.toLowerCase(),
+            user.password,
+            true, // user.choice (alwyas persist)
+            (username, role, response) => {
+                sessionStorage.username = username;
+                this.controlBar.cloudButton.refresh();
+                this.source = 'cloud';
+                if (!isNil(response.days_left)) {
+                    var duration = response.days_left + ' day' +
+                        (response.days_left > 1 ? 's' : '');
+                    new DialogBoxMorph().inform(
+                        'Unverified account: ' + duration + ' left' +
+                        'You are now logged in, and your account\n' +
+                        'is enabled for ' + duration + '.\n' +
+                        'Please use the verification link that\n' +
+                        'was sent to your email address when you\n' +
+                        'signed up.\n\n' +
+                        'If you cannot find that email, please\n' +
+                        'check your spam folder. If you still\n' +
+                        'cannot find it, please use the "Resend\n' +
+                        'Verification Email..." option in the cloud\n' +
+                        'menu.\n\n' +
+                        'You have ' + duration + ' left.',
+                        world,
+                        this.cloudIcon(null, new Color(0, 180, 0))
+                    );
+                } else if (response.title) {
+                    new DialogBoxMorph().inform(
+                        response.title,
+                        response.message,
+                        world,
+                        this.cloudIcon(null, new Color(0, 180, 0))
+                    );
+                } else {
+                    this.showMessage(response.message, 2);
+                }
+            },
+            this.cloudError()
+        )
+    ).withKey('cloudlogin').promptCredentials(
+        'Sign in',
+        'login',
+        null,
+        null,
+        null,
+        null,
+        '', //stay signed in on this computer\nuntil logging out',
+        world,
+        this.cloudIcon(),
+        this.cloudMsg
     );
 };
