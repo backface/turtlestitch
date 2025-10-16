@@ -35,6 +35,8 @@
 		<script src="src/sha512.js?version=2019-06-27"></script>
 		<script src="src/FileSaver.min.js?version=2019-06-27"></script>
 
+		<meta name="snap-cloud-domain" location="https://turtlestitch.org">
+
 		<!-- three.js -->
 		<script type="text/javascript" src="stitchcode/three-newer/three.js?version=2021-12-14"></script>
 		<script type="text/javascript" src="stitchcode/threee/CanvasRenderer.js?version=2021-12-14"></script>
@@ -53,26 +55,27 @@
 		<script type="text/javascript" src="stitchcode/blocks.js?version=2021-12-14"></script>
 		<script type="text/javascript" src="stitchcode/widgets.js?version=2023-05-10"></script>
 		<script type="text/javascript" src="stitchcode/threads.js?version=2022-12-05"></script>
-		<script type="text/javascript" src="stitchcode/objects.js?version=2025-10-09"></script>
-		<script type="text/javascript" src="stitchcode/turtlecloud.js?version=2025-10-13"></script>
+		<script type="text/javascript" src="stitchcode/objects.js?version=2025-10-10"></script>
 		<script type="text/javascript" src="stitchcode/gui.js?version=2025-10-13"></script>
 		<script type="text/javascript" src="stitchcode/store.js?version=2025-10-07"></script>
 
 		<script type="text/javascript">
-		var world;
+			var world;
+			document.querySelector('meta[name="snap-cloud-domain"]').setAttribute("location", (location.protocol + "//" + location.host))
+			console.log(location.host, document.querySelector('meta[name="snap-cloud-domain"]'))
 			window.onload = function () {
-			console.log("is Retina supported: " + isRetinaSupported());
-			disableRetinaSupport();
-			world = new WorldMorph(document.getElementById('world'));
-			world.worldCanvas.focus();
-			new IDE_Morph().openIn(world);
-			loop();
-		};
+				console.log("is Retina supported: " + isRetinaSupported());
+				disableRetinaSupport();
+				world = new WorldMorph(document.getElementById('world'));
+				world.worldCanvas.focus();
+				new IDE_Morph().openIn(world);
+				loop();
+			};
 
-		function loop() {
-			requestAnimationFrame(loop);
-			world.doOneCycle();
-		}
+			function loop() {
+				requestAnimationFrame(loop);
+				world.doOneCycle();
+			}
 		</script>
 	</head>
 	<body style="margin: 0;">

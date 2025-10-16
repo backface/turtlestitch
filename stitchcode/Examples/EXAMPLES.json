@@ -1,0 +1,35 @@
+[
+  {
+    "fileName": "Drawing a Line.xml",
+    "name": "1. Stitching a Line   "
+  },
+  {
+    "fileName": "Drawing a Circle.xml",
+    "name": "2. Stitching a Circle"
+  },
+  {
+    "fileName": "Pinwheel with Square-block.xml",
+    "name": "3. Pinwheel (Custom block)"
+  },
+  {
+    "fileName": "Spiral using For-block.xml",
+    "name": "4. Spiral (For block)"
+  },
+  {
+    "fileName": "Triangle Variable.xml",
+    "name": "5. Triangle (Variables)"
+  },
+  {
+    "fileName": "Random stitch length - explosion.xml",
+    "name": "6. Random Stich Length"
+  },
+
+  {
+    "fileName": "Dragon_curve_iterative.xml",
+    "name": "7. Dragon Curve (iterative)"
+  },
+  {
+    "fileName": "Dragon_curve_recursive.xml",
+    "name": "8. Dragon Curve (recursive)"
+  }
+]
