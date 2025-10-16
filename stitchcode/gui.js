@@ -1,4 +1,4 @@
-VERSION="2.11.0-dev4-newapi"
+VERSION="2.11.0-dev4-api"
 
 // get debug mode
 url = new URL(window.location.href);
@@ -2839,8 +2839,8 @@ ProjectDialogMorph.prototype.buildContents = function () {
     var notification;
 
     this.originalBuildContents();
-    this.unpublishButton.hide();   
-    this.publishButton.hide();
+    // this.unpublishButton.hide();   
+    // this.publishButton.hide();
     this.fixLayout();
  
     this.notesField.setWidth(this.preview.width());
@@ -2878,27 +2878,13 @@ ProjectDialogMorph.prototype.fixLayout = function () {
   this.changed();
 }
 
-
-ProjectDialogMorph.prototype.setSourceOrig = ProjectDialogMorph.prototype.setSource;
-ProjectDialogMorph.prototype.setSource = function (source) {
-    this.setSourceOrig(source)
-    //this.recoverButton.hide();
-    this.unpublishButton.hide();   
-    this.publishButton.hide();
-    this.fixLayout();
-}
-
 ProjectDialogMorph.prototype.installCloudProjectListOrig  = ProjectDialogMorph.prototype.installCloudProjectList;
 ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
     this.installCloudProjectListOrig(pl)
     if (this.task === 'open' || this.task === 'add') {
-        this.recoverButton.hide();
-        this.unpublishButton.hide();   
-        this.publishButton.hide();        
+        this.recoverButton.hide();      
     }
-
     this.fixLayout();
-
 }
 
 // ProjectDialogMorph.prototype.init = function (ide, task) {
