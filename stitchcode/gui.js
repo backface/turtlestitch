@@ -392,10 +392,6 @@ IDE_Morph.prototype.exportProject = function (name) {
             project = new Project(this.scenes, this.scene);
             project.name = this.projectName;
             project.notes = this.projectNotes;
-            project.origName = this.origName;
-            project.origCreator  = this.origCreator;
-            project.creator = this.creator;
-            project.remixHistory = this.remixHistory;
 
             str = this.serializer.serialize(
                 project
@@ -1728,33 +1724,21 @@ IDE_Morph.prototype.setProjectName = function (string) {
 };
 */
 
-// IDE_Morph.prototype.setProjectName = function (string) {
-//     var projectScene = this.scenes.at(1),
-//         name = this.newSceneName(string, projectScene);
-//     if (name !== projectScene.name) {
-//         projectScene.name = name;
-//         projectScene.stage.version = Date.now();
-//         this.recordUnsavedChanges();
-//         if (projectScene === this.scene) {
-//             this.controlBar.updateLabel();
-//         }
-//     }
-
-//     if (string.replace(/['"]/g, '') != this.projectName || SnapCloud.username != this.creator) {
-//       this.remixHistory = this.creator + ":" + this.projectName + ";"  + this.remixHistory
-//       this.origName =  this.projectName;
-//     }
-//     this.origName =  this.projectName;
-//     this.origCreator =  SnapCloud.username != this.creator ? this.creator : SnapCloud.username;
-//     this.creator = SnapCloud.username ? SnapCloud.username : "anonymous";
-//     this.projectName = string.replace(/['"]/g, '');
-  
-//     this.controlBar.updateLabel();
-
-//     return name;
-// };
-
-
+IDE_Morph.prototype.setProjectName = function (string) {
+    var projectScene = this.scenes.at(1),
+        name = this.newSceneName(string, projectScene);
+    if (name !== projectScene.name) {
+        projectScene.name = name;
+        projectScene.stage.version = Date.now();
+        this.recordUnsavedChanges();
+        if (projectScene === this.scene) {
+            this.controlBar.updateLabel();
+        }
+    }
+    this.projectName = string.replace(/['"]/g, '');  
+    this.controlBar.updateLabel();
+    return name;
+};
 
 
 IDE_Morph.prototype.createSpriteBar = function () {
