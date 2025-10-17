@@ -2885,7 +2885,7 @@ ProjectDialogMorph.prototype.popUp = function (wrrld) {
         this.handle = new HandleMorph(
             this,
             700,
-            450,
+            500,
             this.corner,
             this.corner
         );
