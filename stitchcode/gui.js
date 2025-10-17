@@ -2878,6 +2878,20 @@ ProjectDialogMorph.prototype.fixLayout = function () {
   this.changed();
 }
 
+ProjectDialogMorph.prototype.popUp = function (wrrld) {
+    var world = wrrld || this.ide.world();
+    if (world) {
+        ProjectDialogMorph.uber.popUp.call(this, world);
+        this.handle = new HandleMorph(
+            this,
+            700,
+            450,
+            this.corner,
+            this.corner
+        );
+    }
+};
+
 ProjectDialogMorph.prototype.installCloudProjectListOrig  = ProjectDialogMorph.prototype.installCloudProjectList;
 ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
     this.installCloudProjectListOrig(pl)
