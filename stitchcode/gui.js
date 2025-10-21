@@ -1,4 +1,4 @@
-VERSION="2.11.0-dev5-api"
+VERSION="2.11.0-dev6-api"
 
 // get debug mode
 url = new URL(window.location.href);
@@ -231,11 +231,11 @@ IDE_Morph.prototype.applySavedTurtleStitchSettings = function () {
   }
 
   if(isImperial) {
-    this.stage.turtleShepherd.toggleMetric();
+    this.stage.turtleShepherd.setMetric(false);
     this.stage.scene.grid.draw();
     this.stage.renderer.changed = true;
   } else {
-    this.stage.turtleShepherd.sMetric = true;
+    this.stage.turtleShepherd.setMetric(true);
   }
 
   if (backgroundColor) {

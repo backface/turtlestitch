@@ -2639,52 +2639,77 @@ StageMorph.prototype.initScene = function () {
         this.lines = [];
 
 		c = 2.54;
+    
 		if (myself.turtleShepherd.isMetric()) {
 			this.interval = new Point(5, 5);
 			limit = this.interval.x * 50;
 		} else {
 			this.interval = new Point(Math.round(5 * c), Math.round(5 * c));
-			limit = Math.round(this.interval.x * 50 * c);
+			limit = Math.round(this.interval.x * 10 * c);
 		}
-        for (x = -limit / this.interval.x; x <= limit / this.interval.x; x++) {
-            p1 = new THREE.Vector3(x * this.interval.x, -limit, 0);
-            p2 = new THREE.Vector3(x * this.interval.x, limit, 0);
-            l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
-            l.visible = !StageMorph.prototype.hideGrid;
-            this.lines.push(l);
-        }
 
-        for (y = -limit / this.interval.y; y <= limit / this.interval.y; y++) {
-            p1 = new THREE.Vector3(-limit, y * this.interval.y, 0);
-            p2 = new THREE.Vector3(limit, y * this.interval.y, 0);
-            l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
-            l.visible = !StageMorph.prototype.hideGrid;
-            this.lines.push(l);
-        }
+    for (x = 0; x <= limit / this.interval.x; x++) {
+        p1 = new THREE.Vector3(x * this.interval.x, -limit, 0);
+        p2 = new THREE.Vector3(x * this.interval.x, limit, 0);
+        l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
+        l.visible = !StageMorph.prototype.hideGrid;
+        this.lines.push(l);
+        p1 = new THREE.Vector3(-x * this.interval.x, -limit, 0);
+        p2 = new THREE.Vector3(-x * this.interval.x, limit, 0);
+        l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
+        l.visible = !StageMorph.prototype.hideGrid;
+        this.lines.push(l);        
+    }
+    
+    for (y = 0; y <= limit / this.interval.y; y++) {
+        p1 = new THREE.Vector3(-limit, y * this.interval.y, 0);
+        p2 = new THREE.Vector3(limit, y * this.interval.y, 0);
+        l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
+        l.visible = !StageMorph.prototype.hideGrid;
+        this.lines.push(l);
+
+        p1 = new THREE.Vector3(-limit, - y * this.interval.y, 0);
+        p2 = new THREE.Vector3(limit, - y * this.interval.y, 0);
+        l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
+        l.visible = !StageMorph.prototype.hideGrid;
+        this.lines.push(l);        
+    }
 
 		if (myself.turtleShepherd.isMetric())
 			limit = this.interval.x * 200;
 		else
-			limit = Math.round(this.interval.x * 200 * c);
+			limit = Math.round(this.interval.x * 100 * c);
 
 
-        for (x = -limit/10 / this.interval.x; x <= limit/10 / this.interval.x; x++) {
-            p1 = new THREE.Vector3(x * this.interval.x * 10, -limit,0);
-            p2 = new THREE.Vector3(x * this.interval.x* 10, limit,0);
-            l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color2);
-            l.visible = !StageMorph.prototype.hideGrid;
-            this.lines.push(l);
-        }
+      for (x = 0; x <= limit/10 / this.interval.x; x++) {
+          p1 = new THREE.Vector3(x * this.interval.x * 10, -limit,0);
+          p2 = new THREE.Vector3(x * this.interval.x* 10, limit,0);
+          l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color2);
+          l.visible = !StageMorph.prototype.hideGrid;
+          this.lines.push(l);
 
-        for (y = -limit/10 / this.interval.y; y <= limit/10 / this.interval.y ; y++) {
-            p1 = new THREE.Vector3(-limit, y * this.interval.y * 10, 0);
-            p2 = new THREE.Vector3(limit, y * this.interval.y * 10, 0);
-            l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color2);
-            l.visible = !StageMorph.prototype.hideGrid;
-            this.lines.push(l);
-        }
+          p1 = new THREE.Vector3(-x * this.interval.x * 10, -limit,0);
+          p2 = new THREE.Vector3(-x * this.interval.x* 10, limit,0);
+          l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color2);
+          l.visible = !StageMorph.prototype.hideGrid;
+          this.lines.push(l);            
+      }
 
-        myself.reRender();
+      for (y = 0; y <= limit/10 / this.interval.y ; y++) {
+          p1 = new THREE.Vector3(-limit, y * this.interval.y * 10, 0);
+          p2 = new THREE.Vector3(limit, y * this.interval.y * 10, 0);
+          l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color2);
+          l.visible = !StageMorph.prototype.hideGrid;
+          this.lines.push(l);
+
+          p1 = new THREE.Vector3(-limit, - y * this.interval.y * 10, 0);
+          p2 = new THREE.Vector3(limit, - y * this.interval.y * 10, 0);
+          l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color2);
+          l.visible = !StageMorph.prototype.hideGrid;
+          this.lines.push(l);
+      }
+
+      myself.reRender();
     };
 
     this.scene.grid.setInterval = function (aPoint) {
