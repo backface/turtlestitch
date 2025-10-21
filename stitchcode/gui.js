@@ -1211,7 +1211,7 @@ IDE_Morph.prototype.aboutTurtleStitch = function () {
         + 'The project has been sponsored by netidee Open Innovation\n'
         + '(Internet Foundation Austria) and kickstarter crowdfunding.\n\n'
 
-        + 'TurtleStich is based on Snap!\n\n'
+        + 'TurtleStich is based on Snap! by Jens Mönig and Brian Harvey\n\n'
 
         dlg = new DialogBoxMorph();
     dlg.inform(localize('About TurtleStitch'), localize(aboutTxt), world, this.logo.cachedTexture);
