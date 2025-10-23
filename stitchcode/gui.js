@@ -3105,7 +3105,7 @@ IDE_Morph.prototype.switchToScene = function (
     pauseHats
 ) {
     var appMode = this.isAppMode,
-	    listeners;
+        listeners;
     if (!scene || !scene.stage) {
         return;
     }
@@ -3117,6 +3117,7 @@ IDE_Morph.prototype.switchToScene = function (
     this.scene.captureGlobalSettings();
     this.scene = scene;
     this.globalVariables = scene.globalVariables;
+    listeners = this.stage.messageCallbacks;
     this.stage.destroy();
     this.add(scene.stage);
     this.stage = scene.stage;
@@ -3130,7 +3131,11 @@ IDE_Morph.prototype.switchToScene = function (
     this.selectSprite(this.scene.currentSprite, true);
     // this.corral.album.updateSelection();
     this.fixLayout();
-
+    // this.corral.album.contents.children.forEach(function (morph) {
+    //     if (morph.state) {
+    //         morph.scrollIntoView();
+    //     }
+    // });
     if (!SpriteMorph.prototype.allCategories().includes(this.currentCategory)) {
         this.currentCategory = 'motion';
     }
@@ -3143,13 +3148,12 @@ IDE_Morph.prototype.switchToScene = function (
         this.categories.refreshEmpty();
         this.currentSprite.palette(this.currentCategory);
         this.refreshPalette(true);
-    }    
-
+    }
     this.toggleAppMode(appMode);
     this.controlBar.stopButton.refresh();
     this.world().keyboardFocus = this.stage;
     if (msg) {
-        this.stage.fireChangeOfSceneEvent(msg);
+        this.stage.fireChangeOfSceneEvent(msg, data);
     }
 };
 
