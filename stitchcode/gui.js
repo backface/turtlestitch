@@ -380,6 +380,37 @@ IDE_Morph.prototype.openProject = function (project, purgeCustomizedPrims) {
     this.refreshPalette(true);
 };
 
+IDE_Morph.prototype.buildProjectRequest = function () {
+    var proj = new Project(this.scenes, this.scene),
+        body,
+        xml;
+
+    // TS: add remix tags
+    proj.origName = this.origName;
+    proj.origCreator  = this.origCreator;
+    proj.creator = this.creator;
+    // ------
+
+    this.scene.captureGlobalSettings();
+    this.serializer.isCollectingMedia = true;
+    xml = this.serializer.serialize(proj);
+    body = {
+        notes: proj.notes,
+        xml: xml,
+        /*
+        media: this.hasChangedMedia ? // incremental media upload, disabled
+            this.serializer.mediaXML(proj.name) : null,
+        */
+        media: this.serializer.mediaXML(proj.name),
+        thumbnail: proj.thumbnail.toDataURL(),
+        remixID: this.stage.remixID
+    };
+    this.serializer.isCollectingMedia = false;
+    this.serializer.flushMedia();
+    this.scene.applyGlobalSettings();
+
+    return body;
+};
 
 IDE_Morph.prototype.exportProject = function (name) {
     // Export project XML, saving a file to disk
@@ -392,6 +423,9 @@ IDE_Morph.prototype.exportProject = function (name) {
             project = new Project(this.scenes, this.scene);
             project.name = this.projectName;
             project.notes = this.projectNotes;
+            project.origName = this.origName;
+            project.origCreator  = this.origCreator;
+            project.creator = this.creator;
 
             str = this.serializer.serialize(
                 project
@@ -1735,7 +1769,10 @@ IDE_Morph.prototype.setProjectName = function (string) {
             this.controlBar.updateLabel();
         }
     }
-    this.projectName = string.replace(/['"]/g, '');  
+    this.projectName = string.replace(/['"]/g, '');   
+    this.origCreator =  this.cloud.username != this.creator ? this.creator : this.cloud.username;
+	this.creator = this.cloud.username ? this.cloud.username : "anonymous";
+    this.hasChangedMedia = true;
     this.controlBar.updateLabel();
     return name;
 };
@@ -2430,7 +2467,7 @@ IDE_Morph.prototype.projectMenu = function () {
                         myself.showMessage(
                             'Fetching project\nfrom the cloud...'
                         );
-                        SnapCloud.getPublicProject(
+                        this.cloud.getPublicProject(
                             id,
                             function (projectData) {
                                 var msg;
@@ -2890,9 +2927,10 @@ ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
 // }
 
 // ProjectDialogMorph.prototype.saveProjectOrig = ProjectDialogMorph.prototype.saveProject;
-// ProjectDialogMorph.prototype.saveProject = function () {
-//   this.saveProjectOrig();
-// };
+ProjectDialogMorph.prototype.saveProject = function () {
+  console.log(this)
+  this.saveProjectOrig();
+};
 
 
 StageMorph.prototype.backgroundColor = new Color(255,255,255);

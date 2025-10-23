@@ -16,7 +16,6 @@ function Project(scenes, current) {
     this.origName = null;
     this.creator = null;
     this.origCreator = null;
-    this.remixHistory = null;
 
     projectScene = this.scenes.at(1);
     if (projectScene) {
@@ -65,7 +64,6 @@ Project.prototype.toXML = function (serializer) {
             '<creator>$</creator>\n' +
             '<origCreator>$</origCreator>\n' +
             '<origName>$</origName>\n' +
-            '<remixHistory>$</remixHistory>\n' +
             '</project>',
         this.name || localize('Untitled'),
         serializer.app,
@@ -76,8 +74,7 @@ Project.prototype.toXML = function (serializer) {
         serializer.store(this.scenes.itemsArray()),
         this.creator || '',
         this.origCreator || '',
-        this.origName || '',
-        this.remixHistory || ''
+        this.origName || ''
     );
 };
 
@@ -103,10 +100,10 @@ SnapSerializer.prototype.loadProjectModel = function (xmlNode, ide, remixID) {
     project_model = {project: xmlNode };
     //project.notes = project_model.project.childNamed('notes') ? project_model.project.childNamed('notes').contents : ""
     project.name = project_model.project.attributes.name;
-    project.origName = project_model.project.childNamed('origName') ? project_model.project.childNamed('origName').contents : ""
+    project.origName = project.name // project_model.project.childNamed('origName') ? project_model.project.childNamed('origName').contents : ""
     project.creator =  project_model.project.childNamed('creator') ? project_model.project.childNamed('creator').contents : ""
     project.origCreator =  project_model.project.childNamed('origCreator') ? project_model.project.childNamed('origCreator').contents : ""
-    project.remixHistory =  project_model.project.childNamed('remixHistory') ? project_model.project.childNamed('remixHistory').contents : ""
+    // project.remixHistory =  project_model.project.childNamed('remixHistory') ? project_model.project.childNamed('remixHistory').contents : ""
 
     ide.projectName = project.name;
     //ide.projectNotes = project.notes || '';
