@@ -125,18 +125,18 @@ tempDict = {
   // legacy blocks
   'clear':
     'borrar',
-  'move %n steps by %n steps':
-    'mover %n pasos con %n saltos',
-  'mover %n steps in %n':
-    'mover %n pasos en %n puntadas',
-  'go to x: %n y: %n by %n':
-    'ir a x: %n y: %n con %n salts ',
-  'go to x: %n y: %n in %n':
-    'ir a x: %n y: %n en %n puntades',
+  'move _ steps by _ steps':
+    'mover _ pasos con _ saltos',
+  'mover _ steps in _':
+    'mover _ pasos en _ puntadas',
+  'go to x: _ y: _ by _':
+    'ir a x: _ y: _ con _ salts ',
+  'go to x: _ y: _ in _':
+    'ir a x: _ y: _ en _ puntades',
 
   // new blocks
-  'point towards x: %n y: %n':
-    'apuntar a x: %n y: %n',
+  'point towards x: _ y: _':
+    'apuntar a x: _ y: _',
   'reset':
     'reiniciar',
 
@@ -159,32 +159,32 @@ tempDict = {
     'color HSV',
   'set color to %clr':
     'fijar color a %clr',
-  'set color to RGB %n %n %n':
-    'fijar color a RGB %n %n %n',
-  'set color to HSV %n %n %n':
-    'fijar color a HSV %n %n %n',
-  'set color to hex %s':
-    'fijar color a hexadecimal %s',
+  'set color to RGB _ _ _':
+    'fijar color a RGB _ _ _',
+  'set color to HSV _ _ _':
+    'fijar color a HSV _ _ _',
+  'set color to hex _':
+    'fijar color a hexadecimal _',
   'set color by hue %huewheel':
     'fijar color por tonalidad %huewheel',
-  'set %hsb to %n':
-    'fijar %hsb a %n',
-  'change %hsb by %n':
-    'incrementar %hsb en %n',
+  'set %hsb to _':
+    'fijar %hsb a _',
+  'change %hsb by _':
+    'incrementar %hsb en _',
   'color: %hsb':
     'color: %hsb',
   'opacity':
     'opacitat',
-  'set opacity to %n':
-    'fijar opacitdad %n',
-  'change opacity by %n':
-    'incrementar opacidad en %n',
+  'set opacity to _':
+    'fijar opacitdad _',
+  'change opacity by _':
+    'incrementar opacidad en _',
   'hue':
     'matiz',
   'brightness':
     'brilllo',
- 'change hue by %n':
-    'incrementar matiz en %n',
+ 'change hue by _':
+    'incrementar matiz en _',
 
   // new categories
   'Embroidery':
@@ -193,32 +193,32 @@ tempDict = {
     'Colores',
 
   // embroidery blocks and stuff
-  'running stitch by %n steps':
-    'puntada simple cada %n pasos',
-  'triple run by %n':
-    'puntada triple cada %n pasos',
-  'cross stitch in %n by %n center %b':
-    'puntada de cruz cada %n ancho %n centrado %b',
-  'zigzag with density %n width %n center %b':
-    'zig-zag densidad %n ancho %n centrado %b',
-  'Z-stitch with density %n width %n center %b':
-    'puntada Z densidad %n ancho %n centrado %b',
-  'satin stitch with width %n center %b':
-    'puntada satén ancho %n centrado %b',
-  'tatami stitch width %n interval %n center %b':
-    'puntada tatami ancho %n intervalo %n centrado %b',
-  'jump stitch %b':
-    'puntada de salto %b',
+  'running stitch by _ steps':
+    'puntada simple cada _ pasos',
+  'triple run by _':
+    'puntada triple cada _ pasos',
+  'cross stitch in _ by _ center _':
+    'puntada de cruz cada _ ancho _ centrado _',
+  'zigzag with density _ width _ center _':
+    'zig-zag densidad _ ancho _ centrado _',
+  'Z-stitch with density _ width _ center _':
+    'puntada Z densidad _ ancho _ centrado _',
+  'satin stitch with width _ center _':
+    'puntada satén ancho _ centrado _',
+  'tatami stitch width _ interval _ center _':
+    'puntada tatami ancho _ intervalo _ centrado _',
+  'jump stitch _':
+    'puntada de salto _',
   'tie stitch':
     'puntada de corbata',
   'trim':
     'cortar',
   'stop running':
     'parar bordado',
-  'draw text %s with size %n':
-    'escribir %s con tamaño %n',
-  'text length of %s with size %n':
-    'longitud de %s con tamaño %n',
+  'draw text _ with size _':
+    'escribir _ con tamaño _',
+  'text length of _ with size _':
+    'longitud de _ con tamaño _',
   'rendering X-RAY ...':
     'renderitzant radiografia ...',
   'turn off X-RAY ...':

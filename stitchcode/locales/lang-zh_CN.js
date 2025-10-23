@@ -109,22 +109,22 @@ tempDict = {
   // legacy blocks
   'clear':
     '清空',
-  'move %n steps by %n steps':
-    '移动 %n steps 每针 %n 步',
-  'move %n steps in %n':
-    '移动 %n steps 针数 %n',
-  'go to x: %n y: %n by %n':
-    '移到 x: %n y: %n 每针 %n',
-  'go to x: %n y: %n in %n':
-    '移到 x: %n y: %n 针数 %n',
-  'arc $turnRight radius: %n degrees: %n ':
-    '圆弧 $turnRight 半径: %n 角度: %n ',
-  'arc $turnLeft radius: %n degrees: %n ':
-    '圆弧 $turnLeft 半径: %n 角度: %n ',
+  'move _ steps by _ steps':
+    '移动 _ steps 每针 _ 步',
+  'move _ steps in _':
+    '移动 _ steps 针数 _',
+  'go to x: _ y: _ by _':
+    '移到 x: _ y: _ 每针 _',
+  'go to x: _ y: _ in _':
+    '移到 x: _ y: _ 针数 _',
+  'arc $turnRight radius: _ degrees: _ ':
+    '圆弧 $turnRight 半径: _ 角度: _ ',
+  'arc $turnLeft radius: _ degrees: _ ':
+    '圆弧 $turnLeft 半径: _ 角度: _ ',
   
   // new blocks
-  'point towards x: %n y: %n':
-    '面向 x: %n y: %n',
+  'point towards x: _ y: _':
+    '面向 x: _ y: _',
   'reset':
     '初始化',
 
@@ -147,32 +147,32 @@ tempDict = {
     'HSV颜色',
   'set color to %clr':
     '把颜色设为 %clr',
-  'set color to RGB %n %n %n':
-    '把颜色设为 RGB %n %n %n',
-  'set color to HSV %n %n %n':
-    '把颜色设为 HSV %n %n %n',
-  'set color to hex %s':
-    '把颜色设为 hex %s',
+  'set color to RGB _ _ _':
+    '把颜色设为 RGB _ _ _',
+  'set color to HSV _ _ _':
+    '把颜色设为 HSV _ _ _',
+  'set color to hex _':
+    '把颜色设为 hex _',
   'set color by hue %huewheel':
     '按色调 %huewheel 设置颜色',
-  'set %hsb to %n':
-    '把 %hsb 设为 %n',
-  'change %hsb by %n':
-    '把 %hsb 增加 %n',
+  'set %hsb to _':
+    '把 %hsb 设为 _',
+  'change %hsb by _':
+    '把 %hsb 增加 _',
   'color: %hsb':
     '颜色: %hsb',
   'opacity':
     '不透明度',
-  'set opacity to %n':
-    '把不透明度设为 %n',
-  'change opacity by %n':
-    '把不透明度增加 %n',
+  'set opacity to _':
+    '把不透明度设为 _',
+  'change opacity by _':
+    '把不透明度增加 _',
   'hue':
     '色调',
   'brightness':
     '亮度',
-  'change hue by %n':
-    '把色调增加 %n',
+  'change hue by _':
+    '把色调增加 _',
 
   // new categories
   'Embroidery':
@@ -181,32 +181,32 @@ tempDict = {
     '颜色',
 
   // embroidery blocks and stuff
-  'running stitch by %n steps':
-    '把每针设置为 %n 步',
-  'triple run by %n':
-    '设为往复3次模式，每针设置为 %n 步',
-  'cross stitch in %n by %n center %b':
-    '十字线 齿距 %n 宽度 %n 沿中心 %b',
-  'zigzag with density %n width %n center %b':
-    '锯齿线 齿距 %n 宽度 %n 沿中心 %b',
-  'Z-stitch with density %n width %n center %b':
-    'Z字线 齿距 %n 宽度 %n 沿中心 %b',
-  'satin stitch with width %n center %b':
-    '缎纹线 宽度 %n 沿中心 %b',
-  'tatami stitch width %n interval %n center %b':
-    '榻榻米线 宽度 %n 间距 %n 沿中心 %b',
-  'jump stitch %b':
-    '跳线模式 %b',
+  'running stitch by _ steps':
+    '把每针设置为 _ 步',
+  'triple run by _':
+    '设为往复3次模式，每针设置为 _ 步',
+  'cross stitch in _ by _ center _':
+    '十字线 齿距 _ 宽度 _ 沿中心 _',
+  'zigzag with density _ width _ center _':
+    '锯齿线 齿距 _ 宽度 _ 沿中心 _',
+  'Z-stitch with density _ width _ center _':
+    'Z字线 齿距 _ 宽度 _ 沿中心 _',
+  'satin stitch with width _ center _':
+    '缎纹线 宽度 _ 沿中心 _',
+  'tatami stitch width _ interval _ center _':
+    '榻榻米线 宽度 _ 间距 _ 沿中心 _',
+  'jump stitch _':
+    '跳线模式 _',
   'tie stitch':
     '结针',
   'trim':
     '切割',
   'stop running':
     '停止当前刺绣模式',
-  'draw text %s with size %n':
-    '绣出文本 %s 字号 %n',
-  'text length of %s with size %n':
-    '字符串 %s 为 %n 号字时的长度',
+  'draw text _ with size _':
+    '绣出文本 _ 字号 _',
+  'text length of _ with size _':
+    '字符串 _ 为 _ 号字时的长度',
   'rendering X-RAY ...':
     '实现X射线效果 ...',
   'turn off X-RAY ...':

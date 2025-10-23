@@ -128,20 +128,20 @@ tempDict = {
   // legacy blocks
   'clear' :
     'Effacer',
-  'move %n steps by %n steps' :
-    'passer de %n pas en %n pas',
-  'move %n steps in %n' :
-    'faire %n pas en %n points',
-  'go to x : %n y : %n par %n' :
-    'aller à x : %n y : %n en %n en pas',
-  'go to x : %n y : %n en %n' :
-    'aller à x : %n y : %n en %n points',
+  'move _ steps by _ steps' :
+    'passer de _ pas en _ pas',
+  'move _ steps in _' :
+    'faire _ pas en _ points',
+  'go to x : _ y : _ par _' :
+    'aller à x : _ y : _ en _ en pas',
+  'go to x : _ y : _ en _' :
+    'aller à x : _ y : _ en _ points',
 
   
 
   // nouveaux blocs
-  'point towards x : %n y : %n' :
-    'pointer vers x : %n y : %n',
+  'point towards x : _ y : _' :
+    'pointer vers x : _ y : _',
   'reset' :
     'réinitialiser',
 
@@ -166,38 +166,38 @@ tempDict = {
       
    'set color to %clr':
      'définir la couleur %clr',
-  'set color to RGB %n %n %n' :
-    'définir la couleur RGB %n %n %n',
-  'set color to HSV %n %n %n' :
-    'définir la couleur HSV %n %n %n',
+  'set color to RGB _ _ _' :
+    'définir la couleur RGB _ _ _',
+  'set color to HSV _ _ _' :
+    'définir la couleur HSV _ _ _',
     
-  'set color to hex %s' :
-    'définir la couleur hex %s',
+  'set color to hex _' :
+    'définir la couleur hex _',
   'set color by hue %huewheel' :
     'définir la teinte %huewheel',
-  'set %hsb to %n':
-    'mettre %hsb par %n',
+  'set %hsb to _':
+    'mettre %hsb par _',
    
-  'change %hsb by %n' :
-    'change %hsb par %n',
+  'change %hsb by _' :
+    'change %hsb par _',
   'color: %hsb' :
     'couleur: %hsb',
   'opacity' :
     'opacité',
-  'set opacity to %n' :
-  'mettre l opacité à %n',
-  'change opacity by %n' :
-    'change l opacité par %n',
+  'set opacity to _' :
+  'mettre l opacité à _',
+  'change opacity by _' :
+    'change l opacité par _',
   'hue' :
     'teinte',
   'brightness' :
     'luminosité',
-  'change hue by %n' :
-    'change la teinte par %n',
-  'arc $turnRight radius: %n degrees: %n ' :
-     'arc de cercle $turnRight de rayon: %n angle: %n ',
-  'arc $turnLeft radius: %n degrees: %n ' :
-     'arc $turnLeft avec rayon: %n angle: %n ',
+  'change hue by _' :
+    'change la teinte par _',
+  'arc $turnRight radius: _ degrees: _ ' :
+     'arc de cercle $turnRight de rayon: _ angle: _ ',
+  'arc $turnLeft radius: _ degrees: _ ' :
+     'arc $turnLeft avec rayon: _ angle: _ ',
   
   // catégories turtlestitch
   'Embroidery' :
@@ -209,32 +209,32 @@ tempDict = {
     'Par case',
 
   // embroidery blocks and stuff
-  'running stitch by %n steps' :
-    'point courant en %n étapes',
-  'triple run by %n' :
-    'point courant triple en %n étapes',
-  'cross stitch in %n by %n center %b' :
-    'point de croix de %n sur %n centré %b',
-  'zigzag with density %n width %n center %b':
-    'zigzag avec densité de %n et largeur de %n centré %b',
-  'Z-stitch with density %n width %n center %b' :
-    'point-Z avec densité de %n et largeur de %n centré %b',
-  'satin stitch with width %n center %b' :
-    'point de satin avec largeur de %n centré %b',
-  'tatami stitch width %n interval %n center %b' :
-    'point tatami avec largeur de %n et intervalle de %n centré %b',
-  'jump stitch %b' :
-    'se déplace sans broder %b',
+  'running stitch by _ steps' :
+    'point courant en _ étapes',
+  'triple run by _' :
+    'point courant triple en _ étapes',
+  'cross stitch in _ by _ center _' :
+    'point de croix de _ sur _ centré _',
+  'zigzag with density _ width _ center _':
+    'zigzag avec densité de _ et largeur de _ centré _',
+  'Z-stitch with density _ width _ center _' :
+    'point-Z avec densité de _ et largeur de _ centré _',
+  'satin stitch with width _ center _' :
+    'point de satin avec largeur de _ centré _',
+  'tatami stitch width _ interval _ center _' :
+    'point tatami avec largeur de _ et intervalle de _ centré _',
+  'jump stitch _' :
+    'se déplace sans broder _',
   'tie stitch' :
     'faire un nœud',
   'trim' :
     'couper',
   'stop running' :
     'stoppe la broderie',
-  'draw text %s with size %n' :
-    'écrire le texte %s en taille %n',
-  'text length of %s with size %n':
-    'longueur de texte %s avec taille %n',
+  'draw text _ with size _' :
+    'écrire le texte _ en taille _',
+  'text length of _ with size _':
+    'longueur de texte _ avec taille _',
   'rendering X-RAY ...' :
     'calculer l image en rayons-X ...',
   'turn off X-RAY ...' :

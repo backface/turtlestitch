@@ -119,18 +119,18 @@ tempDict = {
   // legacy blocks
   'clear':
     'wissen',
-  'move %n steps by %n steps':
-    'neem %n stappen in steken van %n',
-  'move %n steps in %n':
-    'neem %n stappen in %n steken',
-  'go to x: %n y: %n by %n':
-    'ga naar x: %n y: %n in steken van %n',
-  'go to x: %n y: %n in %n':
-    'ga naar x: %n y: %n in %n steken',
+  'move _ steps by _ steps':
+    'neem _ stappen in steken van _',
+  'move _ steps in _':
+    'neem _ stappen in _ steken',
+  'go to x: _ y: _ by _':
+    'ga naar x: _ y: _ in steken van _',
+  'go to x: _ y: _ in _':
+    'ga naar x: _ y: _ in _ steken',
 
   // new blocks
-  'point towards x: %n y: %n':
-    'richt naar x: %n y: %n',
+  'point towards x: _ y: _':
+    'richt naar x: _ y: _',
   'reset':
     'reset',
 
@@ -153,32 +153,32 @@ tempDict = {
     'HSV kleur',
   'set color to %clr':
     'maak kleur %clr',
-  'set color to RGB %n %n %n':
-    'maak kleur RGB %n %n %n',
-  'set color to HSV %n %n %n':
-    'maak kleur HSV %n %n %n',
-  'set color to hex %s':
-    'maak kleur hex %s',
+  'set color to RGB _ _ _':
+    'maak kleur RGB _ _ _',
+  'set color to HSV _ _ _':
+    'maak kleur HSV _ _ _',
+  'set color to hex _':
+    'maak kleur hex _',
   'set color by hue %huewheel':
     'maak kleurtint %huewheel',
-  'set %hsb to %n':
-    'stel %hsb in op %n',
-  'change %hsb by %n':
-    'verander %hsb met %n',
+  'set %hsb to _':
+    'stel %hsb in op _',
+  'change %hsb by _':
+    'verander %hsb met _',
   'color: %hsb':
     'kleur: %hsb',
   'opacity':
     'ondoorschijnendheid',
-  'set opacity to %n':
-    'maak ondoorschijnendheid %n',
-  'change opacity by %n':
-    'verander ondoorschijnendheid met %n',
+  'set opacity to _':
+    'maak ondoorschijnendheid _',
+  'change opacity by _':
+    'verander ondoorschijnendheid met _',
   'hue':
     'tint (hue)',
   'brightness':
     'helderheid',
-  'change hue by %n':
-    'verander tint (hue) met %n',
+  'change hue by _':
+    'verander tint (hue) met _',
 
   // new categories
   'Embroidery':
@@ -187,32 +187,32 @@ tempDict = {
     'Kleuren',
 
   // embroidery blocks and stuff
-  'running stitch by %n steps':
-    'lijnsteek met steeklengte %n',
-  'triple run by %n':
-    'drievoudige lijnsteek met steeklengte %n',
-  'cross stitch in %n by %n center %b':
-    'kruissteek van %n bij %n gecentreerd %b',
-  'zigzag with density %n width %n center %b':
-    'zigzag met dichtheid %n breedte %n gecentreerd %b',
-  'Z-stitch with density %n width %n center %b':
-    'Z-steek met dichtheid %n breedte %n gecentreerd %b',
-  'satin stitch with width %n center %b':
-    'satijnsteek met breedte %n gecentreerd %b',
-  'tatami stitch width %n interval %n center %b':
-    'Tatami-steek met breedte %n interval %n gecentreerd %b',
-  'jump stitch %b':
-    'springsteek %b',
+  'running stitch by _ steps':
+    'lijnsteek met steeklengte _',
+  'triple run by _':
+    'drievoudige lijnsteek met steeklengte _',
+  'cross stitch in _ by _ center _':
+    'kruissteek van _ bij _ gecentreerd _',
+  'zigzag with density _ width _ center _':
+    'zigzag met dichtheid _ breedte _ gecentreerd _',
+  'Z-stitch with density _ width _ center _':
+    'Z-steek met dichtheid _ breedte _ gecentreerd _',
+  'satin stitch with width _ center _':
+    'satijnsteek met breedte _ gecentreerd _',
+  'tatami stitch width _ interval _ center _':
+    'Tatami-steek met breedte _ interval _ gecentreerd _',
+  'jump stitch _':
+    'springsteek _',
   'tie stitch':
     'knoopsteek',
   'trim':
     'knip af',
   'stop running':
     'verwijder borduurinstellingen',
-  'draw text %s with size %n':
-    'schrijf tekst %s met grootte %n',
-  'text length of %s with size %n':
-    'lengte van tekst %s met grootte %n',
+  'draw text _ with size _':
+    'schrijf tekst _ met grootte _',
+  'text length of _ with size _':
+    'lengte van tekst _ met grootte _',
   'rendering X-RAY ...':
     'R\u00f6ntgenfoto maken ...',
   'turn off X-RAY ...':

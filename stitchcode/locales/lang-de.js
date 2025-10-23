@@ -131,18 +131,18 @@ tempDict = {
   // legacy blocks
   'clear':
     'l\u00f6schen',
-  'move %n steps by %n steps':
-    'gehe %n Schritte in %n er Schritten',
-  'move %n steps in %n':
-    'gehe %n Schritte in %n Stichen',
-  'go to x: %n y: %n by %n':
-    'gehe zu x: %n y: %n in %n er Schritten',
-  'go to x: %n y: %n in %n':
-    'gehe zu x: %n y: %n in %n Stichen',
+  'move _ steps by _ steps':
+    'gehe _ Schritte in _ er Schritten',
+  'move _ steps in _':
+    'gehe _ Schritte in _ Stichen',
+  'go to x: _ y: _ by _':
+    'gehe zu x: _ y: _ in _ er Schritten',
+  'go to x: _ y: _ in _':
+    'gehe zu x: _ y: _ in _ Stichen',
 
   // new blocks
-  'point towards x: %n y: %n':
-    'zeige nach x: %n y: %n',
+  'point towards x: _ y: _':
+    'zeige nach x: _ y: _',
   'reset':
     'zur\u00fccksetzen',
 
@@ -165,36 +165,36 @@ tempDict = {
     'HSV Farbe',
   'set color to %clr':
     'setze Farbe auf %clr',
-  'set color to RGB %n %n %n':
-    'setze Farbe auf RGB %n %n %n',
-  'set color to HSV %n %n %n':
-    'setze Farbe auf HSV %n %n %n',
-  'set color to hex %s':
-    'setze Farbe auf hex %s',
+  'set color to RGB _ _ _':
+    'setze Farbe auf RGB _ _ _',
+  'set color to HSV _ _ _':
+    'setze Farbe auf HSV _ _ _',
+  'set color to hex _':
+    'setze Farbe auf hex _',
   'set color by hue %huewheel':
     'setze Farbton %huewheel',
-  'set %hsb to %n':
-    'setze %hsb auf %n',
-  'change %hsb by %n':
-    '\u00e4ndere %hsb auf %n',
+  'set %hsb to _':
+    'setze %hsb auf _',
+  'change %hsb by _':
+    '\u00e4ndere %hsb auf _',
   'color: %hsb':
     'Farbe: %hsb',
   'opacity':
     'Deckkraft',
-  'set opacity to %n':
-    'setze Deckkraft auf %n',
-  'change opacity by %n':
-    '\u00e4ndere Deckkraft um %n',
+  'set opacity to _':
+    'setze Deckkraft auf _',
+  'change opacity by _':
+    '\u00e4ndere Deckkraft um _',
   'hue':
     'Farbton',
   'brightness':
     'absolute Helligkeit',
-  'change hue by %n':
-    '\u00e4ndere Farbton um %n',
-  'arc $turnRight radius: %n degrees: %n ':
-     'Kreisbogen $turnRight mit Radius: %n Winkel: %n ',
-  'arc $turnLeft radius: %n degrees: %n ':
-     'Kreisbogen $turnLeft mit Radius: %n Winkel: %n ',
+  'change hue by _':
+    '\u00e4ndere Farbton um _',
+  'arc $turnRight radius: _ degrees: _ ':
+     'Kreisbogen $turnRight mit Radius: _ Winkel: _ ',
+  'arc $turnLeft radius: _ degrees: _ ':
+     'Kreisbogen $turnLeft mit Radius: _ Winkel: _ ',
      
   // new categories
   'Embroidery':
@@ -203,32 +203,32 @@ tempDict = {
     'Farben',
 
   // embroidery blocks and stuff
-  'running stitch by %n steps':
-    'Laufstich in %n er Schritten',
-  'triple run by %n':
-    'Dreifach-Laufstich in %n er Schritten',
-  'cross stitch in %n by %n center %b':
-    'Kreuzstich %n mal %n zentriert %b',
-  'zigzag with density %n width %n center %b':
-    'Zickzack mit Dichte %n Breite %n zentriert %b',
-  'Z-stitch with density %n width %n center %b':
-    'Z-Stich mit Dichte %n Breite %n zentriert %b',
-  'satin stitch with width %n center %b':
-    'Satinstich mit Breite %n zentriert %b',
-  'tatami stitch width %n interval %n center %b':
-    'Tatami-Stich mit Breite %n Intervall %n zentriert %b',
-  'jump stitch %b':
-    'Sprungstich %b',
+  'running stitch by _ steps':
+    'Laufstich in _ er Schritten',
+  'triple run by _':
+    'Dreifach-Laufstich in _ er Schritten',
+  'cross stitch in _ by _ center _':
+    'Kreuzstich _ mal _ zentriert _',
+  'zigzag with density _ width _ center _':
+    'Zickzack mit Dichte _ Breite _ zentriert _',
+  'Z-stitch with density _ width _ center _':
+    'Z-Stich mit Dichte _ Breite _ zentriert _',
+  'satin stitch with width _ center _':
+    'Satinstich mit Breite _ zentriert _',
+  'tatami stitch width _ interval _ center _':
+    'Tatami-Stich mit Breite _ Intervall _ zentriert _',
+  'jump stitch _':
+    'Sprungstich _',
   'tie stitch':
     'Vern\u00e4hstich',
   'trim':
     'schneiden',
   'stop running':
     'Stickeinstellungen zur\u00fccksetzen',
-  'draw text %s with size %n':
-    'schreibe Text %s in Gr\u00f6sse %n',
-  'text length of %s with size %n':
-    'L\u00e4nge von Text %s mit Gr\u00f6sse %n',
+  'draw text _ with size _':
+    'schreibe Text _ in Gr\u00f6sse _',
+  'text length of _ with size _':
+    'L\u00e4nge von Text _ mit Gr\u00f6sse _',
   'rendering X-RAY ...':
     'berechne R\u00f6ntgenbild ...',
   'turn off X-RAY ...':
