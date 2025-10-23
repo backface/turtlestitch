@@ -2560,7 +2560,7 @@ IDE_Morph.prototype.refreshPalette = function (shouldIgnorePosition) {
 
 // Language
 IDE_Morph.prototype.originalSetLanguage = IDE_Morph.prototype.setLanguage;
-IDE_Morph.prototype.setLanguage = function(lang, callback) {
+IDE_Morph.prototype.setLanguage = function(lang, callback, noSave) {
     var myself = this;
     myself.originalSetLanguage(lang, function () {
         var translation = document.getElementById('bb-language'),
@@ -2570,7 +2570,7 @@ IDE_Morph.prototype.setLanguage = function(lang, callback) {
             document.head.removeChild(translation);
         }
         if (lang === 'en') {
-            return this.reflectLanguage('en', callback);
+            return myself.reflectLanguage('en', callback);
         }
         translation = document.createElement('script');
         translation.id = 'bb-language';
@@ -2579,7 +2579,7 @@ IDE_Morph.prototype.setLanguage = function(lang, callback) {
         };
         document.head.appendChild(translation);
         translation.src = src;
-    });
+    }, noSave);
 };
 
 IDE_Morph.prototype.setStageExtent = function (aPoint) {
