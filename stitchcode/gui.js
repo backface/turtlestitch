@@ -1770,10 +1770,11 @@ IDE_Morph.prototype.setProjectName = function (string) {
         }
     }
     this.projectName = string.replace(/['"]/g, '');   
-    this.origCreator =  this.cloud.username != this.creator ? this.creator : this.cloud.username;
+    this.origCreator = this.cloud.username != this.creator ? this.creator : this.cloud.username;
 	this.creator = this.cloud.username ? this.cloud.username : "anonymous";
     this.hasChangedMedia = true;
     this.controlBar.updateLabel();
+    console.log(this.origCreator)
     return name;
 };
 
@@ -2928,7 +2929,6 @@ ProjectDialogMorph.prototype.installCloudProjectList = function (pl) {
 
 // ProjectDialogMorph.prototype.saveProjectOrig = ProjectDialogMorph.prototype.saveProject;
 ProjectDialogMorph.prototype.saveProject = function () {
-  console.log(this)
   this.saveProjectOrig();
 };
 
