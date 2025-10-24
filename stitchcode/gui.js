@@ -1,4 +1,4 @@
-VERSION="2.11.0-dev7-api"
+VERSION="2.11.0-dev8-api"
 
 // get debug mode
 url = new URL(window.location.href);
