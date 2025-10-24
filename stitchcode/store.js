@@ -112,6 +112,8 @@ SnapSerializer.prototype.loadProjectModel = function (xmlNode, ide, remixID) {
     ide.creator = project.creator || '';
     ide.remixHistory = project.remixHistory || '';
 
+    console.log(project.name, project.origName, project.creator, project.origCreator)
+
     if (scenesModel) {
         if (scenesModel.attributes.select) {
             project.sceneIdx = +scenesModel.attributes.select;
