@@ -103,16 +103,12 @@ SnapSerializer.prototype.loadProjectModel = function (xmlNode, ide, remixID) {
     project.origName = project.name // project_model.project.childNamed('origName') ? project_model.project.childNamed('origName').contents : ""
     project.creator =  project_model.project.childNamed('creator') ? project_model.project.childNamed('creator').contents : ""
     project.origCreator =  project_model.project.childNamed('origCreator') ? project_model.project.childNamed('origCreator').contents : ""
-    // project.remixHistory =  project_model.project.childNamed('remixHistory') ? project_model.project.childNamed('remixHistory').contents : ""
 
     ide.projectName = project.name;
     //ide.projectNotes = project.notes || '';
     ide.origName = project.origName || '';
     ide.origCreator = project.origCreator || '';
     ide.creator = project.creator || '';
-    ide.remixHistory = project.remixHistory || '';
-
-    console.log(project.name, project.origName, project.creator, project.origCreator)
 
     if (scenesModel) {
         if (scenesModel.attributes.select) {

@@ -1774,7 +1774,6 @@ IDE_Morph.prototype.setProjectName = function (string) {
 	this.creator = this.cloud.username ? this.cloud.username : "anonymous";
     this.hasChangedMedia = true;
     this.controlBar.updateLabel();
-    console.log(this.cloud.username, this.creator, this.origCreator)
     return name;
 };
 
