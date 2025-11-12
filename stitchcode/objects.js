@@ -552,22 +552,21 @@ SpriteMorph.prototype.forwardBy = function (totalsteps, stepsize) {
 
 SpriteMorph.prototype.arcRight = function (radius, degrees) {
     //radius = !isFinite(+radius) ? 0 : radius;
+	var stitchLen,nbTurn,angle;
     if (!isFinite(degrees)) {
       throw new Error('degrees must not be Infinity');
     }
     if (!isFinite(radius)) {
       throw new Error('radius must not be Infinity');
     }
-    if (degrees > 0) {    
-      for (let n=0; n < Math.floor(degrees / 10.0); n++) {
-          this.turn(5);
-          this.forward(radius * 0.174532)
-          this.turn(5)
-      }
-      if (degrees % 10 !== 0) {
-          this.turn((degrees % 10)/2.0);
-          this.forward((radius * 0.174532) / (10.0 / (degrees % 10)))
-          this.turn((degrees % 10)/2.0 ) 
+    if (degrees > 0) {   
+      stitchLen = (this.stitchoptions.length && this.stitchoptions.length > 0) ? this.stitchoptions.length:10;
+	  nbTurn = Math.ceil(radius * (degrees / 360) * (6.283/stitchLen));
+	  angle = degrees / nbTurn;
+      for (let n=0; n < nbTurn; n++) {
+          this.turn(angle/2)
+          this.forward(2 * radius * Math.sin(angle * (Math.PI /180) /2));
+          this.turn(angle/2)
       }
     } else if (degrees < 0) {      
       this.arcLeft(radius, Math.abs(degrees))
@@ -577,6 +576,7 @@ SpriteMorph.prototype.arcRight = function (radius, degrees) {
 
 SpriteMorph.prototype.arcLeft = function (radius, degrees) {
     //radius = !isFinite(+radius) ? 0 : radius;
+	var stitchLen,nbTurn,angle;
     if (!isFinite(degrees)) {
       throw new Error('degrees must not be Infinity');
     }
@@ -584,20 +584,19 @@ SpriteMorph.prototype.arcLeft = function (radius, degrees) {
       throw new Error('radius must not be Infinity');
     }
     if (degrees > 0) {
-      for (let n=0; n < Math.floor(degrees / 10.0); n++) {
-          this.turn(-5);
-          this.forward(radius * 0.174532)
-          this.turn(-5)
-      }
-      if (degrees % 10 !== 0) {
-          this.turn(-((degrees % 10)/2.0));
-          this.forward((radius * 0.174532) / (10.0 / (degrees % 10)))
-          this.turn(-((degrees % 10)/2.0)) 
+      stitchLen = (this.stitchoptions.length && this.stitchoptions.length > 0) ? this.stitchoptions.length:10;
+	  nbTurn = Math.ceil(radius * (degrees / 360) * (6.283/stitchLen));
+	  angle = degrees / nbTurn;		
+      for (let n=0; n < nbTurn; n++) {
+          this.turn(-angle/2)
+          this.forward(2 * radius * Math.sin(angle * (Math.PI /180) /2));
+          this.turn(-angle/2)
       }
     } else if (degrees < 0) {  
       this.arcRight(radius, Math.abs(degrees))
     }
 };
+
 
 SpriteMorph.prototype.forwardSegemensWithEndCheck = function(steps, stepsize) {
   for(i=0;i<steps;i++) {
