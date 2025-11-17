@@ -117,10 +117,10 @@ tempDict = {
     '移到 x: _ y: _ 每针 _',
   'go to x: _ y: _ in _':
     '移到 x: _ y: _ 针数 _',
-  'arc $turnRight radius: _ degrees: _ ':
-    '圆弧 $turnRight 半径: _ 角度: _ ',
-  'arc $turnLeft radius: _ degrees: _ ':
-    '圆弧 $turnLeft 半径: _ 角度: _ ',
+  'arc _ radius: _ degrees: _ ':
+    '圆弧 _ 半径: _ 角度: _ ',
+  'arc _ radius: _ degrees: _ ':
+    '圆弧 _ 半径: _ 角度: _ ',
   
   // new blocks
   'point towards x: _ y: _':
@@ -145,22 +145,22 @@ tempDict = {
     'hex颜色',
   'HSV color':
     'HSV颜色',
-  'set color to %clr':
-    '把颜色设为 %clr',
+  'set color to _':
+    '把颜色设为 _',
   'set color to RGB _ _ _':
     '把颜色设为 RGB _ _ _',
   'set color to HSV _ _ _':
     '把颜色设为 HSV _ _ _',
   'set color to hex _':
     '把颜色设为 hex _',
-  'set color by hue %huewheel':
-    '按色调 %huewheel 设置颜色',
-  'set %hsb to _':
-    '把 %hsb 设为 _',
-  'change %hsb by _':
-    '把 %hsb 增加 _',
-  'color: %hsb':
-    '颜色: %hsb',
+  'set color by hue _':
+    '按色调 _ 设置颜色',
+  'set _ to _':
+    '把 _ 设为 _',
+  'change _ by _':
+    '把 _ 增加 _',
+  'color: _':
+    '颜色: _',
   'opacity':
     '不透明度',
   'set opacity to _':
@@ -215,3 +215,4 @@ tempDict = {
 
 // Add attributes to original SnapTranslator.dict.de
 for (var attrname in tempDict) { SnapTranslator.dict.zh_CN[attrname] = tempDict[attrname]; }
+
