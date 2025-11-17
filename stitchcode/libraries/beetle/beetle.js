@@ -1908,3 +1908,9 @@ SnapExtensions.primitives.set('bb_rotateByXY(deltaX,deltaY)', function (deltaX,d
     if (!stage.beetleController) { return; }
         stage.beetleController.camera.rotateByXY(deltaX,deltaY);
 });
+
+SnapExtensions.primitives.set('bb_zoomBy(delta)', function (delta) {
+    var stage = this.parentThatIsA(StageMorph);
+    if (!stage.beetleController) { return; }
+        stage.beetleController.camera.zoomBy(delta);
+});
