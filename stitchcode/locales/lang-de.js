@@ -163,22 +163,22 @@ tempDict = {
     'hexadezimaler Farbwert',
   'HSV color':
     'HSV Farbe',
-  'set color to %clr':
-    'setze Farbe auf %clr',
+  'set color to _':
+    'setze Farbe auf _',
   'set color to RGB _ _ _':
     'setze Farbe auf RGB _ _ _',
   'set color to HSV _ _ _':
     'setze Farbe auf HSV _ _ _',
   'set color to hex _':
     'setze Farbe auf hex _',
-  'set color by hue %huewheel':
-    'setze Farbton %huewheel',
-  'set %hsb to _':
-    'setze %hsb auf _',
-  'change %hsb by _':
-    '\u00e4ndere %hsb auf _',
-  'color: %hsb':
-    'Farbe: %hsb',
+  'set color by hue _':
+    'setze Farbton _',
+  'set _ to _':
+    'setze _ auf _',
+  'change _ by _':
+    '\u00e4ndere _ auf _',
+  'color: _':
+    'Farbe: _',
   'opacity':
     'Deckkraft',
   'set opacity to _':
@@ -191,10 +191,10 @@ tempDict = {
     'absolute Helligkeit',
   'change hue by _':
     '\u00e4ndere Farbton um _',
-  'arc $turnRight radius: _ degrees: _ ':
-     'Kreisbogen $turnRight mit Radius: _ Winkel: _ ',
-  'arc $turnLeft radius: _ degrees: _ ':
-     'Kreisbogen $turnLeft mit Radius: _ Winkel: _ ',
+  'arc _ radius: _ degrees: _ ':
+     'Kreisbogen _ mit Radius: _ Winkel: _ ',
+  'arc _ radius: _ degrees: _ ':
+     'Kreisbogen _ mit Radius: _ Winkel: _ ',
      
   // new categories
   'Embroidery':
