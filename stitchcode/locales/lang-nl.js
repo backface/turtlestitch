@@ -151,22 +151,22 @@ tempDict = {
     'kleur in hex',
   'HSV color':
     'HSV kleur',
-  'set color to %clr':
-    'maak kleur %clr',
+  'set color to _':
+    'maak kleur _',
   'set color to RGB _ _ _':
     'maak kleur RGB _ _ _',
   'set color to HSV _ _ _':
     'maak kleur HSV _ _ _',
   'set color to hex _':
     'maak kleur hex _',
-  'set color by hue %huewheel':
-    'maak kleurtint %huewheel',
-  'set %hsb to _':
-    'stel %hsb in op _',
-  'change %hsb by _':
-    'verander %hsb met _',
-  'color: %hsb':
-    'kleur: %hsb',
+  'set color by hue _':
+    'maak kleurtint _',
+  'set _ to _':
+    'stel _ in op _',
+  'change _ by _':
+    'verander _ met _',
+  'color: _':
+    'kleur: _',
   'opacity':
     'ondoorschijnendheid',
   'set opacity to _':

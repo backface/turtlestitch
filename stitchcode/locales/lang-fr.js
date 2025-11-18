@@ -164,8 +164,8 @@ tempDict = {
    'HSV color':
      'couleur HSV',
       
-   'set color to %clr':
-     'définir la couleur %clr',
+   'set color to _':
+     'définir la couleur _',
   'set color to RGB _ _ _' :
     'définir la couleur RGB _ _ _',
   'set color to HSV _ _ _' :
@@ -173,15 +173,15 @@ tempDict = {
     
   'set color to hex _' :
     'définir la couleur hex _',
-  'set color by hue %huewheel' :
-    'définir la teinte %huewheel',
-  'set %hsb to _':
-    'mettre %hsb par _',
+  'set color by hue _' :
+    'définir la teinte _',
+  'set _ to _':
+    'mettre _ par _',
    
-  'change %hsb by _' :
-    'change %hsb par _',
-  'color: %hsb' :
-    'couleur: %hsb',
+  'change _ by _' :
+    'change _ par _',
+  'color: _' :
+    'couleur: _',
   'opacity' :
     'opacité',
   'set opacity to _' :
@@ -194,10 +194,10 @@ tempDict = {
     'luminosité',
   'change hue by _' :
     'change la teinte par _',
-  'arc $turnRight radius: _ degrees: _ ' :
-     'arc de cercle $turnRight de rayon: _ angle: _ ',
-  'arc $turnLeft radius: _ degrees: _ ' :
-     'arc $turnLeft avec rayon: _ angle: _ ',
+  'arc _ radius: _ degrees: _ ' :
+     'arc de cercle _ de rayon: _ angle: _ ',
+  'arc _ radius: _ degrees: _ ' :
+     'arc _ avec rayon: _ angle: _ ',
   
   // catégories turtlestitch
   'Embroidery' :

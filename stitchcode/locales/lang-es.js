@@ -157,22 +157,22 @@ tempDict = {
     'color hexadecimal',
   'HSV color':
     'color HSV',
-  'set color to %clr':
-    'fijar color a %clr',
+  'set color to _':
+    'fijar color a _',
   'set color to RGB _ _ _':
     'fijar color a RGB _ _ _',
   'set color to HSV _ _ _':
     'fijar color a HSV _ _ _',
   'set color to hex _':
     'fijar color a hexadecimal _',
-  'set color by hue %huewheel':
-    'fijar color por tonalidad %huewheel',
-  'set %hsb to _':
-    'fijar %hsb a _',
-  'change %hsb by _':
-    'incrementar %hsb en _',
-  'color: %hsb':
-    'color: %hsb',
+  'set color by hue _':
+    'fijar color por tonalidad _',
+  'set _ to _':
+    'fijar _ a _',
+  'change _ by _':
+    'incrementar _ en _',
+  'color: _':
+    'color: _',
   'opacity':
     'opacitat',
   'set opacity to _':
