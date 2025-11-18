@@ -191,10 +191,10 @@ tempDict = {
     'absolute Helligkeit',
   'change hue by _':
     '\u00e4ndere Farbton um _',
-  'arc _ radius: _ degrees: _ ':
-     'Kreisbogen _ mit Radius: _ Winkel: _ ',
-  'arc _ radius: _ degrees: _ ':
-     'Kreisbogen _ mit Radius: _ Winkel: _ ',
+  'arc _ radius: _ degrees: _':
+     'Kreisbogen _ mit Radius: _ Winkel: _',
+  'arc _ radius: _ degrees: _':
+     'Kreisbogen _ mit Radius: _ Winkel: _',
      
   // new categories
   'Embroidery':
