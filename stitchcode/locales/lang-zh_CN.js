@@ -117,10 +117,10 @@ tempDict = {
     '移到 x: _ y: _ 每针 _',
   'go to x: _ y: _ in _':
     '移到 x: _ y: _ 针数 _',
-  'arc _ radius: _ degrees: _ ':
-    '圆弧 _ 半径: _ 角度: _ ',
-  'arc _ radius: _ degrees: _ ':
-    '圆弧 _ 半径: _ 角度: _ ',
+  'arc _ radius: _ degrees: _':
+    '圆弧 _ 半径: _ 角度: _',
+  'arc _ radius: _ degrees: _':
+    '圆弧 _ 半径: _ 角度: _',
   
   // new blocks
   'point towards x: _ y: _':
@@ -215,4 +215,5 @@ tempDict = {
 
 // Add attributes to original SnapTranslator.dict.de
 for (var attrname in tempDict) { SnapTranslator.dict.zh_CN[attrname] = tempDict[attrname]; }
+
 
