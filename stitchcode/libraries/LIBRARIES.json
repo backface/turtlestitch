@@ -16,13 +16,45 @@
 	  "lists"
     ],
     "translations": {
-	  "zh_CN": {
-		"name": "几何积木库",
-		"description": "用于海龟刺绣和设计的Snap!积木库，包含几何变换积木、矢量积木、填充积木等。"		  
-	  }
-	}
-  },   
- {
+      "zh_CN": {
+      "name": "几何积木库",
+      "description": "用于海龟刺绣和设计的Snap!积木库，包含几何变换积木、矢量积木、填充积木等。"		  
+      }
+    }
+  },
+  {
+    "fileName": "../../libraries/code2blocks_module.xml",
+    "name": "Code to Blocks to Code",
+    "description": "Translate text code to blocks and vice-versa",
+    "searchData": [
+      "parse code _ to blocks",
+      "encode blocks _ to text _ pretty"
+    ],
+    "categories": [
+      "operators"
+    ],
+    "translations": {
+      "de": {
+        "searchData": [
+          "verwandle Code _ in Blöcke\rca",
+          "verwandle Blöcke _ in Code _ formatiert\rca"
+        ],
+        "searchData": [
+          "verwandle Code _ in Blöcke\rca",
+          "verwandle Blöcke _ in Code _ formatiert\rca"
+        ]
+      },
+      "ca": {
+        "name": "Codi textual dels blocs",
+        "description": "Obté el codi textual dels blocs i viceversa",
+        "searchData": [
+          "blocs del codi textual _",
+          "codi textual dels blocs _ formatats _"
+        ]
+      }
+    }
+  },
+{
     "fileName": "beetle.xml",
     "name": "3D Beetle Geometry",
     "description": "Generate 3D geometry by extruding points, lines or polygons along a path in 3D space.",
@@ -110,51 +142,7 @@
         ]
       }
     }
-  },  
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },    
-  {
-    "fileName": "../../libraries/code2blocks_module.xml",
-    "name": "Code to Blocks to Code",
-    "description": "Translate text code to blocks and vice-versa",
-    "searchData": [
-      "parse code _ to blocks",
-      "encode blocks _ to text _ pretty"
-    ],
-    "categories": [
-      "operators"
-    ],
-    "translations": {
-      "de": {
-        "searchData": [
-          "verwandle Code _ in Blöcke\rca",
-          "verwandle Blöcke _ in Code _ formatiert\rca"
-        ],
-        "searchData": [
-          "verwandle Code _ in Blöcke\rca",
-          "verwandle Blöcke _ in Code _ formatiert\rca"
-        ]
-      },
-      "ca": {
-        "name": "Codi textual dels blocs",
-        "description": "Obté el codi textual dels blocs i viceversa",
-        "searchData": [
-          "blocs del codi textual _",
-          "codi textual dels blocs _ formatats _"
-        ]
-      }
-    }
-  },
+  },   
   {
     "fileName": "../../libraries/OOP_module.xml",
     "name": "OOP",
@@ -1077,37 +1065,6 @@
     }
   },
   {
-    "fileName": "../../libraries/embroidery_module.xml",
-    "name": "Embroidery",
-    "description": "Generate embroidery files for stitching pen trails on a sewing machine, experimental and under construction.",
-    "searchData": [
-      "stop stitching",
-      "_ stitch by _ width _ center _",
-      "_ stitch by _",
-      "satin stitch width _ center _",
-      "arc turn right rotate radius: _ degrees: _",
-      "arc turn left rotate radius: _ degrees: _",
-      "_ of stitch",
-      "move _ steps",
-      "go to x: _ y: _",
-      "go to _",
-      "change x by _",
-      "set x to _",
-      "change y by _",
-      "set y to _"
-    ],
-    "categories": [
-      "Embroidery",
-      "motion"
-    ],
-    "translations": {
-      "ca": {
-        "name": "Brodats digitals",
-        "description": "Generació d'arxius per les brodadores digitals afegint les funcionalitats de brodadora al dibuix de tortuga estàndard. Experimental"
-      }
-    }
-  },
-  {
     "fileName": "../../libraries/maps_module.xml",
     "name": "World Map",
     "description": "Add interactive maps to projects",
@@ -1190,52 +1147,6 @@
     ],
     "categories": [
       "sensing"
-    ]
-  },
-  {
-    "fileName": "../../libraries/textCostumes_module.xml",
-    "name": "Text Costumes",
-    "description": "Generate costumes from letters or words of text.",
-    "translations": {
-      "ca": {
-        "name": "Text als vestits",
-        "description": "Genera vestits utilitzant lletres, paraules... o qualevol text."
-      },
-      "gl": {
-        "name": "Traxes de texto",
-        "description": "Xerar traxes a partires de letras ou palabras… ou calquera texto."
-      },
-      "it": {
-        "name": "Costumi Testo",
-        "description": "Genera costumi da lettere o parole di testo."
-      },
-      "nl": {
-        "name": "Tekstkostuums",
-        "description": "Genereer kostuums uit letters of woorden tekst."
-      },
-      "pt": {
-        "name": "Trajes de texto",
-        "description": "Gerar trajes a partir de letras ou palavras de texto."
-      },
-      "ti": {
-        "name": "ኣልባሳት ጽሑፍ",
-        "description": "ኣልባሳት ካብ ፊደላት ወይ ቃላት ናይ ጽሑፍ ኣዳሉ።"
-      },
-      "ua": {
-        "name": "Текстові костюми",
-        "description": "Генерування костюмів з букв та слів"
-      },
-      "zh_CN": {
-        "name": "文本样式",
-        "description": "从文本的字母或单词生成造型。"
-      }
-    },
-    "searchData": [
-      "costume from text _ size _",
-      "costume _ with background RGBA _ padding _"
-    ],
-    "categories": [
-      "looks"
     ]
   },
   {
@@ -1416,30 +1327,6 @@
       "lists",
       "operators"
     ]
-  },
-  {
-    "fileName": "../../libraries/halo_module.xml",
-    "name": "Outlines and Halos",
-    "description": "Compute and display outlines of costumes and halos around sprites",
-    "searchData": [
-      "outline color: _ width: _",
-      "halo color: _ width: _ while _",
-      "halo color: _ width: _ for _ secs"
-    ],
-    "categories": [
-      "looks"
-    ],
-    "translations": {
-      "de": {
-        "searchData": [
-          "umriss"
-        ]
-      },
-      "ca": {
-        "name": "Contorns i Halos",
-        "description": "Crea i mostra contorns i halos dinàmics als vestits dels objectes"
-      }
-    }
   },
   {
     "fileName": "../../libraries/audioComp_module.xml",
@@ -1656,42 +1543,6 @@
     ],
     "categories": [
       "other"
-    ]
-  },
-  {
-    "fileName": "../../libraries/tiles_module.xml",
-    "name": "Tiles",
-    "description": "Divide the stage into sub-regions in each of which to perform an action",
-    "translations": {
-      "ca": {
-        "name": "Rajoles d'escenari",
-        "description": "Divideix l'escenari en diferents regions iguals per realitzar la mateixa acció repetitivament"
-      }
-    },
-    "searchData": [
-      "for each tile sized _ _",
-      "for each _ in _ _ by _ _ _",
-      "render each _ in table _ _"
-    ],
-    "categories": [
-      "control"
-    ]
-  },
-  {
-    "fileName": "../../libraries/arcs_module.xml",
-    "name": "Arcs",
-    "description": "Turn sprites by a delta of degrees moving them at a given radius",
-    "translations": {
-      "ca": {
-        "description": "Creeu arcs tot girant els objectes un número de graus i movent-los en un radi determinat"
-      }
-    },
-    "searchData": [
-      "arc turn right rotate radius: _ degrees: _",
-      "arc turn left rotate radius: _ degrees: _"
-    ],
-    "categories": [
-      "motion"
     ]
   },
   {
@@ -2409,48 +2260,7 @@
       "operators"
     ]
   },
-  {
-    "fileName": "../../libraries/textformat_module.xml",
-    "name": "Writing and formatting",
-    "description": "Write text using fancy fonts, contributed by Tethrarxitet",
-    "searchData": [
-      "write _ size _ stats _",
-      "text costume _ size _ stats _",
-      "font _  bold _  italic _",
-      "font _  weight _  italic _",
-      "write _ size _ stats _ wrap _",
-      "width of text _ size _ stats _"
-    ],
-    "categories": [
-      "pen"
-    ],
-    "translations": {
-      "es": {
-        "searchData": [
-          "escribir _ con tamaña _ e información _\rpt",
-          "disfraz de texto _ tamaño _ e información _\rpt",
-          "nombre de la fuente _ _ espesor _ _ ¿oblicuo? _\rpt"
-        ],
-        "searchData": [
-          "escribir _ con tamaña _ e información _\rpt",
-          "disfraz de texto _ tamaño _ e información _\rpt",
-          "nombre de la fuente _ _ espesor _ _ ¿oblicuo? _\rpt"
-        ]
-      },
-      "pt": {
-        "searchData": [
-          "nome da fonte _ _ texto em negrito? _ _ oblíquo? _\res"
-        ],
-        "searchData": [
-          "nome da fonte _ _ texto em negrito? _ _ oblíquo? _\res"
-        ]
-      },
-      "ca": {
-        "name": "Escrivint i formatant text",
-        "description": "Escriu text utilitzant les fonts de Tethrarxitet"
-      }
-    }
-  },
+
   {
     "fileName": "../../libraries/sprite_api_module.xml",
     "name": "Sprite Method API",
@@ -2475,486 +2285,6 @@
         "description": "Crida els blocs propis dels objectes des de altres objectes"
       }
     }
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "../../libraries/SciSnap3Blocks.xml",
-    "name": "SciSnap! v3",
-    "description": "Scientific Functions, Graphing, SQL interface, Machine Learning, from Uni Göttingen (Eckart Modrow)",
-    "translations": {
-      "ca": {
-        "description": "Funcions científiques, gràfics, comandes SQL i 'Machine Learning' creats per la Universitat de Göttingen (Eckart Modrow)"
-      }
-    },
-    "searchData": [
-      "INFO \"My own blocks\"",
-      "create a _ ( of _ )  with name _",
-      "import Sprite",
-      "is JavaScript enabled?",
-      "is key _ pressed?",
-      "datetime",
-      "datetime: _ to _",
-      "input dialog on _ with title _  and items _",
-      "setting _",
-      "set flag _ to _",
-      "INFO \"Math tools\"",
-      "show global message title: _  message: _",
-      "vector _",
-      "random vector dim _  range _ to _",
-      "matrix of vectors _",
-      "random _ x _ matrix  range _ to _",
-      "transpose _",
-      "_ of _",
-      "linear operation _ _ _",
-      "apply _ to _",
-      "solve _ *x= _",
-      "apply Gauss method to _",
-      "polynomial interpolation for _",
-      "_ ( _ )",
-      "affine transformation of _  by _ --> _",
-      "_ + _ * i",
-      "_ * e^i _",
-      "_ toThin _ - form",
-      "_ of a _",
-      "complex operation _ _ _",
-      "configure _ as a MathPad width: _ height: _  color: _ with close-button _ left? _ size: _",
-      "new dictionary",
-      "create _ var _",
-      "_ as _",
-      "new costume size: _ _ _",
-      "is variable _ in the scope of _ ?",
-      "set MathPadProperty _ of _ to _",
-      "MathPadProperty _ of _",
-      "set MathPad costume properties width: _ height: _  color: _ offsets: _ _  with close-button _ left? _ size _ on _",
-      "set MathPad properties lineWidth: _ onlyPoints? _ grid? _  dimension: _ xMin: _ xMax: _ yMin: _ yMax: _  zMin: _ zMax: _ startPoint: _ _ _ on _",
-      "plot _ _ color: _ on MathPad _  Change startpoint? _",
-      "plot set _ setname: _  color: _ linewidth: _ level(1..5): _ on MathPad _ ",
-      "MathPad Example: vektor addition",
-      "MathPad Example: affine transformation",
-      "MathPad Example: set operations",
-      "rename costume _ to _",
-      "add key _ value _ to dictionary _",
-      "set value _ to _",
-      "set _ of _ to _",
-      "get _ of sprite _",
-      "delete var _",
-      "value of key _ in dictionary _",
-      "replace value of key _ in dictionary _ with _",
-      "remove entry of key _ in dictionary _",
-      "read dictionary from JSON file",
-      "write dictionary _ to JSON file _",
-      "copy of costume _",
-      "costume of _",
-      "show _ as dialog",
-      "close all open dialog windows",
-      "layer",
-      "set layer to _",
-      "set cursor _",
-      "is _ a _",
-      "random",
-      "𝝅",
-      "e",
-      "_ !",
-      "( _ )  ( _ )",
-      "round _ to _ digits",
-      "replace _ _ with _ in _",
-      "index of _ in _",
-      "root of _  starting at _ by Newton´s method",
-      "sequence element _ ( _ )",
-      "first _ elements of sequence _",
-      "sequence of secant slopes for _  at _ calculated with sequence _",
-      "derivative _ ´( _ )",
-      "_  ∑ _  _ = _",
-      "_  ∫ _ dx  _  calculated with _ intervals",
-      "_ of _ sampled with _ Hz",
-      "b(N= _ p= _ k= _ )",
-      "B x= _ (N= _ p= _ )",
-      "h(N= _ M= _ n= _ k= _ )",
-      "H x= _ (N= _ M= _ n= _ )",
-      "p(θ= _ k= _ )",
-      "P x= _ p(θ= _ )",
-      "pareto (xmin= _ k= _ x= _ )",
-      "n (x= _ μ= _ σ= _ )",
-      "𝜙",
-      "|R",
-      "set of { _ }",
-      "set of {x| _ _ x _ _ }",
-      "set of {x| _ }",
-      "is _ ε _ ?",
-      "_ _ _",
-      "is _ ⊆ _ ?",
-      "is _ = _ ?",
-      "_ elements ε |N of _",
-      "section _ of _",
-      "_ edge of interval _",
-      "element _ toOutline text",
-      "text _ toOutline elements",
-      "INFO \"Data tools\"",
-      "empty table",
-      "copy of _",
-      "data _ as _",
-      "_ x _ table  initialized with _",
-      "_ by _ table  with labels: _",
-      "_ random points with ranges x: _ _  y: _ _ inside of a _",
-      "_ random points near a straight line  x-range _ _ gradient _  y-axis-intercept _ range _",
-      "_ random points near _  between _ and _ range _",
-      "_ _ of _ with first item? _",
-      "add _ _ to _",
-      "delete _ _ of _",
-      "element _ _ of _",
-      "set element _ _ of _ to _",
-      "columns _ of _  from row _ to _",
-      "subsection of _ in _ from  _ _ to _ _",
-      "select rows of _ where  column _ is _ _",
-      "count values in _",
-      "sort _ with predicate _",
-      "entropy of _",
-      "_ without duplicates",
-      "_ normalized by _",
-      "_ vertical compressed  with factor _ by averaging",
-      "_ pooling of _  with stride _",
-      "_ sorted by column _  ascending _ considering headline? _",
-      "_ of column _ of _  grouped by column _ considering headline? _",
-      "_ of column _ and _  of _ considering headline? _",
-      "regression line parameters of _",
-      "_ next neighbors of _  in _",
-      "convolution kernel _ applied  to _ _ width _ height _",
-      "_ -means clustering for _  with Euclidean metrics",
-      "_ -means clustering for _  with metric _",
-      "DBSCAN clustering for _  radius _ minMembers _",
-      "decision tree ID3 for _  with labeled data in last column",
-      "classify _ with ID3-tree _",
-      "INFO \"PlotPad\" for dealing with diagrams",
-      "configure _ as a PlotPad width: _ height: _  color: _ with close-button? _ left? _ size: _",
-      "is _ a PlotPad?",
-      "set PlotPadProperty _ of _ to _",
-      "PlotPadProperty _ of _",
-      "set PlotPad costume properties width: _ height: _  back color: _ front color: _  offsets: _ _ on _",
-      "set PlotPad labels on _ to  title: _ titleheight: _  x-label: _ xLabelheight: _  y-label: _ yLabelheight: _",
-      "set PlotPad line properties style: _  width: _ color: _ on _",
-      "set PlotPad marker properties style: _ width: _  color: _ connected? _ on _",
-      "set PlotPad scale properties precision: _ _  textheight: _ _ number of intervals: _ _  on _ pretty formated? _",
-      "set PlotPad offsets from edges on _",
-      "set PlotPad ranges for x: _ _ y: _ _  with border? _ of _ on _",
-      "add graph _ to PlotPad _",
-      "add dataplot of numeric data: _ to PlotPad _",
-      "add dataplot of mixed data: _  y-scale? _ x-scale? _ to PlotPad _",
-      "add histogram of _ with _ groups  to PlotPad _ y-axis starting with 0? _",
-      "add axes and scales to PlotPad _",
-      "clear _ on _",
-      "restore PlotPad content of _",
-      "set pretty ranges on PlotPad _",
-      "pretty values for a PlotPad from _  to _ with _ intervals",
-      "get ranges for PlotPad _  from _ with border _",
-      "convert value _ to coordinate _  of PlotPad _",
-      "PlotPad _ on _ by mouse",
-      "Example:  Plot of random data width _ height _  line _ marker _ color _",
-      "Example:  Histogram of random data width _ height _  line _ color _",
-      "Example:  Simple plot of data: _  x: _ y: _ width: _ height: _  title: _ labels: _ _  line: _ marker: _ color: _",
-      "Example: regression line",
-      "change SpriteName of _ to _",
-      "list of sprites with names  starting with _",
-      "list _ contains _ anywhere",
-      "INFO \"SQL tools\"",
-      "configure SQL",
-      "is SQL configured?",
-      "connect to database server",
-      "read databases",
-      "choose database no. _",
-      "read tables",
-      "choose table no. _",
-      "attributes of table no. _",
-      "SELECT _ _ FROM _ WHERE _",
-      "SELECT _ _ FROM _ WHERE _  GROUP BY _ HAVING _ ORDER BY _ _ LIMIT _",
-      "exec SQL-command _",
-      "import query result _ to SQLData",
-      "_ = _",
-      "_ < _",
-      "_ > _",
-      "_ OR _",
-      "_ AND _",
-      "NOT _",
-      "_ LIKE _",
-      "_ IN ( _ )",
-      "AVG ( _ )",
-      "COUNT ( _ )",
-      "MIN ( _ )",
-      "MAX ( _ )",
-      "SUM ( _ )",
-      "SQL-Example: simple query",
-      "SQL-Example: a bit advanced query",
-      "where is the _ block used?",
-      "make a drop at _ _ bounded by a rectangle _ _  shifted by _ _ percent, main color _  with _ particles on _",
-      "list length _ initialized with _",
-      "Example: \"drip painting\"",
-      "INFO \"ImagePad\" for dealing with images",
-      "configure _ as an ImagePad width: _ height: _  color: _ with close-button? _ left? _ size: _",
-      "is _ an ImagePad?",
-      "ImagePadProperty _ of _",
-      "set ImagePadProperty _ of _ to _",
-      "set ImagePad costume properties width: _ height: _  back color: _ offsets: _ _ on _",
-      "set ImagePad line properties style: _  width: _ color: _ fill color: _ on _",
-      "import image data from _  to myData of _ and set properties",
-      "_ _ image log? _ alpha _  from myData on _",
-      "draw list of points _ as _ size: _ on _  using Snap! coordinates? _ with noise? _ range: _",
-      "set _ at _ on _ to _  using Snap! coordinates _",
-      "_ at _ on _  using Snap! coordinates _",
-      "_ on _ by mouse  using Snap! coordinates _",
-      "affine transformation of costume _  by _ --> _ using Snap! coordinates _",
-      "brightness around _ within radius _  calculated with _ of ImagePad _  using Snap! coordinates _",
-      "remove sprite _",
-      "select sprite _",
-      "let _ respond to _",
-      "image data _ width _ height _  _ image data _ width _ height _  with offsets _ _",
-      "Example: slice data of an image",
-      "Example: false color image of moon crater Albertarius",
-      "Example: random points on an image",
-      "Example: space modulation",
-      "INFO \"SciSnap! globals\"",
-      "INFO \"Window to ImagePads\"",
-      "configure _ as a window to ImagePad _",
-      "is _ a window to Imagepads?",
-      "_ ImagePad _ to/from image stack  of window _ and adjust width/height _",
-      "switch to _ image of window _  and adjust width/height _",
-      "update window _",
-      "magnify or shrink image on window _ by _ %",
-      "move image of window _ by _ _",
-      "scroll image of window _",
-      "stage position _ toOutline _ on _  using Snap! coordinates _",
-      "_ _ on _ toOutline stage position  using Snap! coordinates _",
-      "position _ is in window _",
-      "is _ deleted?",
-      "attach part _ to sprite _",
-      "start SciSnap! stage: _ X _",
-      "create costume data",
-      "create SciSnap! costumes",
-      "create SciSnap! global variables and properties",
-      "set SciSnap! global property _ to _",
-      "SciSnap! global property _",
-      "configure _ as a SketchPad width: _ height: _  color: _ with close-button _ left? _ size: _",
-      "is _ a _ ?",
-      "reshape and clear SketchPad _  to width: _ height: _",
-      "delete SketchPad _",
-      "adjust close-button of _",
-      "_ _ - tool for window _ size _",
-      "_ _ of window _",
-      "update tool positions on _",
-      "update tool coordinates on _",
-      "move _ _",
-      "detach all parts from _",
-      "on _ run _",
-      "delete _ _ in _",
-      "substring of _ from _ to _",
-      "trim _ by _",
-      "Euclidean distance between  point _ and point _",
-      "Levenshtein distance of _ and _",
-      "delete all closeButtons",
-      "set SketchPadProperty _ of _ to _",
-      "SketchPadProperty _ of _",
-      "draw line from _ to _ on _  using Snap! coordinates? _",
-      "_ rectangle from: _ to: _ on _  using Snap! coordinates? _",
-      "_ circle center: _ radius: _ on _  using Snap! coordinates? _",
-      "draw text _ at: _ height: _ horizontal? _  on _ using Snap! coordinates? _",
-      "width of text _ in height _ on _",
-      "Example: rectangles, inspired by Frank Stella",
-      "Example: circles",
-      "Example: why?",
-      "read _ data from URL _",
-      "read _ -file with filepicker",
-      "select _ with filepicker",
-      "read file as BLOB _",
-      "write _ to _ -file _",
-      "import _ from _ to SciSnap!Data",
-      "report SciSnap! error _  from _ and stop all scripts",
-      "INFO \"GraphPad\" for dealing with graphs",
-      "configure _ as a GraphPad width: _ height: _  color: _ with close-button? _ left? _ size: _",
-      "is _ a GraphPad?",
-      "set GraphPadProperty _ of _ to _",
-      "GraphPadProperty _ of _",
-      "set GraphPad costume properties width: _ height: _  back color: _ on _",
-      "set GraphPad vertex properties minSize: _  growing? _ showsContent? _ on _",
-      "set GraphPad edge properties lineWidth: _  color: _ directed? _ weighted? _  showsWeight? _ on _",
-      "new vertex at _ content: _ on graph of _  using Snap! coordinates? _",
-      "add _ random vertices to graph on _",
-      "move vertex _ of graph on _ to _  using Snap! coordinates? _",
-      "add edge from vertex _ to vertex _ to graph on _",
-      "add _ random edges to graph on _",
-      "draw graph on _",
-      "delete vertex _ of graph on _",
-      "delete edge from vertex _ to vertex _  of graph on _",
-      "weight of edge from vertex _ to vertex _  of graph on _",
-      "change weight of edge from vertex _ to vertex _  to _ of graph on _",
-      "ask for new weight of graph on _",
-      "ask for new start vertex width of graph on _",
-      "content of vertex _ of graph on _",
-      "change content of vertex _ to _ of graph on _",
-      "ask for new vertex content in graph on _",
-      "set marker of vertex _ of graph on _",
-      "remove marker of vertex _ of graph on _",
-      "remove all markers of graph on _",
-      "depth first search of content _  starting at vertex _ of graph on _",
-      "breadth first search of content _  starting at vertex _ of graph on _",
-      "distance on _ from vertex _ to vertex _",
-      "shortest path in graph from vertex _  to vertex _ on _",
-      "list of all shortest paths in graph from vertex _  to all connected vertices of graph on _",
-      "vertexnumber at _ of graph on _  using Snap! coordinates? _",
-      "vertexnumber of _ in graph of _",
-      "Graph Example: small worlds (needs some seconds)",
-      "Graph Example: distribution of links",
-      "INFO \"NNPad\" for dealing with Neural Nets",
-      "configure _ as a NeuralNetPad width: _ height: _  color: _ with close-button? _ left? _ size: _",
-      "is _ a NNPad?",
-      "set NNPadProperty _ of _ to _",
-      "NNPadProperty _ of _",
-      "set NNPad costume properties width: _ height: _  color: _ offsets: _ on _",
-      "set NNPad net properties numberOfLayers: _ layerWidth: _  on _",
-      "NN add new weights for _ layers of width _ on _",
-      "NN output of _ layer on _",
-      "NN show status on _",
-      "teach NN with input _ and target output _ by back-  propagation with learning factor _ on _",
-      "NN Example: on _",
-      "INFO \"GridPad\" for dealing with cellular automata",
-      "configure _ as an GridPad width: _ height: _  color: _ with close-button? _ left? _ size: _",
-      "is _ a GridPad?",
-      "set GridPadProperty _ of _ to _",
-      "GridPadProperty _ of _",
-      "set GridPad costume properties width: _ height: _  back color: _ offsets: _ _ on _",
-      "set GridPad line properties style: _  width: _ color: _ fill color: _ on _",
-      "set GridPad grid properties on _  horizontal cells: _ vertical cells: _  initial cell colornumber: _ with grid lines? _",
-      "add grid _ on _",
-      "fill cells on _ range x: _ _ y: _ _  randomly with color numbers _",
-      "set cell value on _ to _ by mouse",
-      "_ on _ by mouse",
-      "set cell value on _ at _ _ to _  with grid lines? _",
-      "cell value on _ at _ _",
-      "_ -neighborhood as torus? _ of _ _  on _",
-      "all cells on _ as torus? _ swapped _ times  randomly inside radius _ range x: _ _ y: _ _",
-      "all cells on _ as torus? _ with value _  take value _ if number of surrounding value _ is _ _  else take value _ with noise? _ of _ %  range x: _ _ y: _ _",
-      "all cells on _ as torus? _ take _  of surrounding cells x: _ _ y: _ _ range: _",
-      "combine grid1 _ and grid2 _ by value1= _ _ value2= _  to _ else _",
-      "Example: plot of mixed data",
-      "set _ to full size, bounded by  left _ right _ top _ bottom _",
-      "convert _ on _ to _ - coordinates",
-      "let part _ of the TheLineTool respond to _",
-      "let SquareTool _ respond to _",
-      "Example: Use of a window to an image",
-      "Example: get line data with the LineTool",
-      "Example: get brightness data with SquareTools",
-      "Example: graphical noise",
-      "Example: create dynamically a new sprite  that responds to three events",
-      "variadic position _ toOutline position",
-      "variadic color _ toOutline RGB(A)-value",
-      "translate _",
-      "apply Wolfram automaton no _ to grid _  with colors for 0: _ and 1: _",
-      "is _ numerical?",
-      "install eventhandler _ for _",
-      "Example: diffusion",
-      "Example: Wolfram Automaton No. 30",
-      "extract pure text from _",
-      "prepare data für naive Bayes text classification  from text list of category 1 _  and text list of other categories _",
-      "naive Bayes classification of _  based on trained data _",
-      "list _ from item _ to item _",
-      "remove all custom blocks in _",
-      "_ category _ color _ _ _",
-      "_ block _",
-      "Example: configure SciSnap! as a MathTool",
-      "call %#1 %#2"
-    ],
-    "categories": [
-      "0. My own blocks",
-      "control",
-      "sensing",
-      "2. Math tools",
-      "looks",
-      "lists",
-      "variables",
-      "pen",
-      "operators",
-      "3. Data tools",
-      "5. PlotPad for data plots",
-      "4. SQL tools",
-      "6. ImagePad for image operations",
-      "1. SciSnap! globals",
-      "7. GraphPad for graph operations",
-      "8. NNPad for neural networks",
-      "9. GridPad for grid operations"
-    ]
-  },
-  {
-    "fileName": "../../libraries/TuneScope.xml",
-    "name": "TuneScope",
-    "description": "Music Notation, Instruments, Drums, Tones, Chords, Tracks, from the University of Virginia (Glen Bull)",
-    "translations": {
-      "ca": {
-        "description": "Notació musical, instruments, bateries, tons, acords i pistes creats per la Universitat de Virginia (Glen Bull)",
-        "searchData": [
-          "mostra la variable _\res",
-          "assigna a _ el valor _\res",
-          "associació _ _"
-        ],
-        "searchData": [
-          "mostra la variable _\res",
-          "assigna a _ el valor _\res",
-          "associació _ _"
-        ]
-      }
-    },
-    "searchData": [
-      "show var _",
-      "set var _ to _",
-      "create _ var _",
-      "Initialize TuneScope",
-      "Set Instrument To _",
-      "Set Volume To _ %",
-      "Set Instrument _ Volume to _ %",
-      "Play Note _ for Duration _ and Wait",
-      "Play Note _ for Duration _",
-      "Play Chord _ for Duration _",
-      "Rest for Note Duration _",
-      "_ Scale: _ Octave: _",
-      "Note _ in _ Scale: _ Octave: _",
-      "Interval Between Note _ to _ in the _ Scale _",
-      "_ Chord: _ Octave: _",
-      "_ Chord: _ Octave: _ Chord Position: _",
-      "Add Note _ to Chord _",
-      "Chord Rest",
-      "Drum Pattern _",
-      "Drum _ _ Beat _ Times _",
-      "Measure _",
-      "Section _",
-      "Track: _ Instrument: _  Musical Notation (Notes or Chords): _",
-      "Play Tracks _ Time Signature: _",
-      "Beats in Measure _  Time Signature _",
-      "Note Duration Value _",
-      "Note [ Pitch: _ Duration: _ ]",
-      "Tone Number: _ Frequency: _ Amplitude: _",
-      "Tone Number: _ _ On/Off",
-      "Tone Off",
-      "Play MIDI Controller: _ Instrument: _",
-      "Stop MIDI Controller",
-      "Convert MIDI _ to Note",
-      "Convert Note _ to MIDI",
-      "flash turbo fast assoc _ _",
-      "Import MIDI File",
-      "Convert MIDI File _ to TuneScope",
-      "Current Note"
-    ],
-    "categories": [
-      "variables",
-      "Music",
-      "lists"
-    ]
   },
   {
     "fileName": "~",
@@ -3008,33 +2338,6 @@
     ],
     "categories": [
       "other"
-    ]
-  },
-  {
-    "fileName": "../../libraries/mqtt.xml",
-    "name": "MQTT",
-    "description": "(Message Queuing Telemetry Transport) protocol for connecting with IOT devices and/or other software",
-    "translations": {
-      "ca": {
-        "description": "MQTT (Message Queuing Telemetry Transport - Transport de telemetria de missatges en cua) Protocol per connectar dispositius IoT amb diferent programari"
-      }
-    },
-    "searchData": [
-      "$cloudOutline MQTT connect to _ _",
-      "$cloudOutline MQTT subscribe to _ topic _  on each message run _ _",
-      "$cloudOutline MQTT publish to _ topic _ payload _ _",
-      "$cloudOutline MQTT unsubscribe from _ topic _",
-      "$cloudOutline MQTT disconnect from _",
-      "$cloudOutline MQTT response _ topic _  reply _ _",
-      "$cloudOutline MQTT request _ topic _  response topic _ payload _  on response run _ _",
-      "$cloudOutline MQTT example response reporter payload _ topic _",
-      "$cloudOutline MQTT request _ topic _  response topic _ payload _ _",
-      "_ to base64",
-      "_ from base64 _",
-      "MQTT Extension Examples"
-    ],
-    "categories": [
-      "MQTT"
     ]
   },
   {
@@ -3212,155 +2515,6 @@
         "name": "Continuacions",
         "description": "Captura dinàmicament les continuacions en temps d'execució i crea diferents estructures de control"
       }
-    }
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "~",
-    "name": "~"
-  },
-  {
-    "fileName": "../../libraries/microworlds/dialogs.xml",
-    "name": "(EDC) Dialogs",
-    "description": "Display dialogs and messages to the user.",
-    "searchData": [
-      "inform title _ message _",
-      "show message _ secs _"
-    ],
-    "categories": [
-      "looks"
-    ],
-    "translations": {
-    }
-  },
-  {
-    "fileName": "../../libraries/microworlds/fancy-text-morphs.xml",
-    "name": "(EDC) Fancy Text",
-    "description": "Text formatting and basic fraction support for SAY and THINK blocks.",
-    "searchData": [
-      "fancy think _ size: _ max width: _ color: _ in my _ for _ seconds",
-      "fancy think _ size: _ max width: _ color: _ in my _",
-      "fancy say _ size: _ max width: _ color: _ in my _ for _ seconds",
-      "fancy say _ size: _ max width: _ color: _ in my _",
-      "fancy text costume _ size: _ max width: _ color: _ align: _ font: _"
-    ],
-    "categories": [
-      "looks"
-    ],
-    "translations": {
-    }
-  },
-  {
-    "fileName": "../../libraries/microworlds/fancy-text.xml",
-    "name": "(EDC) Fancy Stage Writing",
-    "description": "Text formatting and basic fraction support for writing on stage.",
-    "searchData": [
-      "write on stage text _ size: _ font: _ align: _ x: _ y: _ color: _"
-    ],
-    "categories": [
-      "pen"
-    ],
-    "translations": {
-    }
-  },
-  {
-    "fileName": "../../libraries/microworlds/microworld.xml",
-    "name": "(EDC) Microworld",
-    "description": "Customize the display of the Snap! UI to create a microworld programming environment.",
-    "searchData": [
-      "load microworld",
-      "switch to language _ and broadcast _ with data _ show loading screen _",
-      "block spec _",
-      "button label _ message _ data _",
-      "key: _ value: _",
-      "set buttons in _ to _",
-      "stage button label _ message _ data _ x _ y _ anchor x _ anchor y _ font size _",
-      "microworld define _ _ _",
-      "button pic labeled _",
-      "hide loading screen",
-      "show loading screen",
-      "set loading screen after translate _",
-      "set active buttons in _ to _",
-      "set broadcast after translate _",
-      "set menu _ to items _",
-      "set ide param _ to _",
-      "switch to sprite _",
-      "exit microworld",
-      "enter microworld",
-      "microworld active?",
-      "set block buttons _",
-      "set editable block specs _",
-      "set palette blocks _",
-      "set enable variables _",
-      "set enable keyboard _",
-      "set hidden UI features _",
-      "block specs _",
-      "list to comma-separated string _",
-      "hidden UI features $-1 _ category list $-1 _ make block buttons $-1 _ search button $-1 _ stepping button $-1 _ start button $-1 _ pause button"
-    ],
-    "categories": [
-      "Microworld",
-      "operators"
-    ],
-    "translations": {
-      "pt": {
-        "searchData": [
-          "um par (chave",
-          "altera o valor da configuração _ para _"
-        ],
-        "searchData": [
-          "um par (chave",
-          "altera o valor da configuração _ para _"
-        ]
-      }
-    }
-  },
-  {
-    "fileName": "../../libraries/microworlds/script-pic-costume.xml",
-    "name": "(EDC) Script Pic Costumes",
-    "description": "Turn a ringified block/script into a costume",
-    "searchData": [
-      "costume from script: _"
-    ],
-    "categories": [
-      "looks"
-    ],
-    "translations": {
-    }
-  },
-  {
-    "fileName": "../../libraries/microworlds/translations.xml",
-    "name": "(EDC) Translations",
-    "description": "Support for translating text, blocks, and dropdown/placeholder values",
-    "searchData": [
-      "update custom block translations from translations _",
-      "extract _ from translation data _",
-      "extract block translation data from _",
-      "all translated block labels for _ from translations _",
-      "translate input options with translations _ fallback _",
-      "custom block with label that translates to %label from translations %translations",
-      "add missing translation to _ language _ key _",
-      "translate _ from translations _ fallback language _ missing handler _ placeholders from list _",
-      "get translation information for _ from translations _ fallback language _ missing handler _",
-      "language",
-      "languages in translation _",
-      "IDE labels and languages limit to _",
-      "dropdown choice _ translates to _ from translations _",
-      "extract equivalent dropdown options from _",
-      "dropdown choice _ translates to _ from equivalent options _",
-      "translate input defaults with translations _ fallback _"
-    ],
-    "categories": [
-      "Translations"
-    ],
-    "translations": {
     }
   }
 ]
