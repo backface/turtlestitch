@@ -833,8 +833,6 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
 	oldx = this.xPosition();
 	oldy = this.yPosition();
 
-  console.log(dist)
-
 	if (dist >= 0) {
 		dest = this.position().distanceAngle(dist, this.heading);
 	} else {
