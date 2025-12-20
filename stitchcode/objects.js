@@ -511,9 +511,9 @@ SpriteMorph.prototype.forward = function (steps) {
   				var real_length = dist / Math.round(dist / this.stitchoptions.length);
           if (dist < this.stitchoptions.length)
             real_length = dist;
-  				this.forwardBy(dist, real_length);
+  				this.forwardBy(dist * this.sign, real_length);
   			} else {
-  				this.forwardBy(dist, this.stitchoptions.length);
+  				this.forwardBy(dist * this.sign, this.stitchoptions.length);
   			}
   		} else {
   			this.doMoveForward(steps);     // when not in running mode or pen is not down just go a straight line
@@ -832,6 +832,8 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
 
 	oldx = this.xPosition();
 	oldy = this.yPosition();
+
+  console.log(dist)
 
 	if (dist >= 0) {
 		dest = this.position().distanceAngle(dist, this.heading);
