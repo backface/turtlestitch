@@ -1,4 +1,4 @@
-VERSION="2.11.1"
+VERSION="2.11.2"
 
 // get debug mode
 url = new URL(window.location.href);
