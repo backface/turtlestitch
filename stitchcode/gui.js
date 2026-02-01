@@ -1595,8 +1595,16 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         function () { myself.downloadDST(); },
         'Export as Tajima/DST'
     );
-    downloadDSTButton.newLines = 2.7;
+    downloadDSTButton.newLines = 1.7;
     elements.push(downloadDSTButton);
+
+    var downloadPESButton = new PushButtonMorph(
+        null,
+        function () { myself.downloadPES(); },
+        'Export as Brother/PES'
+    );
+    downloadPESButton.newLines = 1.7;
+    elements.push(downloadPESButton);
 
     if (DEBUG) {
 		elements.push(' DEBUG MODE: true');
@@ -1724,6 +1732,14 @@ IDE_Morph.prototype.downloadDST = function() {
     expUintArr = this.stage.turtleShepherd.toDST(name);
     blob = new Blob([expUintArr], {type: 'application/octet-stream'});
     saveAs(blob, name + '.dst');
+};
+
+// PES export
+IDE_Morph.prototype.downloadPES = function() {
+	var name = this.projectName ? this.projectName : 'turtlestitch';
+    expUintArr = this.stage.turtleShepherd.toPES(name);
+    blob = new Blob([expUintArr], {type: 'application/octet-stream'});
+    saveAs(blob, name + '.pes');
 };
 
 // PNG export

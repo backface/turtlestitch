@@ -5,6 +5,7 @@
     Embroidery function for Javscript
     ------------------------------------------------------------------
     Copyright (C) 2016-2021 Michael Aschauer
+    Copyright (C) 2025 maehw
 
 */
 
@@ -843,6 +844,191 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
     return expUintArr;
 };
 
+TurtleShepherd.prototype.toPES = function(name="noname") {
+    var expArr = [];
+
+    function writeString(str, length=null, padWithSpace=true) {
+        if(length === null) {
+            length = str.length;
+        }
+		for(var i = 0; i<length; i++) {
+			if (i < str.length) {
+				expArr.push(str[i].charCodeAt(0));
+			} else {
+				if (padWithSpace) {
+					expArr.push(0x20);
+				} else {
+					expArr.push(0x00);
+				}
+			}
+		}
+	}
+
+    function writeInt16Le(value) {
+        expArr.push((value >> 0) & 0xFF);
+        expArr.push((value >> 8) & 0xFF);
+    }
+
+    function writeInt24Le(value) {
+        expArr.push((value >> 0) & 0xFF);
+        expArr.push((value >> 8) & 0xFF);
+        expArr.push((value >> 16) & 0xFF);
+    }
+
+    function writeInt32Le(value) {
+        expArr.push((value >> 0) & 0xFF);
+        expArr.push((value >> 8) & 0xFF);
+        expArr.push((value >> 16) & 0xFF);
+        expArr.push((value >> 24) & 0xFF);
+    }
+
+    function updateInt24Le(value, pos) {
+        expArr[pos] = (value >> 0) & 0xFF;
+        expArr[pos+1] = (value >> 8) & 0xFF;
+        expArr[pos+2] = (value >> 16) & 0xFF;
+    }
+
+    // identification and version
+	writeString("#PES0001");
+	
+	// remaining PES v1 header section
+	writeInt32Le(0x16); // location of PEC block
+	
+	writeInt16Le(0);
+	writeInt16Le(0);
+	writeInt16Le(0);
+	expArr.push(0xFF, 0xFF, 0, 0); // end of the header
+	// from here on, it's all PEC
+
+	// PEC header
+	const iconWidth = 48;
+	const iconWidthBytes = iconWidth/8; // icon width in bytes: icon width in pixels divided by 8 pixels per byte
+	const iconHeight = 38; // icon height (in pixels)
+	writeString("LA:" + name.substr(0, 8), 19, true); // 20 bytes name, typically truncated at 8 chars, padded with spaces
+	expArr.push(0x0D); // carriage return
+	writeString("", 12, true);
+	expArr.push(0xFF, 0x00);
+	expArr.push(iconWidthBytes); 
+	expArr.push(iconHeight);
+	writeString("", 12, true);
+    // number of thread colors minus one, 0xFF means 0 colors;
+    // assume thread color and therefore write value 0 here
+    expArr.push(0);
+    // color index of that one thread color    
+    expArr.push(1);
+    // fill the remaining space reserved for colors
+	writeString("", 462, true);
+
+    // PEC block
+    stitchBlockStartPos = expArr.length;
+    expArr.push(0, 0);
+    stitchBlockLenPos = expArr.length; // recall byte position where we place the spaceholder
+    writeInt24Le(0); // spaceholder for stitch block length
+    expArr.push(0x31, 0xFF, 0xF0);
+    width = 1000; // FIXME (is this in multiple of 0.1mm?)
+    height = 1000; // FIXME (is this in multiple of 0.1mm?)
+    writeInt16Le(width);
+    writeInt16Le(height);
+    writeInt16Le(0x1E0);
+    writeInt16Le(0x1B0);
+
+    // Perform actual encoding of PEC stitch list subsection
+    lastStitch = null;
+    hasFirst = false;
+    scale = this.scale;
+    // TODO: implement proper functionality
+	for (var i=0; i < this.cache.length; i++) {
+		if (this.cache[i].cmd == "color") {
+		} else if (this.cache[i].cmd == "move") {
+            stitch = this.cache[i];
+            if (!hasFirst) {
+                x0 = Math.round(stitch.x * scale);
+                y0 = -Math.round(stitch.y * scale);
+
+                dx = x0;
+                dy = y0;
+                lastStitch = {cmd: "move", x: x0, y: y0, penDown: stitch.penDown}             
+                hasFirst = true;
+            } else if (hasFirst) {
+                x1 = Math.round(stitch.x * scale);
+                y1 = -Math.round(stitch.y * scale);
+                x0 = Math.round(lastStitch.x * scale);
+                y0 = -Math.round(lastStitch.y * scale);
+
+                dx = x1 - x0
+                dy = y1 - y0
+            }
+            
+            // check whether to encode in short or long form;
+            // jump and trim stitches are probably not handled correctly at the moment (FIXME!)
+            dmax = Math.max(Math.abs(dx), Math.abs(dy));
+
+            if(stitch.penDown && dmax < 127) {
+                // short form (1 byte) indicated by MSBit=0; 7 bit for delta
+                expArr.push(dx & 0x7F, dy & 0x7F);
+                
+            } else if(dmax < 2047) {
+                // long form (2 bytes) indicated by MSBit=1; 12 bit for delta
+                let msBits = 0x80;
+                //if(!stitch.penDown) {
+                //    msBits |= 0x10; // make it a jump stitch (FIXME: doesn't work as expected)
+                //}
+                expArr.push(msBits | ((dx >> 8) & 0x0F));
+                expArr.push(dx & 0xFF);
+                expArr.push(msBits | ((dy >> 8) & 0x0F));
+                expArr.push(dy & 0xFF);
+            } else {
+            
+                // TODO: cannot encode; break this down into multiple stitches?!
+                //       are there other ways of communicating errors to the user?
+                console.log("PES/PEC export: cannot encode stitch!");
+            }
+
+            lastStitch = stitch;
+		}
+	}
+    // Mockery with dx and dy coordinates (in short form)
+    // delta of 0x0A represents 10 units of 0.1 mm each, i.e. 1 mm
+    // delta of 0x76 represents -10 units (MSBit 0; then 7 bit two's complement) of 0.1 mm each, i.e. 1 mm
+    /*
+    for (var i=0; i<20; i++) {
+        expArr.push(0x0A, 0x0A); // go diagonally
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x0A, 0x00); // go x only
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x00, 0x0A); // go y only
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x76, 0x00); // go -x only
+    }
+    for (var i=0; i<20; i++) {
+        expArr.push(0x00, 0x76); // go -y only
+    }
+    */
+    expArr.push(0xFF); // file end
+
+    // calculate stitch block length value and update in the binary data
+    stitchBlockLen = expArr.length - stitchBlockStartPos;
+    updateInt24Le(stitchBlockLen, stitchBlockLenPos);
+
+    // PEC thumbnail images for every color (use chessboard alike pattern for now)
+    patternByte = 0xAA;
+    for (i=0;i<iconWidthBytes*iconHeight*2;i++) {
+        if(i % 6 == 0) {
+            // swap pattern bytes
+            patternByte = (patternByte == 0xAA) ? 0x55 : 0xAA;
+        }
+        expArr.push(patternByte);
+    }
+
+    expUintArr = new Uint8Array(expArr.length);
+    for (i=0;i<expArr.length;i++) {
+        expUintArr[i] = expArr[i];
+    }
+    return expUintArr;
+}
 
 TurtleShepherd.prototype.getStitchesAsArr = function () {
   stitches = [];
