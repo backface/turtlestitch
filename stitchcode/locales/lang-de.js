@@ -173,10 +173,6 @@ tempDict = {
     'setze Farbe auf hex _',
   'set color by hue _':
     'setze Farbton _',
-  'set _ to _':
-    'setze _ auf _',
-  'change _ by _':
-    '\u00e4ndere _ auf _',
   'color: _':
     'Farbe: _',
   'opacity':
