@@ -63,7 +63,7 @@ Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.store = '2026-March-10';
+modules.store = '2026-April-07';
 
 // XML_Serializer ///////////////////////////////////////////////////////
 /*
@@ -363,7 +363,7 @@ SnapSerializer.prototype.loadProjectModel = function (
         scenesModel.childrenNamed('scene').forEach(model => {
             ide.scene.captureGlobalSettings();
             project.scenes.add(
-                this.loadScene(model, appVersion, null, keepRoles)
+                this.loadScene(model, appVersion, remixID, keepRoles)
             );
             ide.scene.applyGlobalSettings();
         });

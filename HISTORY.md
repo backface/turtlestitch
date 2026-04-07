@@ -118,6 +118,9 @@
     * Catalan, thanks, Joan!
     * German
 
+### 2026-04-07
+* store: fixed retaining the remixID of cloud projects
+
 ### 2026-04-03
 * objects: fixed restoring the hidden custom blocks in a palette of a template-based project
 * gui: automatically turn generated puzzles into templates and hide empty categories
