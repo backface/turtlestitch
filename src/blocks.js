@@ -164,7 +164,7 @@ CustomHatBlockMorph, GrayPaletteMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.blocks = '2026-March-13';
+modules.blocks = '2026-April-07';
 
 var SyntaxElementMorph;
 var BlockMorph;
@@ -940,9 +940,11 @@ SyntaxElementMorph.prototype.labelParts = {
             'global?': ['global?'],
             'expression': ['expression'],
             'type': ['type'],
+            'answer': ['answer'],
             'scope': ['scope'],
             'selector': ['selector'],
             'slots': ['slots'],
+            'strict': ['strict'],
             '~' : null,
             'defaults': ['defaults'],
             'menus' : ['menus'],
@@ -968,9 +970,11 @@ SyntaxElementMorph.prototype.labelParts = {
             'comment': ['comment'],
             'category': ['category'],
             'type': ['type'],
+            'answer': ['answer'],
             'scope': ['scope'],
             'selector': ['selector'],
             'slots': ['slots'],
+            'strict': ['strict'],
             '~' : null,
             'defaults': ['defaults'],
             'menus' : ['menus'],

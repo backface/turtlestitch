@@ -8631,6 +8631,16 @@ Process.prototype.reportBasicBlockAttribute = function (attribute, block) {
         return ['command', 'reporter', 'predicate', 'hat'].indexOf(
             this.reportTypeOf(block)
         ) + 1;
+    case 'answer':
+        if (expr instanceof ReporterBlockMorph) {
+            if (expr.isCustomBlock) {
+                return (expr.isGlobal ? expr.definition
+                    : this.blockReceiver().getMethod(expr.semanticSpec)
+                ).reports || '';
+            }
+            return expr.reports || '';
+        }
+        return '';
     case 'scope':
         return expr.isCustomBlock ? (expr.isGlobal ? 1 : 2) : 0;
     case 'selector':
@@ -8656,6 +8666,14 @@ Process.prototype.reportBasicBlockAttribute = function (attribute, block) {
                         : each.getSpec())
             )
         ).map(spec => this.slotType(spec));
+    case 'strict':
+        if (expr.isCustomBlock) {
+            return (expr.isGlobal ?
+                expr.definition
+                : this.blockReceiver().getMethod(expr.semanticSpec)
+            ).enforceTypes;
+        }
+        return false;
     case 'defaults':
         slots = new List();
         if (expr.isCustomBlock) {
@@ -9268,6 +9286,12 @@ Process.prototype.doSetBlockAttribute = function (attribute, block, val) {
             }
         }
         break;
+    case 'answer':
+        this.assertType(val, 'text');
+        if (['reporter', 'predicate'].includes(def.type)) {
+            def.reports = val;
+        }
+        break;
     case 'scope':
         if (isInUse()) {
             throw new Error('cannot change this\nfor a block that is in use');
@@ -9318,6 +9342,10 @@ Process.prototype.doSetBlockAttribute = function (attribute, block, val) {
                 def.declarations.set(name, info);
             }
         });
+        break;
+    case 'strict':
+        this.assertType(val, 'Boolean');
+        def.enforceTypes = val;
         break;
     case 'defaults':
         this.assertType(val, ['list', 'Boolean', 'number', 'text', 'color']);

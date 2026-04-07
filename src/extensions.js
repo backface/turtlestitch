@@ -36,7 +36,7 @@ TableFrameMorph, console, Morph, MenuMorph*/
 
 /*jshint esversion: 11, bitwise: false*/
 
-modules.extensions = '2026-March-04';
+modules.extensions = '2026-April-07';
 
 // Global stuff
 
@@ -318,9 +318,11 @@ SnapExtensions.primitives.set(
             ['comment'],
             ['category'],
             ['type'],
+            ['answer'],
             ['scope'],
             ['selector'],
             ['slots'],
+            ['strict'],
             ['defaults'],
             ['menus'],
             ['editables'],
