@@ -120,6 +120,7 @@
 
 ### 2026-04-07
 * store: fixed retaining the remixID of cloud projects
+* threads: added metaprogramming support for "unevaluated number" type input slots (type 21)
 
 ### 2026-04-03
 * objects: fixed restoring the hidden custom blocks in a palette of a template-based project

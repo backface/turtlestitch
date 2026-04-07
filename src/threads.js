@@ -66,7 +66,7 @@ CustomHatBlockMorph*/
 
 /*jshint esversion: 11, bitwise: false, evil: true*/
 
-modules.threads = '2026-April-02';
+modules.threads = '2026-April-07';
 
 var ThreadManager;
 var Process;
@@ -9086,7 +9086,11 @@ Process.prototype.slotType = function (spec) {
         // mnemonics:
         '{}':           20,
         'dict':         20,
-        'struct':       20
+        'struct':       20,
+
+        '21':           21,
+        'nue':          21 // spec
+        //mnemonics: none
 
     }[key];
     if (num === undefined) {
@@ -9116,7 +9120,7 @@ Process.prototype.slotSpec = function (num) {
 
     spec = ['s', 'n', 'b', 'l', 'mlt', 'cs', 'cmdRing', 'repRing', 'predRing',
     'anyUE', 'boolUE', 'obj', 'upvar', 'clr', 'scriptVars', 'loop', 'receive',
-    'send', 'elseif', 'parameter', 'adt'][id];
+    'send', 'elseif', 'parameter', 'adt', 'nUE'][id];
 
     if (spec === undefined) {
         return null;
