@@ -347,6 +347,7 @@ SnapSerializer.prototype.loadProjectModel = function (
         scenesModel = xmlNode.childNamed('scenes'),
         lang = xmlNode.attributes.lang,
         zoom = xmlNode.attributes.zoom,
+        fade = xmlNode.attributes.fade,
         flat = xmlNode.attributes.flat,
         bright = xmlNode.attributes.bright,
         shouldRefresh = false,
@@ -401,6 +402,9 @@ SnapSerializer.prototype.loadProjectModel = function (
         }
         if (zoom) {
             ide.setZoom(+zoom, true); // no save
+        }
+        if (fade) {
+            ide.setBlockTransparency(+fade, false); // no save
         }
     }
     if (scenesModel) {
@@ -2129,7 +2133,7 @@ Project.prototype.toXML = function (serializer) {
     }
 
     return serializer.format(
-        '<project name="@" app="@" version="@"%%%%>' +
+        '<project name="@" app="@" version="@"%%%%%>' +
             '<notes>$</notes>' +
             '<thumbnail>$</thumbnail>' +
             '<scenes select="@">%</scenes>' +
@@ -2139,8 +2143,13 @@ Project.prototype.toXML = function (serializer) {
         serializer.version,
         hasTemplate ?
             ' lang="' + SnapTranslator.language + '"' : '',
-        hasTemplate ? // && (ZOOM > 1) ?
+        hasTemplate ?
             ' zoom="' + Math.round(ZOOM * 100) + '"' : '',
+        hasTemplate ?
+            ' fade="' +
+                Math.round(100 - (SyntaxElementMorph.prototype.alpha * 100)) +
+                '"'
+            : '',
         hasTemplate ?
             ' flat="' + MorphicPreferences.isFlat.toString() + '"' : '',
         hasTemplate ?
