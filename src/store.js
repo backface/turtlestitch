@@ -57,13 +57,13 @@ BlockMorph, ArgMorph, InputSlotMorph, TemplateSlotMorph, CommandSlotMorph, ZOOM,
 FunctionSlotMorph, MultiArgMorph, ColorSlotMorph, nop, CommentMorph, isNil,
 localize, SVG_Costume, MorphicPreferences, Process, isSnapObject, Variable,
 SyntaxElementMorph, BooleanSlotMorph, normalizeCanvas, contains, Scene,
-Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph*/
+Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph, SnapTranslator*/
 
 /*jshint esversion: 11*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.store = '2026-April-07';
+modules.store = '2026-April-11';
 
 // XML_Serializer ///////////////////////////////////////////////////////
 /*
@@ -345,8 +345,21 @@ SnapSerializer.prototype.loadProjectModel = function (
         app = appInfo ? appInfo.split(' ')[0] : null,
         appVersion = appInfo ? parseFloat(appInfo.split(' ')[1]) || 0 : 0,
         scenesModel = xmlNode.childNamed('scenes'),
+        lang = xmlNode.attributes.lang,
         zoom = xmlNode.attributes.zoom,
-        project = new Project();
+        flat = xmlNode.attributes.flat,
+        bright = xmlNode.attributes.bright,
+        shouldRefresh = false,
+        project = new Project(),
+        loop;
+
+    function isLoadingAssets() {
+        return ide.sprites.asArray().concat([ide.stage]).some(any =>
+            (any.costume ? any.costume.loaded !== true : false) ||
+            any.costumes.asArray().some(each => each.loaded !== true) ||
+            any.sounds.asArray().some(each => each.loaded !== true)
+        );
+    }
 
     if (ide && app && app !== this.app.split(' ')[0]) {
         ide.inform(
@@ -355,6 +368,40 @@ SnapSerializer.prototype.loadProjectModel = function (
                 app +
                 '\n\nand may be incompatible or fail to load here.'
         ).nag = true;
+    }
+    if (ide) {
+        if (!isNil(flat)) {
+            if (flat === 'true') {
+                ide.setFlatDesign();
+            } else {
+                ide.setDefaultDesign();
+            }
+            shouldRefresh = true;
+        }
+        if (!isNil(bright)) {
+            if (bright === 'true') {
+                ide.setBrightTheme();
+            } else {
+                ide.setDefaultTheme();
+            }
+            shouldRefresh = true;
+        }
+        if (lang) {
+            loop = setInterval(() => {
+                if (isLoadingAssets()) {
+                    return;
+                }
+                clearInterval(loop);
+                ide.setLanguage(lang, null, true); // no save
+            });
+        }
+        if (shouldRefresh) {
+            ide.buildPanes();
+            ide.fixLayout();
+        }
+        if (zoom) {
+            ide.setZoom(+zoom, true); // no save
+        }
     }
     if (scenesModel) {
         if (scenesModel.attributes.select) {
@@ -371,9 +418,6 @@ SnapSerializer.prototype.loadProjectModel = function (
         project.scenes.add(
             this.loadScene(xmlNode, appVersion, remixID, keepRoles)
         );
-    }
-    if (ide && zoom) {
-        ide.setZoom(+zoom, true); // no save
     }
     return project.initialize();
 };
@@ -2085,7 +2129,7 @@ Project.prototype.toXML = function (serializer) {
     }
 
     return serializer.format(
-        '<project name="@" app="@" version="@"%>' +
+        '<project name="@" app="@" version="@"%%%%>' +
             '<notes>$</notes>' +
             '<thumbnail>$</thumbnail>' +
             '<scenes select="@">%</scenes>' +
@@ -2093,8 +2137,14 @@ Project.prototype.toXML = function (serializer) {
         this.name || localize('Untitled'),
         serializer.app,
         serializer.version,
-        hasTemplate && (ZOOM > 1) ?
+        hasTemplate ?
+            ' lang="' + SnapTranslator.language + '"' : '',
+        hasTemplate ? // && (ZOOM > 1) ?
             ' zoom="' + Math.round(ZOOM * 100) + '"' : '',
+        hasTemplate ?
+            ' flat="' + MorphicPreferences.isFlat.toString() + '"' : '',
+        hasTemplate ?
+            ' bright="' + IDE_Morph.prototype.isBright.toString() + '"' : '',
         this.notes || '',
         thumbdata,
         scenes.indexOf(this.currentScene) + 1,
