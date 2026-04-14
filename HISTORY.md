@@ -9,7 +9,7 @@
     * templates
         * marking a starter project / puzzle as "template" removes its name when loading it (and lets users create their own projects based on the template) 
         * projects based on a template let the user restore the visibility of global blocks in the template palette
-        * template-projects store their magnification level, block fade level, language, design and theme
+        * template-projects store their magnification level, block fade level, blocks zoom, language, design and theme and propagate them into the projects that are created from them
         * "generate puzzle" automatically turns the project into a template
     * tutorials
         * open and run a scene inside a separate modeless window
@@ -117,6 +117,9 @@
     * Chinese, thank you, @Ayist14 !
     * Catalan, thanks, Joan!
     * German
+
+### 2026-04-14
+* store, scenes, gui: include the author's blocks zoom level in templates and puzzles and in template-instances
 
 ### 2026-04-11
 * store: include the author's language, zoom-level, design and theme in templates and puzzles

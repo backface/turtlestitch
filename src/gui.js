@@ -87,7 +87,7 @@ HatBlockMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2026-April-03';
+modules.gui = '2026-April-14';
 
 // Declarations
 
@@ -3643,14 +3643,14 @@ IDE_Morph.prototype.refreshIDE = function () {
     if (Process.prototype.isCatchingErrors) {
         try {
             projectData = this.serializer.serialize(
-                new Project(this.scenes, this.scene)
+                new Project(this.scenes, this.scene, true)
             );
         } catch (err) {
             this.showMessage('Serialization failed: ' + err);
         }
     } else {
         projectData = this.serializer.serialize(
-            new Project(this.scenes, this.scene)
+            new Project(this.scenes, this.scene, true)
         );
     }
     SpriteMorph.prototype.initBlocks();
@@ -8244,14 +8244,14 @@ IDE_Morph.prototype.reflectLanguage = function (lang, callback, noSave) {
         if (Process.prototype.isCatchingErrors) {
             try {
                 projectData = this.serializer.serialize(
-                    new Project(this.scenes, this.scene)
+                    new Project(this.scenes, this.scene, true)
                 );
             } catch (err) {
                 this.showMessage('Serialization failed: ' + err);
             }
         } else {
             projectData = this.serializer.serialize(
-                new Project(this.scenes, this.scene)
+                new Project(this.scenes, this.scene, true)
             );
         }
     }
@@ -8564,7 +8564,7 @@ IDE_Morph.prototype.userSetBlocksScale = function () {
     );
 };
 
-IDE_Morph.prototype.setBlocksScale = function (num) {
+IDE_Morph.prototype.setBlocksScale = function (num, noSave) {
     var projectData, onComplete, name, tutorial;
     if (this.scene.createdFromTemplate) {
         name = this.scene.name;
@@ -8582,14 +8582,14 @@ IDE_Morph.prototype.setBlocksScale = function (num) {
     if (Process.prototype.isCatchingErrors) {
         try {
             projectData = this.serializer.serialize(
-                new Project(this.scenes, this.scene)
+                new Project(this.scenes, this.scene, true)
             );
         } catch (err) {
             this.showMessage('Serialization failed: ' + err);
         }
     } else {
         projectData = this.serializer.serialize(
-            new Project(this.scenes, this.scene)
+            new Project(this.scenes, this.scene, true)
         );
     }
     SpriteMorph.prototype.initBlocks();
@@ -8608,7 +8608,9 @@ IDE_Morph.prototype.setBlocksScale = function (num) {
             true,  // keepRoles
             onComplete // restore name and template origin
         );
-    this.saveSetting('zoom', num);
+    if (!noSave) {
+        this.saveSetting('zoom', num);
+    }
 };
 
 // IDE_Morph blocks fading
@@ -8897,14 +8899,14 @@ IDE_Morph.prototype.userCustomizePalette = function (callback = nop) {
     if (Process.prototype.isCatchingErrors) {
         try {
             projectData = this.serializer.serialize(
-                new Project(this.scenes, this.scene)
+                new Project(this.scenes, this.scene, true)
             );
         } catch (err) {
             this.showMessage('Serialization failed: ' + err);
         }
     } else {
         projectData = this.serializer.serialize(
-            new Project(this.scenes, this.scene)
+            new Project(this.scenes, this.scene, true)
         );
     }
     SpriteMorph.prototype.initBlocks();

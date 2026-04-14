@@ -54,7 +54,7 @@ ScriptsMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.scenes = '2026-March-10';
+modules.scenes = '2026-April-14';
 
 // Projecct /////////////////////////////////////////////////////////
 
@@ -63,7 +63,7 @@ modules.scenes = '2026-March-10';
 
 // Project instance creation:
 
-function Project(scenes, current) {
+function Project(scenes, current, temporary = false) {
     var projectScene;
 
     this.scenes = scenes || new List();
@@ -88,6 +88,9 @@ function Project(scenes, current) {
 
     // for undeleting scenes - do not persist
     this.trash = [];
+
+    // for refreshing the ide
+    this.isTemporary = temporary;
 }
 
 Project.prototype.initialize = function () {
@@ -125,8 +128,21 @@ function Scene(aStageMorph) {
     this.showPaletteButtons = true;
     this.role = null; // null (default), "template" or "tutorial"
     this.createdFromTemplate = false;
-    this.template = null; // {name: str, version: str, hide: nested list}
     this.hideSprites = false;
+
+    // template settings
+    // {
+    //      name: str,
+    //      version: str,
+    //      hide: nested list - [primitives, custom blocks, variables],
+    //      lang: str - optional,
+    //      zoom: str (percentage)- optional,
+    //      scale: str (factor) - optional,
+    //      fade: str (percentage) - optional,
+    //      flat: str (bool) - optional,
+    //      bright: str (bool) - optional
+    // }
+    this.template = null;
 
     // cached IDE state
     this.sprites = new List();

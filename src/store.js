@@ -63,7 +63,7 @@ Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph, SnapTranslator*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.store = '2026-April-11';
+modules.store = '2026-April-14';
 
 // XML_Serializer ///////////////////////////////////////////////////////
 /*
@@ -345,14 +345,60 @@ SnapSerializer.prototype.loadProjectModel = function (
         app = appInfo ? appInfo.split(' ')[0] : null,
         appVersion = appInfo ? parseFloat(appInfo.split(' ')[1]) || 0 : 0,
         scenesModel = xmlNode.childNamed('scenes'),
-        lang = xmlNode.attributes.lang,
-        zoom = xmlNode.attributes.zoom,
-        fade = xmlNode.attributes.fade,
-        flat = xmlNode.attributes.flat,
-        bright = xmlNode.attributes.bright,
         shouldRefresh = false,
         project = new Project(),
-        loop;
+        template, langLoop, scaleLoop;
+
+    function applyConfiguration() {
+        if (!isNil(template.attributes.flat)) {
+            if (template.attributes.flat === 'true') {
+                ide.setFlatDesign();
+            } else {
+                ide.setDefaultDesign();
+            }
+            shouldRefresh = true;
+        }
+        if (!isNil(template.attributes.bright)) {
+            if (template.attributes.bright === 'true') {
+                ide.setBrightTheme();
+            } else {
+                ide.setDefaultTheme();
+            }
+            shouldRefresh = true;
+        }
+        if (template.attributes.lang &&
+            (template.attributes.lang !== SnapTranslator.language)
+        ) {
+            langLoop = setInterval(() => {
+                if (isLoadingAssets()) {
+                    return;
+                }
+                clearInterval(langLoop);
+                ide.setLanguage(template.attributes.lang, null, true);
+            });
+        }
+        if (template.attributes.scale &&
+            (+template.attributes.scale !== SyntaxElementMorph.prototype.scale)
+        ) {
+            scaleLoop = setInterval(() => {
+                if (isLoadingAssets()) {
+                    return;
+                }
+                clearInterval(scaleLoop);
+                ide.setBlocksScale(+template.attributes.scale, true);
+            });
+        }
+        if (shouldRefresh) {
+            ide.buildPanes();
+            ide.fixLayout();
+        }
+        if (template.attributes.zoom) {
+            ide.setZoom(+template.attributes.zoom, true);
+        }
+        if (template.attributes.fade) {
+            ide.setBlockTransparency(+template.attributes.fade, false);
+        }
+    }
 
     function isLoadingAssets() {
         return ide.sprites.asArray().concat([ide.stage]).some(any =>
@@ -370,44 +416,13 @@ SnapSerializer.prototype.loadProjectModel = function (
                 '\n\nand may be incompatible or fail to load here.'
         ).nag = true;
     }
-    if (ide) {
-        if (!isNil(flat)) {
-            if (flat === 'true') {
-                ide.setFlatDesign();
-            } else {
-                ide.setDefaultDesign();
-            }
-            shouldRefresh = true;
-        }
-        if (!isNil(bright)) {
-            if (bright === 'true') {
-                ide.setBrightTheme();
-            } else {
-                ide.setDefaultTheme();
-            }
-            shouldRefresh = true;
-        }
-        if (lang) {
-            loop = setInterval(() => {
-                if (isLoadingAssets()) {
-                    return;
-                }
-                clearInterval(loop);
-                ide.setLanguage(lang, null, true); // no save
-            });
-        }
-        if (shouldRefresh) {
-            ide.buildPanes();
-            ide.fixLayout();
-        }
-        if (zoom) {
-            ide.setZoom(+zoom, true); // no save
-        }
-        if (fade) {
-            ide.setBlockTransparency(+fade, false); // no save
-        }
-    }
+
     if (scenesModel) {
+        template = scenesModel.childrenNamed('scene').map(each =>
+            each.childNamed('template')).find(item => !isNil(item));
+        if (template && (xmlNode.attributes.temp !== 'true')) {
+            applyConfiguration();
+        }
         if (scenesModel.attributes.select) {
             project.sceneIdx = +scenesModel.attributes.select;
         }
@@ -436,6 +451,11 @@ SnapSerializer.prototype.loadScene = function (
     var scene = new Scene(),
         model,
         hidden,
+        lang,
+        zoom,
+        fade,
+        flat,
+        bright,
         nameID;
 
     this.scene = scene;
@@ -483,6 +503,11 @@ SnapSerializer.prototype.loadScene = function (
     scene.role = model.scene.attributes.role || null;
     model.template = model.scene.childNamed('template');
     if (model.template) {
+        lang = model.template.attributes.lang;
+        zoom = model.template.attributes.zoom;
+        fade = model.template.attributes.fade;
+        flat = model.template.attributes.flat;
+        bright = model.template.attributes.bright;
         hidden = new List();
         hidden.add(
             this.loadValue(model.template.childNamed('primitives').children[0])
@@ -498,6 +523,11 @@ SnapSerializer.prototype.loadScene = function (
             version: model.template.attributes.version,
             hide: hidden
         };
+        if (!isNil(lang)) {scene.template.lang = lang; }
+        if (!isNil(zoom)) {scene.template.zoom = zoom; }
+        if (!isNil(fade)) {scene.template.fade = fade; }
+        if (!isNil(flat)) {scene.template.flat = flat; }
+        if (!isNil(bright)) {scene.template.bright = bright; }
     }
     model.globalVariables = model.scene.childNamed('variables');
 
@@ -2133,7 +2163,7 @@ Project.prototype.toXML = function (serializer) {
     }
 
     return serializer.format(
-        '<project name="@" app="@" version="@"%%%%%>' +
+        '<project name="@" app="@" version="@"%>' +
             '<notes>$</notes>' +
             '<thumbnail>$</thumbnail>' +
             '<scenes select="@">%</scenes>' +
@@ -2141,19 +2171,7 @@ Project.prototype.toXML = function (serializer) {
         this.name || localize('Untitled'),
         serializer.app,
         serializer.version,
-        hasTemplate ?
-            ' lang="' + SnapTranslator.language + '"' : '',
-        hasTemplate ?
-            ' zoom="' + Math.round(ZOOM * 100) + '"' : '',
-        hasTemplate ?
-            ' fade="' +
-                Math.round(100 - (SyntaxElementMorph.prototype.alpha * 100)) +
-                '"'
-            : '',
-        hasTemplate ?
-            ' flat="' + MorphicPreferences.isFlat.toString() + '"' : '',
-        hasTemplate ?
-            ' bright="' + IDE_Morph.prototype.isBright.toString() + '"' : '',
+        this.isTemporary ? ' temp="true"' : '',
         this.notes || '',
         thumbdata,
         scenes.indexOf(this.currentScene) + 1,
@@ -2184,9 +2202,14 @@ Scene.prototype.toXML = function (serializer) {
         var blocks = dict.hide;
         return '<template version="' +
             dict.version +
-            '" name="' +
-            dict.name +
-        '">' +
+            '" name="' + dict.name + '"' +
+            (isNil(dict.lang) ? '' : (' lang="' + dict.lang + '"')) +
+            (isNil(dict.zoom) ? '' : (' zoom="' + dict.zoom + '"')) +
+            (isNil(dict.scale) ? '' : (' scale="' + dict.scale + '"')) +
+            (isNil(dict.fade) ? '' : (' fade="' + dict.fade + '"')) +
+            (isNil(dict.flat) ? '' : (' flat="' + dict.flat + '"')) +
+            (isNil(dict.bright) ? '' : (' bright="' + dict.bright + '"')) +
+        '>' +
             '<primitives>' + serializer.store(blocks.at(1)) + '</primitives>' +
             '<custom>' + serializer.store(blocks.at(2)) + '</custom>' +
             '<variables>' + serializer.store(blocks.at(3)) + '</variables>' +
@@ -2197,7 +2220,13 @@ Scene.prototype.toXML = function (serializer) {
         this.template = {
             name: this.name || localize('Untitled'),
             version: SnapVersion,
-            hide: this.stage.hiddenGlobalBlocks()
+            hide: this.stage.hiddenGlobalBlocks(),
+            lang: SnapTranslator.language,
+            zoom: Math.round(ZOOM * 100),
+            scale: SyntaxElementMorph.prototype.scale,
+            fade: Math.round(100 - (SyntaxElementMorph.prototype.alpha * 100)),
+            flat: MorphicPreferences.isFlat,
+            bright: IDE_Morph.prototype.isBright
         };
     }
 
