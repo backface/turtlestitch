@@ -9,7 +9,7 @@
     * templates
         * marking a starter project / puzzle as "template" removes its name when loading it (and lets users create their own projects based on the template) 
         * projects based on a template let the user restore the visibility of global blocks in the template palette
-        * template-projects store their magnification level, block fade level, blocks zoom, language, design and theme and propagate them into the projects that are created from them
+        * template-projects can store their magnification level, block fade level, blocks zoom, language, design and theme and propagate them into the projects that are created from them
         * "generate puzzle" automatically turns the project into a template
     * tutorials
         * open and run a scene inside a separate modeless window
@@ -84,6 +84,7 @@
         * sprite icons no longer blur when the sprite size is reduced or the zoom level increases
         * resizing the browser / window in presentation ("app") mode scales the stage smoothly
         * removed "stage selected, no motion primitives" text from the palette to support sprite-less microworlds
+        * turned "language", "looks" and "microphone resolution" menus into settings-submenus
     * blocks
         * removed landscape orientation of text-input slots
     * meta-programming
@@ -117,6 +118,9 @@
     * Chinese, thank you, @Ayist14 !
     * Catalan, thanks, Joan!
     * German
+
+### 2026-04-15
+* gui, scenes, store: let authors select which IDE settings to include in their template projects
 
 ### 2026-04-14
 * store, scenes, gui: include the author's blocks zoom level in templates and puzzles and in template-instances

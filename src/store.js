@@ -63,7 +63,7 @@ Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph, SnapTranslator*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.store = '2026-April-14';
+modules.store = '2026-April-15';
 
 // XML_Serializer ///////////////////////////////////////////////////////
 /*
@@ -2217,17 +2217,31 @@ Scene.prototype.toXML = function (serializer) {
     }
 
     if (this.role === 'template') {
-        this.template = {
-            name: this.name || localize('Untitled'),
-            version: SnapVersion,
-            hide: this.stage.hiddenGlobalBlocks(),
-            lang: SnapTranslator.language,
-            zoom: Math.round(ZOOM * 100),
-            scale: SyntaxElementMorph.prototype.scale,
-            fade: Math.round(100 - (SyntaxElementMorph.prototype.alpha * 100)),
-            flat: MorphicPreferences.isFlat,
-            bright: IDE_Morph.prototype.isBright
-        };
+        this.template.name = this.name || localize('Untitled');
+        this.template.version = SnapVersion;
+        this.template.hide = this.stage.hiddenGlobalBlocks();
+
+        // optional settings to be included:
+        if (this.template.lang !== undefined) {
+            this.template.lang = SnapTranslator.language;
+        }
+        if (this.template.zoom !== undefined) {
+            this.template.zoom = Math.round(ZOOM * 100);
+        }
+        if (this.template.scale !== undefined) {
+            this.template.scale = SyntaxElementMorph.prototype.scale;
+        }
+        if (this.template.fade !== undefined) {
+            this.template.fade = Math.round(
+                100 - (SyntaxElementMorph.prototype.alpha * 100)
+            );
+        }
+        if (this.template.flat !== undefined) {
+            this.template.flat = MorphicPreferences.isFlat;
+        }
+        if (this.template.bright !== undefined) {
+            this.template.bright = IDE_Morph.prototype.isBright;
+        }
     }
 
     serializer.scene = this; // keep the order of sprites in the corral
@@ -2268,7 +2282,7 @@ Scene.prototype.toXML = function (serializer) {
                 (a, b) => a + ' ' + b,
                 ''
             ),
-        this.template ? templateXML(this.template) : '',
+        this.template.hide ? templateXML(this.template) : '',
         code('codeHeaders'),
         code('codeMappings'),
         serializer.store(this.stage.globalBlocks),

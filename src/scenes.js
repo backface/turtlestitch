@@ -54,7 +54,7 @@ ScriptsMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.scenes = '2026-April-14';
+modules.scenes = '2026-April-15';
 
 // Projecct /////////////////////////////////////////////////////////
 
@@ -131,18 +131,17 @@ function Scene(aStageMorph) {
     this.hideSprites = false;
 
     // template settings
-    // {
-    //      name: str,
-    //      version: str,
-    //      hide: nested list - [primitives, custom blocks, variables],
-    //      lang: str - optional,
-    //      zoom: str (percentage)- optional,
-    //      scale: str (factor) - optional,
-    //      fade: str (percentage) - optional,
-    //      flat: str (bool) - optional,
-    //      bright: str (bool) - optional
-    // }
-    this.template = null;
+    this.template = {
+        name: null,
+        version: null,
+        hide: null,
+        lang: undefined,
+        zoom: undefined,
+        scale: undefined,
+        fade: undefined,
+        flat: undefined,
+        bright: undefined
+    };
 
     // cached IDE state
     this.sprites = new List();
@@ -248,6 +247,13 @@ Scene.prototype.applyGlobalSettings = function () {
     SpriteMorph.prototype.penColorModel = this.penColorModel;
     SpriteMorph.prototype.blocks = this.blocks;
     ScriptsMorph.prototype.enforceTypes = this.enforceTypes;
+};
+
+// Scene embedded template settings
+
+Scene.prototype.hasEmbeddedTemplateSettings = function () {
+    return ['lang', 'zoom', 'scale', 'fade', 'flat', 'bright'].some(any =>
+        this.template[any] !== undefined);
 };
 
 // Scene ops:

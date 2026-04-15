@@ -87,7 +87,7 @@ HatBlockMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2026-April-14';
+modules.gui = '2026-April-15';
 
 // Declarations
 
@@ -4620,6 +4620,16 @@ IDE_Morph.prototype.settingsMenu = function () {
         }
     }
 
+    function addPreferenceMenu(label, test, submenu) {
+        menu.addMenu(
+            [
+                (test? on : off),
+                localize(label)
+            ],
+            submenu
+        );
+    }
+
     function addSubPreference(label, toggle, test, onHint, offHint, hide) {
         if (!hide || shiftClicked) {
             menu.addItem(
@@ -4635,7 +4645,7 @@ IDE_Morph.prototype.settingsMenu = function () {
     }
 
     menu = new MenuMorph(this);
-    menu.addPair(
+    menu.addMenu(
         [
             new SymbolMorph(
                 'globe',
@@ -4643,15 +4653,15 @@ IDE_Morph.prototype.settingsMenu = function () {
             ),
             localize('Language...')
         ],
-        'languageMenu'
+        this.languageMenu()
     );
     menu.addItem(localize(
         'Magnification') + '...',
         'userZoom'
     );
-    menu.addItem(
+    menu.addMenu(
         localize('Looks') + '...',
-        'looksMenu'
+        this.looksMenu()
     );
     menu.addItem(
         'Stage size...',
@@ -4666,9 +4676,9 @@ IDE_Morph.prototype.settingsMenu = function () {
             new Color(100, 0, 0)
         );
     }
-    menu.addItem(
+    menu.addMenu(
         'Microphone resolution...',
-        'microphoneMenu'
+        this.microphoneMenu()
     );
     menu.addLine();
     if (shiftClicked) {
@@ -5065,22 +5075,6 @@ IDE_Morph.prototype.settingsMenu = function () {
     );
     menu.addLine(); // everything below this line is stored in the project
     addPreference(
-        'Template',
-        () => this.scene.role = this.scene.role === 'template' ?
-            null : 'template',
-        this.scene.role === 'template',
-        'uncheck to save this\nscene regularly',
-        'check to turn this scene into an uneditable\ntemplate when saving it'
-    );
-    addPreference(
-        'Tutorial',
-        () => this.scene.role = this.scene.role === 'tutorial' ?
-            null : 'tutorial',
-        this.scene.role === 'tutorial',
-        'uncheck to treat this\nscene regularly',
-        'check to turn this scene\ninto a tutorial'
-    );
-    addPreference(
         'Thread safe scripts',
         () => stage.isThreadSafe = !stage.isThreadSafe,
         this.stage.isThreadSafe,
@@ -5239,6 +5233,34 @@ IDE_Morph.prototype.settingsMenu = function () {
         'disable dragging media\nand blocks out of\nwatchers and balloons',
         false
     );
+    menu.addLine(); // templates and tutorial settings stored in the project
+    if (this.scene.role !== 'tutorial') {
+        addPreference(
+            'Template',
+            () => this.scene.role = this.scene.role === 'template' ?
+                null : 'template',
+            this.scene.role === 'template',
+            'uncheck to save this\nscene regularly',
+            'check to turn this scene into an uneditable\ntemplate when saving it'
+        );
+    }
+    if (this.scene.role !== 'template') {
+        addPreference(
+            'Tutorial',
+            () => this.scene.role = this.scene.role === 'tutorial' ?
+                null : 'tutorial',
+            this.scene.role === 'tutorial',
+            'uncheck to treat this\nscene regularly',
+            'check to turn this scene\ninto a tutorial'
+        );
+    }
+    if (this.scene.role === 'template' || this.scene.template.hide) {
+        addPreferenceMenu(
+            'Include Settings',
+            this.scene.hasEmbeddedTemplateSettings(),
+            this.templateSettingsMenu()
+        );
+    }
     menu.popup(world, pos);
 };
 
@@ -8124,8 +8146,6 @@ IDE_Morph.prototype.saveProjectsBrowser = function () {
 
 IDE_Morph.prototype.microphoneMenu = function () {
     var menu = new MenuMorph(this),
-        world = this.world(),
-        pos = this.controlBar.settingsButton.bottomLeft(),
         resolutions = ['low', 'normal', 'high', 'max'],
         microphone = this.stage.microphone,
         tick = new SymbolMorph(
@@ -8158,15 +8178,13 @@ IDE_Morph.prototype.microphoneMenu = function () {
             () => microphone.setResolution(i + 1)
         );
     });
-    menu.popup(world, pos);
+    return menu;
 };
 
 // IDE_Morph localization
 
 IDE_Morph.prototype.languageMenu = function () {
     var menu = new MenuMorph(this),
-        world = this.world(),
-        pos = this.controlBar.settingsButton.bottomLeft(),
         tick = new SymbolMorph(
             'tick',
             MorphicPreferences.menuFontSize * 0.75
@@ -8193,7 +8211,7 @@ IDE_Morph.prototype.languageMenu = function () {
             }
         )
     );
-    menu.popup(world, pos);
+    return menu;
 };
 
 IDE_Morph.prototype.setLanguage = function (lang, callback, noSave) {
@@ -8283,13 +8301,6 @@ IDE_Morph.prototype.reflectLanguage = function (lang, callback, noSave) {
 // IDE_Morph design settings
 
 IDE_Morph.prototype.looksMenu = function () {
-    this.looksMenuData().popup(
-        this.world(),
-        this.controlBar.settingsButton.bottomLeft()
-    );
-};
-
-IDE_Morph.prototype.looksMenuData = function () {
     var menu = new MenuMorph(this),
         world = this.world(),
         shiftClicked = (world.currentKey === 16),
@@ -8405,6 +8416,131 @@ IDE_Morph.prototype.looksMenuData = function () {
         this.scene.hideSprites,
         'uncheck to show\nthe stage and\nsprite editor panes',
         'check to hide\nthe stage and \nsprite editor panes'
+    );
+    return menu;
+};
+
+IDE_Morph.prototype.templateSettingsMenu = function () {
+    var menu = new MenuMorph(this),
+        settings = ['lang', 'zoom', 'scale', 'fade', 'flat', 'bright'],
+        tick = new SymbolMorph(
+            'tick',
+            MorphicPreferences.menuFontSize * 0.75
+        ),
+        empty = tick.fullCopy(),
+        on = new SymbolMorph(
+            'checkedBox',
+            MorphicPreferences.menuFontSize * 0.75
+        ),
+        off = new SymbolMorph(
+            'rectangle',
+            MorphicPreferences.menuFontSize * 0.75
+        );
+
+    menu.addPreference = function (label, toggle, test, onHint, offHint) {
+        menu.addItem(
+            [
+                (test? on : off),
+                localize(label)
+            ],
+            toggle,
+            test ? onHint : offHint
+        );
+    };
+
+    menu.selectAll = () => settings.map(each =>
+        this.scene.template[each] = null);
+    menu.selectNone = () => settings.map(each =>
+        delete this.scene.template[each]);
+    menu.allSelected = () => settings.every(each =>
+        this.scene.template[each] !== undefined);
+    menu.noneSelected = () => settings.every(each =>
+        this.scene.template[each] === undefined);
+
+    empty.render = nop;
+
+    menu.addItem(
+        [
+            menu.allSelected() ? tick : empty,
+            localize('all')
+        ],
+        menu.selectAll
+    );
+    menu.addItem(
+        [
+            menu.noneSelected() ? tick : empty,
+            localize('none')
+        ],
+        menu.selectNone
+    );
+
+    menu.addLine();
+
+    menu.addPreference(
+        'Language',
+        () => {
+            if (this.scene.template.lang === undefined) {
+                this.scene.template.lang = null;
+            } else {
+                delete this.scene.template.lang;
+            }
+        },
+        this.scene.template.lang !== undefined
+    );
+    menu.addPreference(
+        'Magnification',
+        () => {
+            if (this.scene.template.zoom === undefined) {
+                this.scene.template.zoom = null;
+            } else {
+                delete this.scene.template.zoom;
+            }
+        },
+        this.scene.template.zoom !== undefined
+    );
+    menu.addPreference(
+        'Flat design',
+        () => {
+            if (this.scene.template.flat === undefined) {
+                this.scene.template.flat = null;
+            } else {
+                delete this.scene.template.flat;
+            }
+        },
+        this.scene.template.flat !== undefined
+    );
+    menu.addPreference(
+        'Bright theme',
+        () => {
+            if (this.scene.template.bright === undefined) {
+                this.scene.template.bright = null;
+            } else {
+                delete this.scene.template.bright;
+            }
+        },
+        this.scene.template.bright !== undefined
+    );
+    menu.addPreference(
+        'Fade blocks',
+        () => {
+            if (this.scene.template.fade === undefined) {
+                this.scene.template.fade = null;
+            } else {
+                delete this.scene.template.fade;
+            }
+        },
+        this.scene.template.fade !== undefined
+    );
+    menu.addPreference(
+        'Zoom blocks',
+        () => {
+            if (this.scene.template.scale === undefined) {
+                this.scene.template.scale = null;
+            } else {
+                delete this.scene.template.scale;
+            }
+        },
+        this.scene.template.scale !== undefined
     );
     return menu;
 };
