@@ -96,7 +96,7 @@ CustomBlockDefinition, exportEmbroidery, CustomHatBlockMorph, HandMorph*/
 
 /*jshint esversion: 11*/
 
-modules.objects = '2026-April-03';
+modules.objects = '2026-April-15';
 
 var SpriteMorph;
 var StageMorph;
@@ -4580,7 +4580,7 @@ SpriteMorph.prototype.freshPalette = function (category) {
                 () => new BlockVisibilityDialogMorph(myself).popUp(
                     myself.world())
             );
-            if (ide.scene.template) {
+            if (ide.scene.template.hide) {
                 menu.addItem(
                     'restore palette',
                     () => ide.stage.restoreHiddenGlobalBlocks(

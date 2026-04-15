@@ -121,6 +121,7 @@
 
 ### 2026-04-15
 * gui, scenes, store: let authors select which IDE settings to include in their template projects
+* German translation update
 
 ### 2026-04-14
 * store, scenes, gui: include the author's blocks zoom level in templates and puzzles and in template-instances

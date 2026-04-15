@@ -5256,7 +5256,7 @@ IDE_Morph.prototype.settingsMenu = function () {
     }
     if (this.scene.role === 'template' || this.scene.template.hide) {
         addPreferenceMenu(
-            'Include Settings',
+            'Include settings',
             this.scene.hasEmbeddedTemplateSettings(),
             this.templateSettingsMenu()
         );
