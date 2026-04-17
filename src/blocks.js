@@ -164,7 +164,7 @@ CustomHatBlockMorph, GrayPaletteMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.blocks = '2026-April-07';
+modules.blocks = '2026-April-17';
 
 var SyntaxElementMorph;
 var BlockMorph;
@@ -2923,6 +2923,11 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
 
     bubble.step = () => {
         var pos, area;
+
+        if (wrrld.hand.inputTarget instanceof HandleMorph) {
+            // pause while resizing
+            return;
+        }
 
         if (ide && (ide.currentSprite !== target)) {
             pos = anchor.center();

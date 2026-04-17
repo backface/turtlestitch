@@ -119,6 +119,9 @@
     * Catalan, thanks, Joan!
     * German
 
+### 2026-04-17
+* blocks: pause auto-following of result balloons while resizing shown watchers
+
 ### 2026-04-15
 * gui, scenes, store: let authors select which IDE settings to include in their template projects
 * German translation update
