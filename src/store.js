@@ -63,7 +63,7 @@ Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph, SnapTranslator*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.store = '2026-April-15';
+modules.store = '2026-April-20';
 
 // XML_Serializer ///////////////////////////////////////////////////////
 /*
@@ -2282,7 +2282,8 @@ Scene.prototype.toXML = function (serializer) {
                 (a, b) => a + ' ' + b,
                 ''
             ),
-        this.template.hide ? templateXML(this.template) : '',
+        this.template.hide && (this.role !== 'tutorial') ?
+            templateXML(this.template) : '',
         code('codeHeaders'),
         code('codeMappings'),
         serializer.store(this.stage.globalBlocks),

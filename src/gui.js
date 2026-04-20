@@ -87,7 +87,7 @@ HatBlockMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2026-April-15';
+modules.gui = '2026-April-20';
 
 // Declarations
 
@@ -5254,7 +5254,9 @@ IDE_Morph.prototype.settingsMenu = function () {
             'check to turn this scene\ninto a tutorial'
         );
     }
-    if (this.scene.role === 'template' || this.scene.template.hide) {
+    if ((this.scene.role === 'template' || this.scene.template.hide) &&
+        this.scene.role !== 'tutorial'
+    ) {
         addPreferenceMenu(
             'Include settings',
             this.scene.hasEmbeddedTemplateSettings(),

@@ -120,6 +120,9 @@
     * German
 
 ### 2026-04-17
+* gui, store: don't include ide settings in tutorial scenes
+
+### 2026-04-17
 * blocks: pause auto-following of result balloons while resizing shown watchers
 
 ### 2026-04-15
