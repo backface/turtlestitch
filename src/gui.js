@@ -87,7 +87,7 @@ HatBlockMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2026-April-20';
+modules.gui = '2026-April-21';
 
 // Declarations
 
@@ -2902,10 +2902,10 @@ IDE_Morph.prototype.getProjectName = function () {
     return this.scenes.at(1).name;
 };
 
-IDE_Morph.prototype.setProjectName = function (string) {
+IDE_Morph.prototype.setProjectName = function (string, noChange) {
     var projectScene = this.scenes.at(1),
         name = this.newSceneName(string, projectScene);
-    if (name !== projectScene.name) {
+    if (name !== projectScene.name && !noChange) {
         projectScene.name = name;
         projectScene.stage.version = Date.now();
         this.recordUnsavedChanges();
@@ -8254,7 +8254,7 @@ IDE_Morph.prototype.reflectLanguage = function (lang, callback, noSave) {
             this.scene.createdFromTemplate = false;
             onComplete = () => {
                 this.scene.createdFromTemplate = true;
-                this.setProjectName(name);
+                this.setProjectName(name, true);
                 if (tutorial) {
                     this.launchProjectTutorial();
                 }

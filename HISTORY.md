@@ -119,7 +119,10 @@
     * Catalan, thanks, Joan!
     * German
 
-### 2026-04-17
+### 2026-04-21
+* gui: don't log edit changes when switching to another language
+
+### 2026-04-20
 * gui, store: don't include ide settings in tutorial scenes
 
 ### 2026-04-17
