@@ -121,6 +121,7 @@
 
 ### 2026-04-21
 * gui: don't log edit changes when switching to another language
+* gui, sw: Snap! v12 beta 260421 - removed dev warning dialog
 
 ### 2026-04-20
 * gui, store: don't include ide settings in tutorial scenes
