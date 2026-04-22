@@ -121,6 +121,7 @@
 
 ### 2026-04-22
 * morphic: work around occasional global zoom rendering artifacts
+* v12 beta 260422
 
 ### 2026-04-21
 * gui: don't log edit changes when switching to another language
