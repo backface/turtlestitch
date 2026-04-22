@@ -119,6 +119,9 @@
     * Catalan, thanks, Joan!
     * German
 
+### 2026-04-22
+* morphic: work around occasional global zoom rendering artifacts
+
 ### 2026-04-21
 * gui: don't log edit changes when switching to another language
 * gui, sw: Snap! v12 beta 260421 - removed dev warning dialog
