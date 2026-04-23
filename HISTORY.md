@@ -121,6 +121,7 @@
 
 ### 2026-04-22
 * blocks: trigger "When slot signals edited" for piano keyboard and direction dial dropdown menus
+* v12 beta 260423
 
 ### 2026-04-22
 * morphic: work around occasional global zoom rendering artifacts
