@@ -164,7 +164,7 @@ CustomHatBlockMorph, GrayPaletteMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.blocks = '2026-April-17';
+modules.blocks = '2026-April-23';
 
 var SyntaxElementMorph;
 var BlockMorph;
@@ -11388,6 +11388,7 @@ InputSlotMorph.prototype.menuFromDict = function (
 	function update(num) {
     	myself.setContents(num);
         myself.reactToSliderEdit();
+        myself.reactToEdit();
         if (trgt && !block.isTemplate) {
             trgt.recordUserEdit(
                 'scripts',
@@ -12338,7 +12339,10 @@ InputSlotMorph.prototype.pianoKeyboardMenu = function (searching) {
         instrument = block.scriptTarget().instrument;
     }
     menu = new PianoMenuMorph(
-        this.setContents,
+        (value) => {
+            this.setContents(value);
+            this.reactToEdit();
+        },
         this,
         this.fontSize,
         instrument
