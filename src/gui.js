@@ -87,7 +87,7 @@ HatBlockMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2026-April-23';
+modules.gui = '2026-April-27';
 
 // Declarations
 
@@ -1177,6 +1177,12 @@ IDE_Morph.prototype.createControlBar = function () {
             activeColor.lighter(40),
             activeColor.lighter(40)
         ],
+        errorColor = new Color(173, 15, 0),
+        errorColors = [
+            errorColor,
+            errorColor.lighter(40),
+            errorColor.lighter(40)
+        ],
         myself = this;
 
     if (this.controlBar) {
@@ -1377,23 +1383,35 @@ IDE_Morph.prototype.createControlBar = function () {
     button.labelShadowOffset = new Point(-1, -1);
     button.labelShadowColor = colors[1];
     button.fps = 4;
-    button.isActive = false;
+    button.shownState = 'idle'; // 'active', 'error'
 
     button.step = function () {
-        var isRunning;
+        var state;
         if (!myself.stage) {
             return;
         }
-        isRunning = !!myself.stage.threads.processes.length;
-        if (isRunning === this.isActive) {
+        if (myself.stage.threads.processes.length) {
+            state = myself.stage.threads.processes.some(any => any.errorFlag) ?
+                'error' : 'active';
+        } else {
+            state = 'idle';
+        }
+        if (state === this.shownState) {
             return;
         }
-        this.isActive = isRunning;
-        if (isRunning) {
+        this.shownState = state;
+        switch (state) {
+        case 'active':
             this.color = activeColors[0];
             this.highlightColor = activeColors[1];
             this.pressColor = activeColors[2];
-        } else {
+            break;
+        case 'error':
+            this.color = errorColors[0];
+            this.highlightColor = errorColors[1];
+            this.pressColor = errorColors[2];
+            break;
+        default: // 'idle'
             this.color = colors[0];
             this.highlightColor = colors[1];
             this.pressColor = colors[2];

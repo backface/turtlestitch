@@ -75,6 +75,7 @@
     * data types
         * enhanced "is ... a ...?" predicate to support dependent data types and user defined structs (ADTs)
     * ui
+        * the green-flag button changes its color to red while any script has an error
         * keep result balloons "attached" to their originating block / script when scrolling
         * added icons to the IDE tabs (scripts, costumes, sounds)
         * added "plus" signs to the buttons in the corral bar to emphasize that a new sprite is created by clicking them
@@ -119,7 +120,10 @@
     * Catalan, thanks, Joan!
     * German
 
-### 2026-04-22
+### 2026-04-27
+* gui: made green-flag button change its color to red while any script has an error
+
+### 2026-04-23
 * blocks: trigger "When slot signals edited" for piano keyboard and direction dial dropdown menus
 * v12 beta 260423
 
