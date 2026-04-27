@@ -14153,10 +14153,7 @@ TextSlotMorph.prototype.init = function (
 // TextSlotMorph accessing:
 
 TextSlotMorph.prototype.getSpec = function () {
-    if (this.isNumeric) {
-        return '%mlt';
-    }
-    return '%mlt'; // default
+    return '%mlt';
 };
 
 TextSlotMorph.prototype.contents = function () {
