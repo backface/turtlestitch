@@ -7,6 +7,8 @@ tempDict = {
     '关于TurtleStitch!...',
   'About TurtleStitch':
     '关于TurtleStitch',
+  'Font': '字体',  
+  'Geometry': '几何',  	  
   ' Stitches : ':
     ' 针法 : ',
   'Jumps':
