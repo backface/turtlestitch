@@ -1100,7 +1100,7 @@ CustomBlockDefinition.prototype.declarationFor = function (spec) {
     decl[2] = this.encodeChoices(options);
 
     // isReadOnly
-    decl[3] = part instanceof InputSlotMorph ? part.isReadOnly : true;
+    decl[3] = part instanceof InputSlotMorph ? part.isReadOnly : false;
 
     // isIrreplaceable
     decl[4] = part.isStatic;
