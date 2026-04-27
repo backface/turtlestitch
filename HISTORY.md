@@ -126,6 +126,7 @@
 * blocks: guard piano keyboard dropdown menu against non-numerical values 
 * byob: rearranged some slot types in the long form input dialog so default "Any type" is the first one top left
 * store: tweaked loading local custom blocks to refresh custom dropdowns in variadic slots 
+* v12 beta 260427
 
 ### 2026-04-23
 * blocks: trigger "When slot signals edited" for piano keyboard and direction dial dropdown menus
