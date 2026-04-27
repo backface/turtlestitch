@@ -86,6 +86,7 @@
         * resizing the browser / window in presentation ("app") mode scales the stage smoothly
         * removed "stage selected, no motion primitives" text from the palette to support sprite-less microworlds
         * turned "language", "looks" and "microphone resolution" menus into settings-submenus
+        * rearranged some slot types in the long form input dialog so default "Any type" is the first one top left
     * blocks
         * removed landscape orientation of text-input slots
     * meta-programming
@@ -123,6 +124,7 @@
 ### 2026-04-27
 * gui: made green-flag button change its color to red while any script has an error
 * blocks: guard piano keyboard dropdown menu against non-numerical values 
+* byob: rearranged some slot types in the long form input dialog so default "Any type" is the first one top left 
 
 ### 2026-04-23
 * blocks: trigger "When slot signals edited" for piano keyboard and direction dial dropdown menus

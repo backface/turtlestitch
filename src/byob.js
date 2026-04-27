@@ -113,7 +113,7 @@ ADT_SlotMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.byob = '2026-March-10';
+modules.byob = '2026-April-27';
 
 // Declarations
 
@@ -4863,11 +4863,11 @@ InputSlotDialogMorph.prototype.createSlotTypeButtons = function () {
     var defLabel, defInput, defSwitch, defPicker, loopArrow, settingsButton;
 
     // slot types
+    this.addSlotTypeButton('Any type', '%s');
+    this.addSlotTypeButton('Number', '%n');
+    this.addSlotTypeButton('List', '%l');
     this.addSlotTypeButton('Color', '%clr');
     this.addSlotTypeButton('Text', '%txt');
-    this.addSlotTypeButton('List', '%l');
-    this.addSlotTypeButton('Number', '%n');
-    this.addSlotTypeButton('Any type', '%s');
     this.addSlotTypeButton('Boolean (T/F)', '%b');
     this.addSlotTypeButton('Command\n(inline)', '%cmdRing'); //'%cmd');
     this.addSlotTypeButton('Reporter', '%repRing'); //'%r');
