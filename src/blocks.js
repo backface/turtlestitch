@@ -164,7 +164,7 @@ CustomHatBlockMorph, GrayPaletteMorph, ZOOM*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.blocks = '2026-April-23';
+modules.blocks = '2026-April-27';
 
 var SyntaxElementMorph;
 var BlockMorph;
@@ -12351,7 +12351,7 @@ InputSlotMorph.prototype.pianoKeyboardMenu = function (searching) {
         this.right() - (menu.width() / 2),
         this.bottom()
     ));
-    menu.selectKey(Math.min(Math.max(+this.evaluate(), 0), 143));
+    menu.selectKey(Math.min(Math.max(+this.evaluate() || 0, 0), 143));
 };
 
 InputSlotMorph.prototype.directionDialMenu = function (searching) {
