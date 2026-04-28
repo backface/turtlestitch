@@ -96,7 +96,7 @@ CustomBlockDefinition, exportEmbroidery, CustomHatBlockMorph, HandMorph*/
 
 /*jshint esversion: 11*/
 
-modules.objects = '2026-April-15';
+modules.objects = '2026-April-28';
 
 var SpriteMorph;
 var StageMorph;
@@ -7968,8 +7968,6 @@ SpriteMorph.prototype.floodFill = function () {
 
     var onSheet = this.drawsOnSprite(),
         target = onSheet ? this.sheet : this.parent,
-        start = (onSheet ? this.sheet : this.parent)
-            .costumePoint(this.rotationCenter()),
         clr = new Color(
             Math.round(Math.min(Math.max(this.color.r, 0), 255)),
             Math.round(Math.min(Math.max(this.color.g, 0), 255)),
@@ -7979,6 +7977,7 @@ SpriteMorph.prototype.floodFill = function () {
         layer,
         width,
         height,
+        start,
         ctx,
         img,
         dta,
@@ -8006,6 +8005,8 @@ SpriteMorph.prototype.floodFill = function () {
         : this.parent.penTrails());
     width = layer.width;
     height = layer.height;
+    start = (onSheet ? this.sheet : this.parent)
+        .costumePoint(this.rotationCenter());
     ctx = layer.getContext('2d');
     img = ctx.getImageData(0, 0, width, height);
     dta = img.data;
@@ -12470,18 +12471,12 @@ StageMorph.prototype.trailsLogAsPolySVG = function () {
 
 // StageMorph coordinate conversion
 
-StageMorph.prototype.costumePoint = SpriteMorph.prototype.costumePoint;
-
 StageMorph.prototype.costumePoint = function(aPoint) {
     // answer the coordinates of the given world point on the current
-    // costume's pixel bitmap, if any
+    // pentrails pixel bitmap
     var flipY = new Point(1, -1),
-        stagePoint;
-    if (!this.costume) {
-        return new Point();
-    }
-    stagePoint = this.snapPoint(aPoint).multiplyBy(flipY);
-    return stagePoint.add(this.costume.extent().divideBy(2));
+        stagePoint = this.snapPoint(aPoint).multiplyBy(flipY);
+    return stagePoint.add(this.dimensions.divideBy(2));
 };
 
 StageMorph.prototype.normalizePoint = SpriteMorph.prototype.normalizePoint;

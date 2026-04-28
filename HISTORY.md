@@ -123,6 +123,7 @@
 
 ### 2026-04-28
 * store: refactored loading local custom blocks with custom dropdowns in variadic slots
+* objects: fixed "fill" for the stage
 
 ### 2026-04-27
 * gui: made green-flag button change its color to red while any script has an error
