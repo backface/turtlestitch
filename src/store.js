@@ -63,7 +63,7 @@ Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph, SnapTranslator*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.store = '2026-April-27';
+modules.store = '2026-April-28';
 
 // XML_Serializer ///////////////////////////////////////////////////////
 /*
@@ -1704,13 +1704,16 @@ SnapSerializer.prototype.loadBlock = function (model, isReporter, object) {
             }
         }
     });
-
     if (block.isCustomBlock && !block.isGlobal) {
         // refresh local custom blocks to activate
         // custom dropdonws in variadic slots, if any
-        block.refresh(info);
+        block.inputs().forEach((inp, i) => {
+            if (inp instanceof MultiArgMorph
+            ) {
+                inp.setChoices.apply(inp, info.inputOptionsOfIdx(i));
+            }
+        });
     }
-
     block.cachedInputs = null;
     return block;
 };
