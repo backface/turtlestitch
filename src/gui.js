@@ -2937,7 +2937,7 @@ IDE_Morph.prototype.reactToWorldResize = function (rect) {
         this.setExtent(rect.extent());
     }
     if (this.filePicker) {
-        document.body.removeChild(this.filePicker);
+        this.filePicker.remove();
         this.filePicker = null;
         this.isImportingLocalFile = false;
     }
@@ -5366,7 +5366,7 @@ IDE_Morph.prototype.importLocalFile = function () {
         world = this.world();
 
     if (this.filePicker) {
-        document.body.removeChild(this.filePicker);
+        this.filePicker.remove();
         this.filePicker = null;
     }
     inp.type = 'file';
@@ -5383,7 +5383,7 @@ IDE_Morph.prototype.importLocalFile = function () {
     inp.addEventListener(
         "change",
         () => {
-            document.body.removeChild(inp);
+            inp.remove();
             this.filePicker = null;
             if (addingScenes) {
                 myself.isAddingNextScene = true;
