@@ -6874,11 +6874,14 @@ SpriteMorph.prototype.write = function (text, size) {
 };
 
 SpriteMorph.prototype.writeOn = function (target, text, size) {
-    var targetCostume,
+    var mode = this.blendingMode(),
+        stage,
+        targetCostume,
         start,
         delta,
         dest,
         fontSize,
+        decorations,
         rotation,
         len,
         ctx;
@@ -6892,17 +6895,30 @@ SpriteMorph.prototype.writeOn = function (target, text, size) {
     // check if target has a costume and fetch its pen surface
     if (target.costume) {
         targetCostume = target.surface();
+    } else if (mode === 'source-over') {
+        stage = this.parentThatIsA(StageMorph);
+        target.doSwitchToCostume(new Costume(
+            newCanvas(stage ? stage.dimensions : new Point(480, 360), true),
+            this.newCostumeName(localize('Costume'))
+        ));
+        targetCostume = target.surface();
+        // target.originalCostume = ['Turtle'];
     } else {
         return;
     }
 
     // determine the relative coordinates, rotation and font size
     start = target.costumePoint(this.rotationCenter());
-    fontSize = size;
+    // fontSize = size;
+    fontSize = +(size.toString().split('px')[0]); // support decorations
+    decorations = (size.toString().split('px')[1]) || '';
     rotation = radians(this.direction() - 90);
     if (target instanceof SpriteMorph) {
         fontSize /= target.scale;
         rotation -= radians(target.direction() - 90);
+    }
+    if (decorations !== '') {
+        fontSize = fontSize + 'px' + decorations;
     }
 
     // write the text on the target canvas
@@ -6915,7 +6931,7 @@ SpriteMorph.prototype.writeOn = function (target, text, size) {
     len = ctx.measureText(text).width;
     ctx.translate(start.x, start.y);
     ctx.rotate(rotation);
-    ctx.globalCompositeOperation = this.blendingMode();
+    ctx.globalCompositeOperation = mode;
     ctx.fillText(text, 0, 0);
     ctx.translate(-start.x, -start.y);
     ctx.restore();
