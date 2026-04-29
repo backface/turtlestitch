@@ -125,6 +125,7 @@
 ### 2026-04-28
 * Catalan translation update, thank you, Joan!
 * objects: fixed applying graphics effects to sprites
+* fixed initialization of the "Shapes" library, thanks, @DarDoro, for the report!
 
 ### 2026-04-28
 * store: refactored loading local custom blocks with custom dropdowns in variadic slots
