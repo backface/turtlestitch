@@ -96,7 +96,7 @@ CustomBlockDefinition, exportEmbroidery, CustomHatBlockMorph, HandMorph*/
 
 /*jshint esversion: 11*/
 
-modules.objects = '2026-April-28';
+modules.objects = '2026-April-29';
 
 var SpriteMorph;
 var StageMorph;
@@ -3438,6 +3438,7 @@ SpriteMorph.prototype.getImage = function () {
             this.cachedImage
         );
         this.render(this.cachedImage.getContext('2d'));
+        this.applyGraphicsEffects(this.cachedImage);
         this.shouldRerender = false;
     }
     return this.cachedImage;
@@ -3605,8 +3606,6 @@ SpriteMorph.prototype.render = function (ctx) {
             return this.wearCostume(null, true);
         }
     }
-    // apply graphics effects to image
-    this.applyGraphicsEffects(this.cachedImage);
     this.version = Date.now();
 };
 

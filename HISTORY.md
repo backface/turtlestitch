@@ -83,6 +83,7 @@
         * dialog boxes are more bright and their buttons more discernible in bright mode 
         * rearranged IDE settings menu items into "looks" submenu
         * sprite icons no longer blur when the sprite size is reduced or the zoom level increases
+        * sprite icons no longer display graphics effects, but the original costume
         * resizing the browser / window in presentation ("app") mode scales the stage smoothly
         * removed "stage selected, no motion primitives" text from the palette to support sprite-less microworlds
         * turned "language", "looks" and "microphone resolution" menus into settings-submenus
@@ -122,10 +123,13 @@
     * German
 
 ### 2026-04-28
+* Catalan translation update, thank you, Joan!
+* objects: fixed applying graphics effects to sprites
+
+### 2026-04-28
 * store: refactored loading local custom blocks with custom dropdowns in variadic slots
 * objects: fixed "fill" for the stage
 * v12 beta 260428
-* Catalan translation update
 
 ### 2026-04-27
 * gui: made green-flag button change its color to red while any script has an error
