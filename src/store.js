@@ -448,6 +448,7 @@ SnapSerializer.prototype.loadScene = function (
         hidden,
         lang,
         zoom,
+        scale,
         fade,
         flat,
         bright,
@@ -500,6 +501,7 @@ SnapSerializer.prototype.loadScene = function (
     if (model.template) {
         lang = model.template.attributes.lang;
         zoom = model.template.attributes.zoom;
+        scale = model.template.attributes.scale;
         fade = model.template.attributes.fade;
         flat = model.template.attributes.flat;
         bright = model.template.attributes.bright;
@@ -520,6 +522,7 @@ SnapSerializer.prototype.loadScene = function (
         };
         if (!isNil(lang)) {scene.template.lang = lang; }
         if (!isNil(zoom)) {scene.template.zoom = zoom; }
+        if (!isNil(scale)) {scene.template.scale = scale; }
         if (!isNil(fade)) {scene.template.fade = fade; }
         if (!isNil(flat)) {scene.template.flat = flat; }
         if (!isNil(bright)) {scene.template.bright = bright; }

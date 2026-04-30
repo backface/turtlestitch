@@ -124,6 +124,7 @@
 
 ### 2026-04-30
 * morphic, store: new World>>once mechanism for dynamic scheduling used to load projects and apply settings
+* store: fixed including the blocks zoom level in templates and derived projects
 
 ### 2026-04-29
 * Catalan translation update, thank you, Joan!
