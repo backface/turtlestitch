@@ -63,7 +63,7 @@ Project, CustomHatBlockMorph, SnapVersion, ADT_SlotMorph, SnapTranslator*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.store = '2026-April-28';
+modules.store = '2026-April-30';
 
 // XML_Serializer ///////////////////////////////////////////////////////
 /*
@@ -347,9 +347,10 @@ SnapSerializer.prototype.loadProjectModel = function (
         scenesModel = xmlNode.childNamed('scenes'),
         shouldRefresh = false,
         project = new Project(),
-        template, langLoop, scaleLoop;
+        template;
 
     function applyConfiguration() {
+        var wrld = ide.world();
         if (!isNil(template.attributes.flat)) {
             if (template.attributes.flat === 'true') {
                 ide.setFlatDesign();
@@ -369,24 +370,18 @@ SnapSerializer.prototype.loadProjectModel = function (
         if (template.attributes.lang &&
             (template.attributes.lang !== SnapTranslator.language)
         ) {
-            langLoop = setInterval(() => {
-                if (isLoadingAssets()) {
-                    return;
-                }
-                clearInterval(langLoop);
-                ide.setLanguage(template.attributes.lang, null, true);
-            });
+            wrld.once(
+                () => !isLoadingAssets(),
+                () => ide.setLanguage(template.attributes.lang, null, true)
+            );
         }
         if (template.attributes.scale &&
             (+template.attributes.scale !== SyntaxElementMorph.prototype.scale)
         ) {
-            scaleLoop = setInterval(() => {
-                if (isLoadingAssets()) {
-                    return;
-                }
-                clearInterval(scaleLoop);
-                ide.setBlocksScale(+template.attributes.scale, true);
-            });
+            wrld.once(
+                () => !isLoadingAssets(),
+                () => ide.setBlocksScale(+template.attributes.scale, true)
+            );
         }
         if (shouldRefresh) {
             ide.buildPanes();

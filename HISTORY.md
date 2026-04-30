@@ -122,6 +122,9 @@
     * Catalan, thanks, Joan!
     * German
 
+### 2026-04-30
+* morphic, store: new World>>once mechanism for dynamic scheduling used to load projects and apply settings
+
 ### 2026-04-29
 * Catalan translation update, thank you, Joan!
 * objects: fixed applying graphics effects to sprites
