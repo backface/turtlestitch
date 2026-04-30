@@ -1511,6 +1511,16 @@ SpriteMorph.prototype.zoomOut = function () {
     stage.renderer.changed = true;
 };
 
+SpriteMorph.prototype.setTurboMode = function (bool) {
+    var ide = this.parentThatIsA(IDE_Morph);
+    if (!ide) return;
+    if (bool) {
+        ide.startFastTracking();
+    } else {
+        ide.stopFastTracking();
+    }
+};
+
 
 //SpriteMorph.prototype.thumbnail = function (extentPoint) {};
 //SpriteMorph.prototype.drawNew = function () { this.hide() }
@@ -1904,6 +1914,14 @@ SpriteMorph.prototype.primitiveBlocks = function () {
 
 	  // more blocks
 
+    myPrimitiveBlocks.setTurboMode =
+    {
+        type: 'command',
+        spec: 'turbo mode %b',
+        category: 'other',
+        defaults: [true]
+    };
+
     myPrimitiveBlocks.zoomToFit =
     {
         type: 'command',
@@ -2200,6 +2218,8 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('trimStitch'));
 
   } else if (cat === 'other') {
+        blocks.push(block('setTurboMode'));
+        blocks.push('-');
         blocks.push(block('zoomToFit'));
         blocks.push(block('zoomIn'));
         blocks.push(block('zoomOut'));
