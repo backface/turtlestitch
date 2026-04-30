@@ -2974,8 +2974,8 @@ StageMorph.prototype.initCamera = function () {
               distance = boundingSphere.radius;
 
           if(distance > 0) {
-            var width = Math.max(myself.width(), 480),
-                height = Math.max(myself.height(), 360);
+            var width = Math.max(myself.width(), 480) / myself.scale,
+                height = Math.max(myself.height(), 360) / myself.scale;
 
             this.zoomFactor = Math.max(width / distance, height / distance) * 0.90;
             this.applyZoom();
