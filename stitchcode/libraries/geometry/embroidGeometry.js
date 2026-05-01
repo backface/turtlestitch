@@ -839,60 +839,81 @@ EmbroidGeometry.prototype.toDXF = function() {
 
 (function() {
     var ide = world.children[0],
-        stage = ide.stage;
+        scene = world.children[0].scenes.asArray().find(
+            s => s.globalVariables.names(true).includes('__module__geometryBlocks__')),
+        stage = scene.stage;
+		
+    // Init controller
     if (!stage.embroidGeometry) {
         stage.embroidGeometry = new EmbroidGeometry(stage);
     }
 })();
 
+
 SnapExtensions.primitives.set('eg_get_headingOfLine(line)', function (line) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	return stage.embroidGeometry.headingOfLine(line);
 });
 
 SnapExtensions.primitives.set('eg_get_extentOfLines(lines)', function (lines) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	return stage.embroidGeometry.extentOfLines(lines);
 });
 
 SnapExtensions.primitives.set('eg_get_edgeCuttingLines(lines,direction)', function (lines,direction) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	return stage.embroidGeometry.edgeCuttingLines(lines,direction);
 });
 
 SnapExtensions.primitives.set('eg_get_svgCommand(svgstr)', function (svgstr) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	return stage.embroidGeometry.getSvgCommand(svgstr);
 });
 
 SnapExtensions.primitives.set('eg_get_bezierCurvePoints(p1,p2,p3,number)', function (p1,p2,p3,number) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	let points = stage.embroidGeometry.bezierCurvePoints(p1,p2,p3,number);
 	return new List(points.map(point => new List(point)));
 });
 
 SnapExtensions.primitives.set('eg_get_cubicBezierCurvePoints(p1,p2,p3,p4,number)', function (p1,p2,p3,p4,number) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	let points = stage.embroidGeometry.cubicBezierCurvePoints(p1,p2,p3,p4,number);
 	return new List(points.map(point => new List(point)));
 });
 
 SnapExtensions.primitives.set('eg_get_smoothCubicBezierCurvePoints(p1,p2,p3, previousCp,number)', function (p1,p2,p3, previousCp,number) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	let points = stage.embroidGeometry.smoothCubicBezierCurvePoints(p1,p2,p3,previousCp,number);
 	return new List(points.map(point => new List(point)));
 });
 
 SnapExtensions.primitives.set('eg_get_pointsToVector(points)', function (points) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.embroidGeometry) { return; }
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
 	let vector = stage.embroidGeometry.pointsToVector(points);
 	return new List(vector.map(v => {
 		if (v == "!") {
