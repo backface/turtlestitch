@@ -2159,9 +2159,10 @@ SnapExtensions.buttons.palette.push({
 
 (function() {
     var ide = world.children[0],
-        stage = ide.stage;
+        scene = world.children[0].scenes.asArray().find(
+            s => s.globalVariables.names(true).includes('__module__geometryBlocks__')),
+        stage = scene.stage;
 		
-    // Redo palette so the button actually shows up
     ide.flushBlocksCache();
     ide.refreshPalette();
 	
@@ -2172,13 +2173,17 @@ SnapExtensions.buttons.palette.push({
 
 SnapExtensions.primitives.set('eg_setFont(newFont)', function (newFont) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.font) { return; }
+    if (!stage.font) { 
+	    stage.font = new Font(stage);
+	};
 	stage.font.setFont(newFont);
 });
 
 SnapExtensions.primitives.set('eg_unit_size()', function () {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.font) { return; }
+    if (!stage.font) { 
+	    stage.font = new Font(stage);
+	};
 	return stage.font.unit_size;
 });
 
@@ -2196,25 +2201,33 @@ SnapExtensions.primitives.set('eg_font_types()', function () {
 
 SnapExtensions.primitives.set('eg_font_list()', function () {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.font) { return; }
+    if (!stage.font) { 
+	    stage.font = new Font(stage);
+	};
 	return stage.font.returnFontList();
 });
 
 SnapExtensions.primitives.set('eg_font_name()', function () {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.font) { return; }
+    if (!stage.font) { 
+	    stage.font = new Font(stage);
+	};
 	return stage.font.fontName;
 });
 
 SnapExtensions.primitives.set('eg_get_svg(chr)', function (chr) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.font) { return; }
+    if (!stage.font) { 
+	    stage.font = new Font(stage);
+	};
 	return stage.font.charSvgObj[chr]['svg'];
 });
 
 SnapExtensions.primitives.set('eg_get_width(chr)', function (chr) {
     var stage = this.parentThatIsA(StageMorph);
-    if (!stage.font) { return; }
+    if (!stage.font) { 
+	    stage.font = new Font(stage);
+	};
 	return stage.font.charSvgObj[chr]['width'];
 });
 
