@@ -300,6 +300,28 @@
     return all;
   }
 
+  // ---- remove consecutive draw-points closer than minDist ----
+  // Move points are always kept (they start new subpaths).
+  function resampleMinDist(pts, minDist) {
+    const out = [];
+    const d2 = minDist * minDist;
+    let lastX = Infinity, lastY = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      if (p.tag === 'move') {
+        out.push(p);
+        lastX = p.x; lastY = p.y;
+      } else {
+        const dx = p.x - lastX, dy = p.y - lastY;
+        if (dx * dx + dy * dy >= d2) {
+          out.push(p);
+          lastX = p.x; lastY = p.y;
+        }
+      }
+    }
+    return out;
+  }
+
   // ---- convert to a Snap! List object -------------------
   // Builds a List of 3-element sublists [tag, x, y].
   function toPathList(points) {
@@ -308,21 +330,27 @@
     ));
   }
 
+  const MIN_POINT_DIST = 10;
+
   // ---- shared import logic ------------------------------
   function importSVGPaths(ide, svgText, name) {
     if (!/<path[\s>]/i.test(svgText)) return false;
     try {
       const pts = extractFromSVG(svgText);
       if (pts.length === 0) return false;
-      // Flip Y: SVG y-down → Snap! y-up
+      // Flip Y: SVG y-down → Snap! y-up, then reduce to min spacing
       const flipped = pts.map(p => ({ tag: p.tag, x: p.x, y: -p.y }));
+      const reduced = resampleMinDist(flipped, MIN_POINT_DIST);
       const base = (name || 'svg').replace(/\.svg$/i, '');
       const globals = ide.stage.globalVariables();
-      globals.addVar(base + '-path', toPathList(flipped));
+      globals.addVar(base + '-path', toPathList(reduced));
       ide.flushBlocksCache();
       ide.refreshPalette();
       ide.showMessage(
-        'SVG imported: ' + pts.length + ' points → "' + base + '-path"',
+        'SVG imported: ' + reduced.length + ' points → "' + base + '-path"' +
+        (reduced.length < pts.length
+          ? ' (' + (pts.length - reduced.length) + ' removed, min dist ' + MIN_POINT_DIST + ')'
+          : ''),
         4
       );
       return true;
