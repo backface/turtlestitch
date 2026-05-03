@@ -726,7 +726,7 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 	var extx1 = Math.round(this.maxX) - this.initX;
 	var exty1 = Math.round(this.maxY) - this.initY;
 	var extx2 = Math.round(this.minX) - this.initX;
-	var exty2 = Math.round(this.maxY) - this.initY;
+	var exty2 = Math.round(this.minY) - this.initY;
 	writeHeader("LA:" + name.substr(0, 16), 20, true);
 	writeHeader("ST:" + pad(this.steps, 7), 11);
 	writeHeader("CO:" + pad(this.colors.length, 3), 7);
