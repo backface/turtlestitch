@@ -107,6 +107,16 @@ EmbroidGeometry.prototype.hasCrossPoint = function(line1,line2, noParallel = fal
     return true;
 };
 
+EmbroidGeometry.prototype.linesThatCrossALine = function(lines,line) {
+	var result = new List([]);
+	for (i=1; i <= lines.length(); i++) {
+		if (this.hasCrossPoint(line,lines.at(i).at(2),true)) {
+			result.add(lines.at(i));
+		}
+	};
+	return result;
+};
+
 EmbroidGeometry.prototype.side = function(point,line) {
     var diff = Math.round( (this.headingOfLine(line) - this.headingOfLine(new List([line.at(1),point]))) * 1000) / 1000;
     
@@ -119,6 +129,14 @@ EmbroidGeometry.prototype.side = function(point,line) {
             return 0;
         }
     }	
+};
+
+EmbroidGeometry.prototype.farEnd = function(point,line) {
+	if (this.lengthOfLine(new List([point,line.at(1)])) > this.lengthOfLine(new List([point,line.at(2)]))) {
+		return line.at(1);
+	} else {
+		return line.at(2);
+	}
 };
 
 EmbroidGeometry.prototype.crossPoint = function(line1,line2,check=true,noParallel=false) {
@@ -149,8 +167,8 @@ EmbroidGeometry.prototype.crossPoint = function(line1,line2,check=true,noParalle
     distance = Math.abs(vDistance/Math.cos((90-includedAngle3)*Math.PI/180));
     hypotenuse = Math.sqrt( Math.pow(distance,2) + Math.pow(edgeLength,2) - 2*edgeLength*distance*Math.cos(includedAngle2*Math.PI/180));
     
-    resultPoint = new List([Math.round((line2.at(1).at(1)*1 + hypotenuse*Math.cos(angle1*Math.PI/180))*10000)/10000,
-                            Math.round((line2.at(1).at(2)*1 + hypotenuse*Math.sin(angle1*Math.PI/180))*10000)/10000]);
+    resultPoint = new List([Math.round((line2.at(1).at(1)*1 + hypotenuse*Math.cos(angle1*Math.PI/180))*100000000)/100000000,
+                            Math.round((line2.at(1).at(2)*1 + hypotenuse*Math.sin(angle1*Math.PI/180))*100000000)/100000000]);
                             
     return resultPoint;
 };
@@ -161,6 +179,81 @@ EmbroidGeometry.prototype.lineContainsPoint = function(line,point) {
 
 EmbroidGeometry.prototype.lineContainsLine = function(line1,line2) {
     return this.lineContainsPoint(line1,line2.at(1)) && this.lineContainsPoint(line1,line2.at(2));
+};
+
+EmbroidGeometry.prototype.linesContainLine = function(lines,line) {
+    return lines.asArray().some( curLine => this.lineContainsLine(curLine,line));
+};
+
+EmbroidGeometry.prototype.interceptedLines = function(line,lines) {
+var crossedLines = this.linesThatCrossALine(lines,line),
+    dirLine = this.headingOfLine(line),
+    crossedPoints = new List(),
+    interceptedLines = new List(),
+    realPoints = new List(),
+    lastPoint;
+    
+	if (crossedLines.length() === 0) {
+		return new List();
+	}
+	
+    for (i=1; i<=crossedLines.length(); i++) {
+        crossedPoints.add( new List([this.crossPoint(line,crossedLines.at(i).at(2)),crossedLines.at(i)]));
+    };
+    if (dirLine == 90 ) {
+        crossedPoints = new List(crossedPoints.asArray().sort((a,b) => a.at(1).at(2) - b.at(1).at(2))); 
+    } else {
+        crossedPoints = new List(crossedPoints.asArray().sort((a,b) => a.at(1).at(1) - b.at(1).at(1))); 
+    }; 
+    lastPoint = crossedPoints.at(1);
+    for (i=2; i<=crossedPoints.length(); i++) {
+        let curPoint = crossedPoints.at(i);
+        if (lastPoint.length() === 0) {
+            lastPoint = curPoint;
+        } else if ( lastPoint.at(1) === curPoint.at(1) ) {
+            if ( ((this.headingOfLine( new List([lastPoint.at(1),this.farEnd(lastPoint.at(1),lastPoint.at(2).at(2))])) - this.headingOfLine(line)) % 360 -180) *
+			     ((this.headingOfLine( new List([curPoint.at(1),this.farEnd(curPoint.at(1),curPoint.at(2).at(2))])) - this.headingOfLine(line)) % 360 -180) < 0 ) {
+			    realPoints.add(lastPoint);
+			} else {
+				realPoints.add(lastPoint);
+				realPoints.add(curPoint);
+			}
+			lastPoint = new List();
+		} else if (this.linesContainLine(lines.columns().at(2),new List([lastPoint.at(1),curPoint.at(1)]))) {
+            if ( ((this.headingOfLine( new List([lastPoint.at(1),this.farEnd(lastPoint.at(1),lastPoint.at(2).at(2))])) - this.headingOfLine(line)) % 360 -180) *
+			     ((this.headingOfLine( new List([curPoint.at(1),this.farEnd(curPoint.at(1),curPoint.at(2).at(2))])) - this.headingOfLine(line)) % 360 -180) < 0 ) {			
+			    if ( realPoints.length() % 2 === 1 ) {
+                    realPoints.add(lastPoint);
+                } else {
+                    realPoints.add(curPoint);
+                } 
+			} else {
+				realPoints.add(lastPoint);
+				realPoints.add(curPoint);
+            }
+            lastPoint = new List();
+        } else {
+            realPoints.add(lastPoint);
+            lastPoint = curPoint;
+        }			
+    };
+	if (lastPoint.length() !== 0) {
+		realPoints.add(lastPoint);
+	};
+	let tempLine = new List();
+	for (i=1; i <= realPoints.length(); i++){
+        if (tempLine.length() === 1) {
+			tempLine.add(realPoints.at(i));
+			if (this.lengthOfLine(new List([tempLine.at(1).at(1),tempLine.at(2).at(1)])) > 1) {
+				interceptedLines.add(new List([new List([tempLine.at(1).at(1),tempLine.at(2).at(1)]),
+				                               new List([tempLine.at(1).at(2),tempLine.at(2).at(2)])]));
+		    };
+			tempLine = new List();
+		} else {
+			tempLine.add(realPoints.at(i));
+		}			
+    };		
+    return interceptedLines;
 };
 
 EmbroidGeometry.prototype.extentOfLines = function (lines) {
@@ -216,6 +309,266 @@ EmbroidGeometry.prototype.edgeCuttingLines = function (lines,direction) {
 	transformedPoints.sort((a,b) => a[0] - b[0]);
 	return new List([new List([new List([minX,transformedPoints[0][0]]), new List([maxX,transformedPoints[0][1]])]),
 					 new List([new List([minX,transformedPoints[transformedPoints.length-1][0]]), new List([maxX,transformedPoints[transformedPoints.length-1][1]])])]);	
+};
+
+EmbroidGeometry.prototype.findRoute = function (firstPoint,secondPoint,lines) {
+	var point1 = firstPoint.at(1),
+	    line1 = firstPoint.at(2).at(2),
+		line1No = firstPoint.at(2).at(1),
+		point2 = secondPoint.at(1),
+		line2 = secondPoint.at(2).at(2),
+		line2No = secondPoint.at(2).at(1),
+		closeline,len,lengthOfCloseline,route1,linesInRoute,lengthRoute1,route2;
+	 
+	if ( Math.round(line1No/10000) !== Math.round(line2No/10000) ) {
+		return new List();
+	} else if (line1No === line2No) {
+		return new List([point1,point2]); 
+	} else {
+	    closeline = lines.at(Math.round(line1No/10000));
+		len = closeline.length();
+		lengthOfCloseline = closeline.asArray().reduce((sum,line) => sum + line.at(3),0);
+		if (line1No < line2No) {
+			route1 = new List();
+			linesInRoute = closeline.asArray().filter(line => line.at(1) > line1No && line.at(1) < line2No);
+			route1.add(point1);
+			route1.add(line1.at(2));
+			linesInRoute.forEach(line => route1.add(line.at(2).at(2)));
+			route1.add(point2);
+			lengthRoute1 = this.lengthOfLine(new List([point1,line1.at(2)])) + 
+			               (linesInRoute.length === 0 ? 0 : linesInRoute.reduce((sum,line) => sum + line.at(3),0)) +
+						   this.lengthOfLine(new List([line2.at(1),point2]));
+			if (lengthRoute1 < lengthOfCloseline - lengthRoute1) {
+				return route1;
+			} else {
+				route2 = new List();
+				linesInRoute = closeline.asArray().filter( line => line.at(1) > (Math.round(line1No/10000)*10000) && line.at(1) < line1No ).reverse().concat(
+							   closeline.asArray().filter( line => line.at(1) > line2No && line.at(1) < (Math.round(line1No/10000)*10000 + len + 1)).reverse());
+				route2.add(point1);
+				route2.add(line1.at(1));
+				linesInRoute.forEach(line => route2.add(line.at(2).at(1)));
+				route2.add(point2);
+				return route2;
+			}
+		} else {
+			route1 = new List();
+			linesInRoute = closeline.asArray().filter(line => line.at(1) > line2No && line.at(1) < line1No).reverse();
+			route1.add(point1);
+			route1.add(line1.at(1));	
+			linesInRoute.forEach(line => route1.add(line.at(2).at(1)));
+			route1.add(point2);
+			lengthRoute1 = this.lengthOfLine(new List([point1,line1.at(1)])) + 
+			               (linesInRoute.length === 0 ? 0 : linesInRoute.reduce((sum,line) => sum + line.at(3),0)) +
+						   this.lengthOfLine(new List([line2.at(2),point2]));	
+			if (lengthRoute1 < lengthOfCloseline - lengthRoute1) {
+				return route1;
+			} else {
+				route2 = new List();
+				linesInRoute = closeline.asArray().filter( line => line.at(1) > line1No && line.at(1) < (Math.round(line1No/10000)*10000 + len + 1) ).concat(
+							   closeline.asArray().filter( line => line.at(1) > (Math.round(line1No/10000)*10000) && line.at(1) < line2No));
+				route2.add(point1);
+				route2.add(line1.at(2));
+				linesInRoute.forEach(line => route2.add(line.at(2).at(2)));
+				route2.add(point2);
+				return route2;
+			}					   
+		}
+	}
+};
+
+
+EmbroidGeometry.prototype.moveToNextFilledline = function (line1,line2,lines,turtle) {
+	var tempLine,route,
+	    myself = this;
+	
+	function groupLinesContainPoint(lines,point) {
+		for (let i=1;i<=lines.length(); i++) {
+			let line = lines.at(i);
+			for (let j=1;j<line.length(); j++) {
+				if (myself.lineContainsPoint(line.at(j).at(2),point)){
+					return line.at(j);
+				}
+			}			
+		}
+		return new List();
+	}
+	
+	function gotoPoint(turtle,pos) {
+		turtle.gotoXY(pos.at(1),pos.at(2));
+	}
+	
+	if (line1.isEmpty()) {
+		tempLine = groupLinesContainPoint(lines,new List([turtle.xPosition(),turtle.yPosition()]));
+		route = this.findRoute(new List([new List([turtle.xPosition(),turtle.yPosition()]),tempLine]),
+		                       new List([line2.at(1).at(1),line2.at(2).at(1)]),lines);
+		if ( tempLine.isEmpty() || route.isEmpty() ) {
+			turtle.up();
+			gotoPoint(turtle,line2.at(1).at(1));
+			turtle.down();
+			gotoPoint(turtle,line2.at(1).at(2));
+		} else {
+			for (let i=2; i <= route.length(); i++) {
+				gotoPoint(turtle,route.at(i));
+			}
+			gotoPoint(turtle,line2.at(1).at(2));
+        }			
+	} else {
+		route = this.findRoute(new List([line1.at(1).at(2),line1.at(2).at(2)]),
+		                       new List([line2.at(1).at(1),line2.at(2).at(1)]),lines);		
+		if (turtle.avoidJumps) {
+			console.log(route);
+			for (let i=2; i <= route.length(); i++) {
+				gotoPoint(turtle,route.at(i));
+			}
+		} else {
+			if ( route.length() > 2 ) {
+				turtle.up();
+				gotoPoint(turtle,line2.at(1).at(1));
+				turtle.down();
+			} else {
+				gotoPoint(turtle,line2.at(1).at(1));
+			}
+		}
+		gotoPoint(turtle,line2.at(1).at(2));
+	}
+};
+
+
+
+EmbroidGeometry.prototype.seekNextFilledline = function (point,filledLines,lines) {
+	var curPoint,orderedLines,result,relatedFilledLines,
+	    myself = this;
+	
+	function routeDistance(firstPoint,secondPoint,lines) {
+		var line1,line2,point1,point2,
+			closeLine,len,line1No,line2No,lengthRoute1;
+		
+		point1 = firstPoint.at(1);
+		line1 = firstPoint.at(2).at(2);
+		line1No = firstPoint.at(2).at(1);
+		point2 = secondPoint.at(1);
+		line2 = secondPoint.at(2).at(2);
+		line2No = secondPoint.at(2).at(1);
+		if ( Math.round(line1No/10000) !== Math.round(line2No/10000) ) {
+			return Infinity;
+		} else {
+			if ( line1No === line2No ) {
+				return 0;
+			} else {
+				closeLine = lines.at(Math.round(line1No/10000));
+				len = closeLine.length();
+				if (line1No < line2No) {
+					lengthRoute1 = line2No - line1No;
+				} else {
+					lengthRoute1 = line1No - line2No;
+				}
+				if ( lengthRoute1 < len - lengthRoute1 ) {
+					return lengthRoute1;
+				} else {
+					return len - lengthRoute1;
+				}
+			}
+		}
+	}
+	
+	function lengthOfRoute(firstPoint,secondPoint,lines) {
+		var line1,line2,point1,point2,route1,route2,linesInRoute,
+			closeLine,len,lengthOfCloseline,line1No,line2No,lengthRoute1;
+
+		point1 = firstPoint.at(1);
+		line1 = firstPoint.at(2).at(2);
+		line1No = firstPoint.at(2).at(1);
+		point2 = secondPoint.at(1);
+		line2 = secondPoint.at(2).at(2);
+		line2No = secondPoint.at(2).at(1);
+		
+		if ( Math.round(line1No/10000) !== Math.round(line2No/10000) ) {
+			return Infinity;
+		} else {
+			if ( line1No === line2No ) {
+				return myself.lengthOfLine(new List([point1,point2]));
+			} else {
+				closeLine = lines.at(Math.round(line1No/10000));
+				len = closeLine.length();
+				lengthOfCloseline = closeLine.asArray().reduce((sum,line) => sum + line.at(3),0);
+				if (line1No < line2No) {
+					route1 = new List();
+					linesInRoute = closeLine.asArray().filter( line => line.at(1) > line1No && line.at(1) < line2No);
+					route1.add(point1);
+					route1.add(line1.at(2));
+					linesInRoute.forEach( line => route1.add(line.at(2).at(2)) );
+					route1.add(point2);
+					lengthRoute1 = myself.lengthOfLine(new List([point1,line1.at(2)])) +
+					               (linesInRoute.length === 0 ? 0 : linesInRoute.reduce((sum,line) => sum + line.at(3),0)) +
+								   myself.lengthOfLine(new List([line2.at(1),point2]));
+					if ( lengthRoute1 < lengthOfCloseline - lengthRoute1 ) {
+                        return lengthRoute1;
+                    } else {
+                        return lengthOfCloseline - lengthRoute1;
+                    } 						
+				} else {
+					route1 = new List();
+					linesInRoute = closeLine.asArray().filter( line => line.at(1) > line2No && line.at(1) < line1No);
+					route1.add(point1);
+					route1.add(line1.at(1));
+					linesInRoute.forEach( line => route1.add(line.at(2).at(1)) );
+					route1.add(point2);
+					lengthRoute1 = myself.lengthOfLine(new List([point1,line1.at(1)])) +
+					               (linesInRoute.length === 0 ? 0 : linesInRoute.reduce((sum,line) => sum + line.at(3),0)) +
+								   myself.lengthOfLine(new List([line2.at(2),point2]));
+					if ( lengthRoute1 < lengthOfCloseline - lengthRoute1 ) {
+                        return lengthRoute1;
+                    } else {
+                        return lengthOfCloseline - lengthRoute1;
+                    } 					
+				}
+			}
+		}		
+	}
+	
+	if ( point.at(2).isEmpty() ) {
+		curPoint = point.at(1);
+		orderedLines = filledLines.asArray().map(line => new List([Math.min(myself.lengthOfLine(new List([curPoint,line.at(1).at(1)])),
+		                                                          myself.lengthOfLine(new List([curPoint,line.at(1).at(2)]))),
+													     filledLines.indexOf(line),
+														 line])).sort((a,b) => a.at(1) - b.at(1));
+		result = orderedLines[0].at(3);
+		filledLines.remove(orderedLines[0].at(2));  
+        if ( this.lengthOfLine( new List([curPoint,result.at(1).at(2)])) < this.lengthOfLine( new List([curPoint,result.at(1).at(1)])) ) {
+			result = new List([ new List([result.at(1).at(2),result.at(1).at(1)]), new List([result.at(2).at(2),result.at(2).at(1)]) ]);
+		}
+		return result;
+	} else {
+		orderedLines = filledLines.asArray().map( line => new List([filledLines.indexOf(line),line]));
+		relatedFilledLines = orderedLines.filter( line => Math.round(line.at(2).at(2).at(1).at(1) / 10000) === Math.round( point.at(2).at(1) / 10000) ||
+		                                                  Math.round(line.at(2).at(2).at(2).at(1) / 10000) === Math.round( point.at(2).at(1) / 10000) ); 
+	    if (relatedFilledLines.length === 0 ) {
+			return new List();
+		} else {
+			curPoint = point.at(1);
+			orderedLines = relatedFilledLines.map( line => new List([Math.min(routeDistance(point,new List([line.at(2).at(1).at(1),line.at(2).at(2).at(1)]),lines),
+			                                                                  routeDistance(point,new List([line.at(2).at(1).at(2),line.at(2).at(2).at(2)]),lines)),
+																     line.at(1),line.at(2)]) ).sort((a,b) => a.at(1) - b.at(1));
+		    orderedLines = orderedLines.filter(line => line.at(1) === orderedLines[0].at(1) ).map( line => new List([line.at(2),line.at(3)]));
+			orderedLines = orderedLines.map( line => new List([Math.min(lengthOfRoute(point,new List([line.at(2).at(1).at(1),line.at(2).at(2).at(1)]),lines),
+			                                                            lengthOfRoute(point,new List([line.at(2).at(1).at(2),line.at(2).at(2).at(2)]),lines)),
+															   line.at(1),line.at(2)]) ).sort((a,b) => a.at(1) - b.at(1));
+			result = orderedLines[0].at(3);													   
+		    filledLines.remove(orderedLines[0].at(2));
+		}
+		let line1Section,line2Section;
+		line1Section = Math.round(result.at(2).at(1).at(1) / 10000);
+		line2Section = Math.round(result.at(2).at(2).at(1) / 10000);
+		
+		if (line1Section === line2Section) {
+			if (lengthOfRoute(point,new List([result.at(1).at(2),result.at(2).at(2)]),lines) < lengthOfRoute(point,new List([result.at(1).at(1),result.at(2).at(1)]),lines) ){
+				result = new List([new List([result.at(1).at(2),result.at(1).at(1)]), new List([result.at(2).at(2),result.at(2).at(1)])]);
+			}
+		} else if( line1Section !== Math.round(point.at(2).at(1)/10000)) {
+			result = new List([new List([result.at(1).at(2),result.at(1).at(1)]), new List([result.at(2).at(2),result.at(2).at(1)])]);
+		}
+		return result;
+	}
 };
 
 EmbroidGeometry.prototype.getSvgCommand = function (svgstr) {
@@ -872,6 +1225,47 @@ SnapExtensions.primitives.set('eg_get_edgeCuttingLines(lines,direction)', functi
         stage.embroidGeometry = new EmbroidGeometry(stage);
     }
 	return stage.embroidGeometry.edgeCuttingLines(lines,direction);
+});
+
+SnapExtensions.primitives.set('eg_get_linesThatCroessALine(lines,line)', function (lines,line) {
+    var stage = this.parentThatIsA(StageMorph);
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
+	return stage.embroidGeometry.linesThatCrossALine(lines,line);
+});
+
+SnapExtensions.primitives.set('eg_get_interceptedLines(line,lines)', function (line,lines) {
+    var stage = this.parentThatIsA(StageMorph);
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
+	return stage.embroidGeometry.interceptedLines(line,lines);
+});
+
+SnapExtensions.primitives.set('eg_findRoute(firstPoint,secondPoint,lines)', function (firstPoint,secondPoint,lines) {
+    var stage = this.parentThatIsA(StageMorph);
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
+	return stage.embroidGeometry.findRoute(firstPoint,secondPoint,lines);
+});
+
+SnapExtensions.primitives.set('eg_seekNextFilledline(point,filledLines,lines)', function (point,filledLines,lines) {
+    var stage = this.parentThatIsA(StageMorph);
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
+	return stage.embroidGeometry.seekNextFilledline(point,filledLines,lines);
+});
+
+
+SnapExtensions.primitives.set('eg_moveToNextFilledline(line1,line2,lines,turtle)', function (line1,line2,lines,turtle) {
+    var stage = this.parentThatIsA(StageMorph);
+    if (!stage.embroidGeometry) {
+        stage.embroidGeometry = new EmbroidGeometry(stage);
+    }
+	return stage.embroidGeometry.moveToNextFilledline(line1,line2,lines,turtle);
 });
 
 SnapExtensions.primitives.set('eg_get_svgCommand(svgstr)', function (svgstr) {
