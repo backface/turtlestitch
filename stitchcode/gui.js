@@ -2999,7 +2999,7 @@ IDE_Morph.prototype.clearStageBackground = function () {
 };
 
 
-IDE_Morph.prototype.droppedImage = function (aCanvas, name) {
+IDE_Morph.prototype.droppedImage = function (aCanvas, name, embeddedData, src) {
     var myself = this;
     var stage = this.stage;
     var costume = new Costume(
@@ -3019,6 +3019,18 @@ IDE_Morph.prototype.droppedImage = function (aCanvas, name) {
         );
         return;
     }
+
+    if (!this.isImportingLocalFile &&
+        isString(embeddedData) &&
+        ['scripts', 'palette', 'categories'].includes(src) &&
+        embeddedData[0] === '<' &&
+        ['blocks', 'block', 'script', 'sprite'].some(tag =>
+            embeddedData.slice(1).startsWith(tag))
+    ) {
+        this.isImportingLocalFile = false;
+        return this.droppedText(embeddedData, name, '');
+    }
+	
     this.loadAsBackgroundOrData(costume, name)
 }
 
