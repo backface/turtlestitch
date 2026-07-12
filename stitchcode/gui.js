@@ -1,4 +1,4 @@
-VERSION="2.11.5-dev"
+VERSION = "2.11.5"
 
 // get debug mode
 url = new URL(window.location.href);
@@ -2162,8 +2162,8 @@ IDE_Morph.prototype.createCategories = function() {
       i;
 
     myself.categories.children.forEach((button, i) => {
-      row = i < 8 ? i % 4 : i - 4;
-      col = (i < 4 || i > 7) ? 1 : 2;
+      row = i < 8 ? i % 4 : (i < 10 ? 4 : i-5);
+      col = (i < 4 || i === 8 || i > 9) ? 1 : 2;
       button.setPosition(new Point(
         l + (col * xPadding + ((col - 1) * buttonWidth)),
         t + (((row - shift) + 1) * yPadding + ((row - shift) *
@@ -2999,7 +2999,7 @@ IDE_Morph.prototype.clearStageBackground = function() {
 };
 
 
-IDE_Morph.prototype.droppedImage = function(aCanvas, name) {
+IDE_Morph.prototype.droppedImage = function(aCanvas, name, embeddedData, src) {
   var myself = this;
   var stage = this.stage;
   var costume = new Costume(
@@ -3019,6 +3019,18 @@ IDE_Morph.prototype.droppedImage = function(aCanvas, name) {
     );
     return;
   }
+
+  if (!this.isImportingLocalFile &&
+    isString(embeddedData) &&
+    ['scripts', 'palette', 'categories'].includes(src) &&
+    embeddedData[0] === '<' &&
+    ['blocks', 'block', 'script', 'sprite'].some(tag =>
+      embeddedData.slice(1).startsWith(tag))
+  ) {
+    this.isImportingLocalFile = false;
+    return this.droppedText(embeddedData, name, '');
+  }
+
   this.loadAsBackgroundOrData(costume, name)
 }
 
