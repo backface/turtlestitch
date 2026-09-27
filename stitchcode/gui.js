@@ -13,6 +13,7 @@ IDE_Morph.prototype.setDefaultTheme = IDE_Morph.prototype.setBrightTheme;
 IDE_Morph.prototype.originalInit = IDE_Morph.prototype.init;
 IDE_Morph.prototype.init = function(config) {
   this.originalInit(config);
+  this.currentCategory = this.scene.unifiedPalette ? 'unified' : 'playground';
   this.padding = 1;
   /*
    this.droppedText(
