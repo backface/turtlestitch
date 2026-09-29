@@ -26,7 +26,8 @@ SpriteMorph.prototype.categories =
         'operators',
         'variables',
         'colors',
-        'other',        
+        'other',     
+        'playground',			
         'lists',        
     ];
     
@@ -43,6 +44,7 @@ SpriteMorph.prototype.blockColor = {
     variables : new Color(243, 118, 29),
     lists : new Color(217, 77, 17),
     other: new Color(150, 150, 150),
+	playground : new Color(119,100,36),		
     colors : new Color(207, 74, 217),
 };
 
@@ -2133,6 +2135,15 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         defaults: [true]
     };
 
+    myPrimitiveBlocks.jumpStitchOff =
+    {
+		    only: SpriteMorph,
+        type: 'command',
+        spec: 'jump stitch %b',
+        category: 'embroidery',
+        defaults: [false]
+    };
+	
     myPrimitiveBlocks.trimStitch =
     {
 		    only: SpriteMorph,
@@ -2768,7 +2779,110 @@ SpriteMorph.prototype.blockTemplates = function (
             blocks.push(block('doShowTable'));
         }
 		
- 	}
+ 	} else if (cat === 'playground') {
+		blocks.push(block('resetAll'));
+		blocks.push('-');
+        blocks.push(block('runningStitch'));
+		blocks.push('-');
+        blocks.push(block('forward'));
+        blocks.push('-');
+        blocks.push(block('turn'));
+        blocks.push(block('turnLeft'));
+        blocks.push('-');
+        blocks.push(block('setHeading'));	
+        blocks.push('-');
+        blocks.push('-');
+        blocks.push(block('gotoXY'));		
+        blocks.push(block('arcRight'));
+        blocks.push(block('arcLeft'));
+        blocks.push('-');				
+		blocks.push(block('doRepeat'));
+		blocks.push('-');	
+		blocks.push(block('jumpStitch'));	
+		blocks.push(block('jumpStitchOff'));	
+        blocks.push('-');
+        blocks.push(block('reportVariadicSum'));
+        blocks.push(block('reportDifference'));
+        blocks.push(block('reportVariadicProduct'));
+        blocks.push(block('reportQuotient'));
+        blocks.push(block('reportPower'));		
+		
+		blocks.push('=');
+		
+
+		var titleText = new TextMorph(localize('Examples:'));
+		titleText.fontSize = 12;
+		titleText.setColor(this.paletteTextColor);
+		titleText.isDraggable = false;
+		blocks.push(titleText);
+		blocks.push('-');
+		
+
+		var myself = this;
+		var ide = this.parentThatIsA(IDE_Morph);
+		
+		if (ide) {
+			var playgroundListUrl = ide.resourceURL('stitchcode/Examples/playground/PLAYGROUND');
+			console.log(playgroundListUrl);
+			
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', playgroundListUrl, false); 
+			try {
+				xhr.send();
+				if (xhr.status === 200) {
+					var lines = xhr.responseText.split('\n');
+					for (var i = 0; i < lines.length; i++) {
+						var line = lines[i].trim();
+						if (line === '' || line.startsWith('#')) continue;
+						
+
+						var parts = line.split(',');
+						if (parts.length >= 2) {
+							var buttonText = parts[0].trim();
+							var projectFile = parts[1].trim();
+							
+
+							var projectButton = new PushButtonMorph(
+								null,
+								(function(file, btnText) {
+									return function() {
+										myself.loadPlaygroundProject(file, btnText);
+									};
+								})(projectFile, buttonText),
+								buttonText
+							);
+							projectButton.userMenu = function() {
+								var menu = new MenuMorph(this);
+								menu.addItem('help...', 'showHelp');
+								return menu;
+							};
+							projectButton.selector = 'loadPlaygroundProject';
+							projectButton.showHelp = BlockMorph.prototype.showHelp;
+							projectButton.isDraggable = false;
+							projectButton.hint = localize('Load project: ') + buttonText;
+							blocks.push(projectButton);
+						}
+					}
+				} else {
+					console.log('Failed to load playground list, status: ' + xhr.status);
+					var errorText = new TextMorph(localize('Failed to load examples'));
+					errorText.fontSize = 10;
+					errorText.setColor(new Color(255, 100, 100));
+					errorText.isDraggable = false;
+					blocks.push(errorText);
+				}
+			} catch(e) {
+				console.log('Failed to load playground list: ' + e);
+				var errorText = new TextMorph(localize('Failed to load examples'));
+				errorText.fontSize = 10;
+				errorText.setColor(new Color(255, 100, 100));
+				errorText.isDraggable = false;
+				blocks.push(errorText);
+			}
+		}		
+		
+	}
     return blocks;
 };
 
@@ -3723,4 +3837,73 @@ StageMorph.prototype.mouseClickLeft = function () {
                      this.children,
                      morph => morph instanceof SpriteMorph);
     return sprite.receiveUserInteraction('clicked');
+};
+
+SpriteMorph.prototype.loadPlaygroundProject = function(projectFile, buttonText) {
+    var myself = this;
+    var ide = this.parentThatIsA(IDE_Morph);
+    var stage = this.parentThatIsA(StageMorph);
+    
+    if (!ide) {
+        console.log('IDE not found');
+        return;
+    }
+    
+    var projectUrl = ide.resourceURL('stitchcode/Examples/playground', projectFile);
+	
+	console.log(projectUrl);
+    
+    var confirmDialog = new DialogBoxMorph();
+    confirmDialog.labelString = localize('Load Example');
+    confirmDialog.createLabel();
+    
+    var confirmText = new TextMorph(
+        localize('Load') + '"' + buttonText + '"?' + localize('This will replace your current project.'),
+        confirmDialog.fontSize,
+        confirmDialog.fontStyle,
+        true,
+        false,
+        'center'
+    );
+    confirmDialog.addBody(confirmText);
+    
+    confirmDialog.addButton('ok', 'OK'); 
+    confirmDialog.addButton('cancel', 'Cancel');	
+	
+	confirmDialog.ok = function() {
+        
+		confirmDialog.destroy();
+        var loadingMsg = ide.showMessage('Loading ' + buttonText + '...');
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', projectUrl, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (loadingMsg) loadingMsg.destroy();
+                
+                if (xhr.status === 200) {
+                    try {
+						console.log(xhr.responseText);
+                        ide.rawOpenProjectString(xhr.responseText, true);
+                        ide.showMessage(buttonText + ' loaded!', 2);
+                    } catch(e) {
+                        console.log('Error opening project: ' + e);
+                        ide.showMessage('Error loading project: ' + e, 3);
+                    }
+                } else {
+                    console.log('Failed to load project: ' + projectUrl);
+                    ide.showMessage('Failed to load project: ' + projectFile, 3);
+                }
+            }
+        };
+        xhr.onerror = function() {
+            if (loadingMsg) loadingMsg.destroy();
+            ide.showMessage('Network error loading project', 3);
+        };
+        xhr.send();
+    };
+    
+    
+    confirmDialog.fixLayout();
+    confirmDialog.popUp(myself.world());
 };
