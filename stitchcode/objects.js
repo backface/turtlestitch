@@ -2944,10 +2944,11 @@ StageMorph.prototype.destroy = function () {
 // device resolution without any interference from the patch.
 StageMorph.prototype.trailsPixelRatio = function () {
     // live (not load-time fixed) so the settings-menu retina toggle can
-    // rescale the stage; raw devicePixelRatio mirrors morphic's own
-    // getPixelRatio() (backing-store ratio is 1 on modern browsers), so
-    // the stage buffer matches the world canvas buffer exactly
-    return isRetinaEnabled() ? (window.devicePixelRatio || 1) : 1;
+    // rescale the stage; the ceiling mirrors morphic's own getPixelRatio()
+    // (originalDevicePixelRatio = Math.ceil(devicePixelRatio),
+    // src/morphic.js:1760), so the stage buffer matches the world canvas
+    // buffer exactly on any display
+    return isRetinaEnabled() ? Math.ceil(window.devicePixelRatio || 1) : 1;
 };
 
 StageMorph.prototype.originalInit = StageMorph.prototype.init;
