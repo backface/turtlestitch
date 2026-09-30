@@ -64,8 +64,6 @@
 			var world;
 			document.querySelector('meta[name="snap-cloud-domain"]').setAttribute("location", (location.protocol + "//" + location.host))
 			window.onload = function () {
-				console.log("is Retina supported: " + isRetinaSupported());
-				disableRetinaSupport();
 				world = new WorldMorph(document.getElementById('world'));
 				world.worldCanvas.focus();
 				new IDE_Morph().openIn(world);

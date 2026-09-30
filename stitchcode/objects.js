@@ -3129,8 +3129,7 @@ StageMorph.prototype.initRenderer = function () {
     var myself = this;
 
     console.log("set up renderer");
-    // console.log(this.penTrails().isRetinaEnabled)
-    
+
     if(!this.renderer) {
       if (Detector.webgl) {
           this.renderer = new THREE.WebGLRenderer({
@@ -3156,6 +3155,10 @@ StageMorph.prototype.initRenderer = function () {
         myself.hasBackgroundImage ? 0.0 : 1);
         myself.reRender();
       }
+
+      // render at device resolution on retina/HiDPI displays
+      this.renderer.setPixelRatio(this.trailsPixelRatio());
+      this.renderer.setSize(this.extent().x, this.extent().y);
 
       this.renderer.setBackgroundColor(StageMorph.prototype.backgroundColor);
       
@@ -3608,10 +3611,23 @@ StageMorph.prototype.getIsXRay = function () {
 StageMorph.prototype.clearPenTrails = nop;
 
 StageMorph.prototype.penTrails = function () {
+    // the pen trails canvas is owned by the three.js renderer.
+    // Don't use newCanvas() here: with retina support enabled, Snap's
+    // canvas width/height setters grab a 2D context, which prevents
+    // three.js from creating a WebGL context on the same canvas.
+    // Opt this canvas out of Snap's retina scaling (own property, no
+    // side effects) - the renderer handles the pixel ratio itself,
+    // see trailsPixelRatio()
     if (!this.trailsCanvas) {
-        this.trailsCanvas = newCanvas(this.dimensions, true);
+        this.trailsCanvas = document.createElement('canvas');
+        this.trailsCanvas._isRetinaEnabled = false;
     }
     return this.trailsCanvas;
+};
+
+StageMorph.prototype.trailsPixelRatio = function () {
+    // must match the ratio Snap uses for the world canvas
+    return isRetinaEnabled() ? Math.ceil(window.devicePixelRatio || 1) : 1;
 };
 
 // StageMorph drawing
@@ -3622,7 +3638,8 @@ StageMorph.prototype.drawOn = function (ctx, rect) {
     // we do not need to render the original canvas anymore because
     // we have removed sprites and backgrounds
 
-    var rectangle, area, delta, src, w, h, sl, st;
+    var rectangle, area, delta, src, w, h, sl, st,
+        ratio = this.renderer.getPixelRatio();
     if (!this.isVisible) {
         return null;
     }
@@ -3652,12 +3669,14 @@ StageMorph.prototype.drawOn = function (ctx, rect) {
         // we only draw pen trails!
         ctx.save();
         try {
+            // pen trails are rendered at device resolution,
+            // source coordinates are in device pixels
             ctx.drawImage(
                 this.penTrails(),
-                sl,
-                st,
-                w,
-                h,
+                sl * ratio,
+                st * ratio,
+                w * ratio,
+                h * ratio,
                 area.left(),
                 area.top(),
                 w,

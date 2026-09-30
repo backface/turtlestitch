@@ -432,9 +432,8 @@ TurtleShepherd.prototype.toPNG = function() {
 		var color = this.defaultColor;
 		var hasFirst = false;
 		var colorChanged = false;
-		var cnv = document.createElement('canvas');
-		cnv.width = Math.round(this.w);
-		cnv.height = Math.round(this.h);
+		// non-retina canvas: export at the exact design size
+		var cnv = newCanvas(new Point(Math.round(this.w), Math.round(this.h)), true);
         ctx = cnv.getContext('2d');
 		ctx.strokeStyle = "rgb(" + color.r + ","  + color.g + ","  + color.b + ")";
 		ctx.lineWidth = 1.0;

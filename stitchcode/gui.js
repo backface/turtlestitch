@@ -463,6 +463,14 @@ IDE_Morph.prototype.rawOpenProjectString = function(str, noPrims) {
 
 };
 
+IDE_Morph.prototype.originalToggleRetina = IDE_Morph.prototype.toggleRetina;
+IDE_Morph.prototype.toggleRetina = function () {
+    this.originalToggleRetina();
+    // the stage is kept, adjust its WebGL resolution to the new setting
+    this.stage.renderer.setPixelRatio(this.stage.trailsPixelRatio());
+    this.stage.renderer.changed = true;
+};
+
 
 /*
 
