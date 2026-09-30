@@ -2931,6 +2931,24 @@ StageMorph.prototype.destroy = function () {
     this.originalDestroy();
 };
 
+
+// Retina / high-DPI support (resolves issue #16). morphic's retina patch
+// (enableRetinaSupport in src/morphic.js) installs width/height setters
+// that call getContext("2d") on the canvas they size - which would create
+// a 2D context on the stage canvas and permanently block the WebGL
+// context three.js needs on it (the original #16 failure), plus double-
+// scale the backing store. So the WebGL stage canvas is deliberately kept
+// a non-retina canvas with a native width/height (see penTrails());
+// three.js sizes it in device pixels with the same factor morphic's
+// retina support applies to all other canvases, rendering at full
+// device resolution without any interference from the patch.
+StageMorph.prototype.stagePixelRatio = (function () {
+    if (typeof isRetinaSupported === 'function' && isRetinaSupported()) {
+        return Math.ceil(window.devicePixelRatio || 1);
+    }
+    return 1;
+})();
+
 StageMorph.prototype.originalInit = StageMorph.prototype.init;
 StageMorph.prototype.init = function (globals) {
     var myself = this;
@@ -3147,6 +3165,15 @@ StageMorph.prototype.initRenderer = function () {
         this.renderer = new THREE.CanvasRenderer(
               {canvas: this.penTrails()});
       }
+
+      // size the (non-retina) canvas in device pixels, matching the scale
+      // morphic's retina support applies to the world canvas. This must
+      // happen after the renderer was created: while the retina patch is
+      // installed, any width/height assignment on a canvas that has no
+      // context yet would create a 2D context and block the WebGL
+      // context it just claimed (issue #16)
+      this.renderer.setSize(this.extent().x, this.extent().y);
+      this.renderer.setPixelRatio(this.stagePixelRatio);
 
       this.renderer.setBackgroundColor = function(color) {
         StageMorph.prototype.backgroundColor  = color;
@@ -3609,7 +3636,16 @@ StageMorph.prototype.clearPenTrails = nop;
 
 StageMorph.prototype.penTrails = function () {
     if (!this.trailsCanvas) {
-        this.trailsCanvas = newCanvas(this.dimensions, true);
+        // this canvas hosts the three.js renderer, so it must never
+        // hold a 2D context (a 2D context permanently blocks a WebGL
+        // context on the same canvas - the original issue #16 failure).
+        // morphic's retina patch calls getContext("2d") from inside its
+        // width/height setters and its isRetinaEnabled setter, so this
+        // canvas is marked non-retina through the private data property
+        // (bypassing the accessor) and is only sized after the renderer
+        // has claimed the WebGL context (see initRenderer()).
+        this.trailsCanvas = document.createElement('canvas');
+        this.trailsCanvas._isRetinaEnabled = false;
     }
     return this.trailsCanvas;
 };
@@ -3622,7 +3658,7 @@ StageMorph.prototype.drawOn = function (ctx, rect) {
     // we do not need to render the original canvas anymore because
     // we have removed sprites and backgrounds
 
-    var rectangle, area, delta, src, w, h, sl, st;
+    var rectangle, area, delta, src, w, h, sl, st, ratio;
     if (!this.isVisible) {
         return null;
     }
@@ -3650,14 +3686,20 @@ StageMorph.prototype.drawOn = function (ctx, rect) {
             return null;
         }
         // we only draw pen trails!
+        // the penTrails canvas is sized in device pixels (stagePixelRatio),
+        // so the logical source rect must be translated into backing-store
+        // pixels before blitting; the ratio is derived from the actual
+        // canvas width so it stays correct even if retina support is
+        // toggled at runtime
+        ratio = this.penTrails().width / (this.extent().x || 1);
         ctx.save();
         try {
             ctx.drawImage(
                 this.penTrails(),
-                sl,
-                st,
-                w,
-                h,
+                sl * ratio,
+                st * ratio,
+                w * ratio,
+                h * ratio,
                 area.left(),
                 area.top(),
                 w,
