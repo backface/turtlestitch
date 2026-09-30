@@ -7,8 +7,16 @@
  *                 "draw" — feed this to a render block to trace
  *                 the original artwork as stitches.
  *
- * Coordinates are in Snap! space (center origin, y-up).
+ * Coordinates are in Snap! space (y-up), in turtle steps at the
+ * real size of the drawing: width/height units (mm, cm, in, pt,
+ * pc, px) and the viewBox are applied, 1 mm = 5 steps.
  * Y is flipped from the SVG document (origin top-left, y-down).
+ *
+ * IMPORT OPTIONS (asked when dropping the file)
+ *   scale         : factor applied on top of the real size
+ *   resample      : 0 keeps the shape with as few points as
+ *                   possible (0.1 mm tolerance); a distance in mm
+ *                   places points evenly along each path instead
  *
  * SUPPORTED
  *   Path commands : M m L l H h V v C c S s Q q T t Z z
@@ -28,9 +36,9 @@
  *                   CSS transform property (only attribute)
  *   Structure     : <use> <symbol> <clipPath> <mask> <text>
  *   Styling       : all colors, stroke widths, fill rules, etc.
- *   viewBox       : document viewBox / preserveAspectRatio are
- *                   not applied — raw SVG coordinates are used
- *                   (only Y is flipped)
+ *   viewBox       : preserveAspectRatio alignment is ignored
+ *                   (uniform scale, no centering)
+ *   Units         : percentages in width/height (treated as px)
  * ============================================================ */
 
 (function installSVGPathImporter() {
@@ -279,19 +287,59 @@
     return m;
   }
 
-  // ---- top-level: SVG text → array of {tag, x, y} -------
-  function extractFromSVG(svgText) {
+  // ---- document units → millimeters --------------------
+  const MM_PER_UNIT = {
+    mm: 1, cm: 10, q: 0.25, in: 25.4, pt: 25.4 / 72, pc: 25.4 / 6,
+    px: 25.4 / 96, '': 25.4 / 96
+  };
+
+  function lengthInMM(s) {
+    const m = /^\s*([0-9.eE+-]+)\s*([a-zA-Z]*)\s*$/.exec(s || '');
+    if (!m) return null;
+    const f = MM_PER_UNIT[m[2].toLowerCase()];
+    const v = parseFloat(m[1]);
+    return (f === undefined || !(v > 0)) ? null : v * f;
+  }
+
+  // matrix mapping user units of the root <svg> to millimeters,
+  // plus the document size in mm (if known)
+  function documentMapping(svg) {
+    const vb = (svg.getAttribute('viewBox') || '')
+      .trim().split(/[\s,]+/).map(parseFloat);
+    const hasVB = vb.length === 4 && vb.every(isFinite) && vb[2] > 0 && vb[3] > 0;
+    const wMM = lengthInMM(svg.getAttribute('width'));
+    const hMM = lengthInMM(svg.getAttribute('height'));
+    let k = MM_PER_UNIT.px, ox = 0, oy = 0;
+    if (hasVB) {
+      const kx = wMM ? wMM / vb[2] : null, ky = hMM ? hMM / vb[3] : null;
+      k = (kx && ky) ? Math.min(kx, ky) : (kx || ky || MM_PER_UNIT.px);
+      ox = vb[0]; oy = vb[1];
+    }
+    return {
+      mat: [k, 0, 0, k, -ox * k, -oy * k],
+      widthMM: wMM || (hasVB ? vb[2] * k : null),
+      heightMM: hMM || (hasVB ? vb[3] * k : null)
+    };
+  }
+
+  function parseSVG(svgText) {
     const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
     if (doc.querySelector('parsererror')) {
       throw new Error('SVG is not well-formed XML');
     }
+    return doc;
+  }
+
+  // ---- top-level: SVG document → array of {tag, x, y} in mm ----
+  function extractFromSVG(doc) {
+    const root = documentMapping(doc.documentElement).mat;
     const all = [];
     const paths = doc.querySelectorAll('path');
     paths.forEach(p => {
       const d = p.getAttribute('d');
       if (!d) return;
       const local = parsePath(d);
-      const m = cumulativeTransform(p);
+      const m = mult(root, cumulativeTransform(p));
       local.forEach(pt => {
         const [x, y] = applyMat(m, pt.x, pt.y);
         all.push({ tag: pt.tag, x, y });
@@ -300,25 +348,76 @@
     return all;
   }
 
-  // ---- remove consecutive draw-points closer than minDist ----
-  // Move points are always kept (they start new subpaths).
-  function resampleMinDist(pts, minDist) {
-    const out = [];
-    const d2 = minDist * minDist;
-    let lastX = Infinity, lastY = Infinity;
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
-      if (p.tag === 'move') {
-        out.push(p);
-        lastX = p.x; lastY = p.y;
-      } else {
-        const dx = p.x - lastX, dy = p.y - lastY;
-        if (dx * dx + dy * dy >= d2) {
-          out.push(p);
-          lastX = p.x; lastY = p.y;
-        }
+  // ---- split at "move" points into subpaths -------------
+  function splitSubpaths(pts) {
+    const subs = [];
+    pts.forEach(p => {
+      if (p.tag === 'move' || subs.length === 0) subs.push([]);
+      subs[subs.length - 1].push(p);
+    });
+    return subs;
+  }
+
+  function dist(a, b) {
+    return Math.hypot(b.x - a.x, b.y - a.y);
+  }
+
+  // distance from p to the segment a-b
+  function segmentDist(p, a, b) {
+    const dx = b.x - a.x, dy = b.y - a.y, len2 = dx * dx + dy * dy;
+    if (len2 === 0) return dist(p, a);
+    const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / len2));
+    return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+  }
+
+  // ---- Ramer–Douglas–Peucker: fewest points within tolerance ----
+  function simplify(sp, tolerance) {
+    if (sp.length < 3) return sp;
+    const keep = new Array(sp.length).fill(false);
+    keep[0] = keep[sp.length - 1] = true;
+    const stack = [[0, sp.length - 1]];
+    while (stack.length) {
+      const [first, last] = stack.pop();
+      let maxD = 0, index = -1;
+      for (let i = first + 1; i < last; i++) {
+        const d = segmentDist(sp[i], sp[first], sp[last]);
+        if (d > maxD) { maxD = d; index = i; }
+      }
+      if (maxD > tolerance) {
+        keep[index] = true;
+        stack.push([first, index], [index, last]);
       }
     }
+    return sp.filter((p, i) => keep[i]);
+  }
+
+  // ---- place points evenly along a subpath --------------
+  // the spacing is adjusted slightly so that the subpath's length
+  // is an exact multiple and the last point lands on its end
+  function resampleEven(sp, spacing) {
+    let length = 0;
+    for (let i = 1; i < sp.length; i++) length += dist(sp[i - 1], sp[i]);
+    if (length === 0) return [sp[0]];
+    const count = Math.max(1, Math.round(length / spacing));
+    const step = length / count;
+    const out = [sp[0]];
+    let need = step; // distance left until the next point
+    for (let i = 1; i < sp.length && out.length < count; i++) {
+      let ax = sp[i - 1].x, ay = sp[i - 1].y;
+      const bx = sp[i].x, by = sp[i].y;
+      let seg = Math.hypot(bx - ax, by - ay);
+      while (seg >= need && out.length < count) {
+        const f = need / seg;
+        ax += (bx - ax) * f;
+        ay += (by - ay) * f;
+        out.push({ tag: 'draw', x: ax, y: ay });
+        seg -= need;
+        need = step;
+      }
+      need -= seg;
+    }
+    const end = sp[sp.length - 1];
+    out.push({ tag: 'draw', x: end.x, y: end.y });
     return out;
   }
 
@@ -330,27 +429,45 @@
     ));
   }
 
-  const MIN_POINT_DIST = 10;
+  const SIMPLIFY_TOLERANCE_MM = 0.1;
+
+  function stepsPerMM(ide) {
+    const shepherd = ide.stage.turtleShepherd;
+    return (shepherd && shepherd.pixels_per_millimeter) || 5;
+  }
+
+  const round2 = v => Math.round(v * 100) / 100;
 
   // ---- shared import logic ------------------------------
-  function importSVGPaths(ide, svgText, name) {
+  // options: scale (factor), spacing (mm, 0 = keep shape)
+  function importSVGPaths(ide, svgText, name, options) {
     if (!/<path[\s>]/i.test(svgText)) return false;
     try {
-      const pts = extractFromSVG(svgText);
+      const scale = options.scale, spacing = options.spacing;
+      const pts = extractFromSVG(parseSVG(svgText));
       if (pts.length === 0) return false;
-      // Flip Y: SVG y-down → Snap! y-up, then reduce to min spacing
-      const flipped = pts.map(p => ({ tag: p.tag, x: p.x, y: -p.y }));
-      const reduced = resampleMinDist(flipped, MIN_POINT_DIST);
+      // mm → turtle steps, flip Y: SVG y-down → Snap! y-up
+      const k = stepsPerMM(ide) * scale;
+      const steps = pts.map(p => ({ tag: p.tag, x: p.x * k, y: -p.y * k }));
+      let result = [];
+      splitSubpaths(steps).forEach(sp => {
+        // drop zero-length segments
+        sp = sp.filter((p, i) => i === 0 || dist(p, sp[i - 1]) > 1e-9);
+        result = result.concat(spacing > 0
+          ? resampleEven(sp, spacing * stepsPerMM(ide))
+          : simplify(sp, SIMPLIFY_TOLERANCE_MM * stepsPerMM(ide)));
+      });
+      const xs = result.map(p => p.x), ys = result.map(p => p.y);
+      const wMM = (Math.max(...xs) - Math.min(...xs)) / stepsPerMM(ide);
+      const hMM = (Math.max(...ys) - Math.min(...ys)) / stepsPerMM(ide);
       const base = (name || 'svg').replace(/\.svg$/i, '');
       const globals = ide.stage.globalVariables();
-      globals.addVar(base + '-path', toPathList(reduced));
+      globals.addVar(base + '-path', toPathList(result));
       ide.flushBlocksCache();
       ide.refreshPalette();
       ide.showMessage(
-        'SVG imported: ' + reduced.length + ' points → "' + base + '-path"' +
-        (reduced.length < pts.length
-          ? ' (' + (pts.length - reduced.length) + ' removed, min dist ' + MIN_POINT_DIST + ')'
-          : ''),
+        'SVG imported: ' + result.length + ' points, ' +
+          round2(wMM) + ' × ' + round2(hMM) + ' mm → "' + base + '-path"',
         4
       );
       return true;
@@ -361,30 +478,101 @@
     }
   }
 
-  // ---- ask the user how to handle an SVG with paths ----
-  function askSVGImportMode(ide, svgText, name, asBackground) {
-    const dlg = new DialogBoxMorph();
-    const body = new TextMorph(
-      'This SVG contains path data.\n' +
-      'Import as a path list or use as background image?',
-      dlg.fontSize, dlg.fontStyle, true, false, 'center', 300,
+  // last used import options, offered again on the next import
+  const lastOptions = { scale: 1, spacing: 0 };
+
+  function dialogText(dlg, string) {
+    return new TextMorph(
+      string, dlg.fontSize, dlg.fontStyle, true, false, 'center', 360,
       null,
       MorphicPreferences.isFlat ? null : new Point(1, 1),
       WHITE
     );
+  }
+
+  // ---- ask the user how to handle an SVG with paths ----
+  function askSVGImportMode(ide, svgText, name, asBackground) {
+    const dlg = new DialogBoxMorph();
     dlg.labelString = 'Import SVG';
     dlg.createLabel();
-    dlg.addBody(body);
+    dlg.addBody(dialogText(dlg,
+      'This SVG contains path data.\n' +
+      'Resample as a path list or use as background image?'
+    ));
     dlg.addButton(
-      () => { dlg.destroy(); importSVGPaths(ide, svgText, name); },
-      'Import path list'
+      () => { dlg.destroy(); askPathListOptions(ide, svgText, name); },
+      'Resample as path list'
     );
     dlg.addButton(
       () => { dlg.destroy(); asBackground(); },
       'Use as background'
     );
+    dlg.addButton('cancel', 'Cancel');
     dlg.fixLayout();
     dlg.popUp(ide.world());
+  }
+
+  // ---- ask for scale and resampling, then import --------
+  function askPathListOptions(ide, svgText, name) {
+    const dlg = new DialogBoxMorph();
+    const bdy = new AlignmentMorph('column', dlg.padding);
+    const row = new AlignmentMorph('row', 8);
+    let size = null;
+    try {
+      size = documentMapping(parseSVG(svgText).documentElement);
+    } catch (e) { /* reported on import */ }
+
+    function labelText(string) {
+      return new TextMorph(
+        string, 10, null, false, null, null, null, null,
+        MorphicPreferences.isFlat ? null : new Point(1, 1),
+        WHITE
+      );
+    }
+
+    function field(label, value) {
+      const col = new AlignmentMorph('column', 2);
+      const inp = new InputFieldMorph(value.toString(), true);
+      inp.setWidth(90);
+      col.alignment = 'left';
+      col.setColor(dlg.color);
+      col.add(labelText(label));
+      col.add(inp);
+      col.fixLayout();
+      row.add(col);
+      return inp;
+    }
+
+    if (size && size.widthMM) {
+      bdy.add(dialogText(dlg,
+        'Size: ' + round2(size.widthMM) + ' × ' + round2(size.heightMM) + ' mm'
+      ));
+    }
+    const scaleInp = field('scale factor', lastOptions.scale);
+    const spacingInp = field('resample every (mm)', lastOptions.spacing);
+    row.setColor(dlg.color);
+    row.fixLayout();
+    bdy.add(row);
+    bdy.add(labelText('resample 0 = keep the shape with as few points as possible'));
+    bdy.setColor(dlg.color);
+    bdy.fixLayout();
+
+    dlg.labelString = 'Resample as path list';
+    dlg.createLabel();
+    dlg.addBody(bdy);
+    // Enter in an input field or the button imports the path list
+    dlg.action = () => {
+      const scale = parseFloat(scaleInp.getValue());
+      const spacing = parseFloat(spacingInp.getValue());
+      lastOptions.scale = scale > 0 ? scale : 1;
+      lastOptions.spacing = spacing > 0 ? spacing : 0;
+      importSVGPaths(ide, svgText, name, lastOptions);
+    };
+    dlg.addButton('ok', 'Import');
+    dlg.addButton('cancel', 'Cancel');
+    dlg.fixLayout();
+    dlg.popUp(ide.world());
+    scaleInp.edit();
   }
 
   // ---- hook droppedSVG (file drop → image/svg+xml) -----
