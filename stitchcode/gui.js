@@ -35,6 +35,9 @@ IDE_Morph.prototype.headerColor = new Color(245, 245, 245);
 IDE_Morph.prototype.originalCreateLogo = IDE_Morph.prototype.createLogo;
 IDE_Morph.prototype.createLogo = function() {
   this.originalCreateLogo();
+  // keep Snap!'s own logo for the "About Snap!" dialog
+  this.snapLogo = new Image();
+  this.snapLogo.src = this.logo.texture;
   //if (MorphicPreferences.isFlat) {
   // we are always flat!
   // vector logo (stitchcode/turtlestitch_logo.svg), embedded to avoid
@@ -79,6 +82,18 @@ IDE_Morph.prototype.logoImage = function (height) {
 };
 
 
+
+IDE_Morph.prototype.originalAboutSnap = IDE_Morph.prototype.aboutSnap;
+IDE_Morph.prototype.aboutSnap = function () {
+  // show the original Snap! logo instead of the TurtleStitch logo
+  var texture = this.logo.cachedTexture;
+  this.logo.cachedTexture = this.snapLogo;
+  try {
+    this.originalAboutSnap();
+  } finally {
+    this.logo.cachedTexture = texture;
+  }
+};
 
 IDE_Morph.prototype.createPalette = function(forSearching) {
   // assumes that the logo pane has already been created
@@ -1299,7 +1314,7 @@ IDE_Morph.prototype.aboutTurtleStitch = function() {
   dlg = new DialogBoxMorph();
   dlg.inform(localize('About TurtleStitch'), localize(aboutTxt), world, this.logoImage(40));
 
-  btn1 = dlg.addButton(this.aboutSnap,
+  btn1 = dlg.addButton(() => this.aboutSnap(),
     'About Snap!...'
   );
   btn2 = dlg.addButton(
