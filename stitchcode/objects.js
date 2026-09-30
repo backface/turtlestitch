@@ -2942,12 +2942,13 @@ StageMorph.prototype.destroy = function () {
 // three.js sizes it in device pixels with the same factor morphic's
 // retina support applies to all other canvases, rendering at full
 // device resolution without any interference from the patch.
-StageMorph.prototype.stagePixelRatio = (function () {
-    if (typeof isRetinaSupported === 'function' && isRetinaSupported()) {
-        return Math.ceil(window.devicePixelRatio || 1);
-    }
-    return 1;
-})();
+StageMorph.prototype.trailsPixelRatio = function () {
+    // live (not load-time fixed) so the settings-menu retina toggle can
+    // rescale the stage; raw devicePixelRatio mirrors morphic's own
+    // getPixelRatio() (backing-store ratio is 1 on modern browsers), so
+    // the stage buffer matches the world canvas buffer exactly
+    return isRetinaEnabled() ? (window.devicePixelRatio || 1) : 1;
+};
 
 StageMorph.prototype.originalInit = StageMorph.prototype.init;
 StageMorph.prototype.init = function (globals) {
@@ -3173,7 +3174,7 @@ StageMorph.prototype.initRenderer = function () {
       // context yet would create a 2D context and block the WebGL
       // context it just claimed (issue #16)
       this.renderer.setSize(this.extent().x, this.extent().y);
-      this.renderer.setPixelRatio(this.stagePixelRatio);
+      this.renderer.setPixelRatio(this.trailsPixelRatio());
 
       this.renderer.setBackgroundColor = function(color) {
         StageMorph.prototype.backgroundColor  = color;
@@ -3686,7 +3687,7 @@ StageMorph.prototype.drawOn = function (ctx, rect) {
             return null;
         }
         // we only draw pen trails!
-        // the penTrails canvas is sized in device pixels (stagePixelRatio),
+        // the penTrails canvas is sized in device pixels (trailsPixelRatio),
         // so the logical source rect must be translated into backing-store
         // pixels before blitting; the ratio is derived from the actual
         // canvas width so it stays correct even if retina support is

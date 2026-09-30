@@ -464,6 +464,17 @@ IDE_Morph.prototype.rawOpenProjectString = function(str, noPrims) {
 };
 
 
+IDE_Morph.prototype.originalToggleRetina = IDE_Morph.prototype.toggleRetina;
+IDE_Morph.prototype.toggleRetina = function () {
+    this.originalToggleRetina();
+    // the stage survives the toggle; its canvas is owned by three.js
+    // (not the morphic patch), so rescale it to the new setting here
+    if (this.stage.renderer) {
+        this.stage.renderer.setPixelRatio(this.stage.trailsPixelRatio());
+        this.stage.renderer.changed = true;
+    }
+};
+
 /*
 
 TODO: remove sprite instead of hideing it?
