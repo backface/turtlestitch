@@ -1546,14 +1546,13 @@ IDE_Morph.prototype.createStatusDisplay = function() {
   element.newLines = 1;
   elements.push(element);
 
-  elements.push('Size : ');
+  elements.push(new StringMorph(' ' + localize('Size : '), 12, null, true));
   element = new StringMorph();
   element.update = function() {
     this.text = (stage.turtleShepherd.getDimensions());
   };
-  element.newLines = 1;
+  element.newLines = 1.5;
   elements.push(element);
-  element.newLines = 1;
   elements.push('-');
 
   // too long
