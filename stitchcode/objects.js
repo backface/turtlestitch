@@ -970,7 +970,7 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
 			this.addStitch(oldx, oldy, this.xPosition(), this.yPosition(), this.heading);
 			this.addStitchPoint(this.xPosition(), this.yPosition());
       if (warn && !stage.turtleShepherd.ignoreWarning) {
-				this.addDensityPoint(this.xPosition(), this.yPosition());
+				this.addDensityPoint(warn[0], warn[1]);
 			}
 			if (isFirst || this.lastJumped ) {
 				this.addStitchPoint(oldx,oldy);
@@ -1080,7 +1080,7 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
 				this.addStitch(oldx, oldy, this.xPosition(), this.yPosition(), angle);
 				this.addStitchPoint(this.xPosition(), this.yPosition());
 				if (warn && !stage.turtleShepherd.ignoreWarning) {
-					this.addDensityPoint(this.xPosition(), this.yPosition());
+					this.addDensityPoint(warn[0], warn[1]);
 				}
 
 				if (this.parentThatIsA(StageMorph).turtleShepherd.isEmpty() || this.lastJumped)

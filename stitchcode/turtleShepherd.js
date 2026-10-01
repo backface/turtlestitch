@@ -153,12 +153,25 @@ TurtleShepherd.prototype.getMetricHeight = function() {
 };
 
 
+TurtleShepherd.prototype.addDensity = function(x, y) {
+	// count a needle penetration, answer true when it's the one that
+	// goes over the limit at this spot
+	var d = Math.round(x) + "x" + Math.round(y);
+	this.density[d] = (this.density[d] || 0) + 1;
+	if (this.density[d] > this.densityMax) {
+		this.densityWarning = true;
+		return this.density[d] == this.densityMax + 1;
+	}
+	return false;
+};
+
 TurtleShepherd.prototype.moveTo= function(x1, y1, x2, y2, penState) {
     // ignore jump stitches withouth any previous stitches
     //if (this.steps === 0 && !penState)
 	//	return
 
-	warn = false
+	var warn = false,
+		needleIn = penState && (this.steps === 0 || this.inJumpRun);
 
     if (this.steps === 0) {
         this.initX = x1;
@@ -175,7 +188,6 @@ TurtleShepherd.prototype.moveTo= function(x1, y1, x2, y2, penState) {
                 "penDown":penState,
             }
         );
-        this.density[Math.round(x1) + "x" + Math.round(y1)] = 1;
         if (this.colors.length < 1) {
 			if (this.newColor) {
 				this.colors.push(this.newColor);
@@ -198,16 +210,11 @@ TurtleShepherd.prototype.moveTo= function(x1, y1, x2, y2, penState) {
 	if (y2 < this.minY) this.minY = y2;
 	if (y2 > this.maxY) this.maxY = y2;
 
-	var d = Math.round(x2) + "x" + Math.round(y2);
-	if (this.density[d]) {
-		this.density[d] += 1;
-		if (this.density[d] > this.densityMax) {
-			this.densityWarning = true;
-			if (this.density[d] <= this.densityMax+1)
-				warn = true;
-		}
-	} else  {
-		this.density[d] = 1;
+	// only needle penetrations count for density: stitch ends, and the
+	// start of a stitch after jumps. jumps alone leave no stitch behind
+	if (penState) {
+		if (needleIn && this.addDensity(x1, y1)) warn = [x1, y1];
+		if (this.addDensity(x2, y2)) warn = [x2, y2];
 	}
 
 	if ( this.calcTooLong && penState) {
@@ -242,12 +249,8 @@ TurtleShepherd.prototype.moveTo= function(x1, y1, x2, y2, penState) {
         this.inJumpRun = false;
     }
 
-    if (warn) {
-		warn = false;
-		return [x2, y2];
-	} else {
-		return false;
-	}
+    // answer where the density limit was just exceeded, if anywhere
+    return warn;
 
 	this.lastX = x2;
 	this.lastY = y2;
