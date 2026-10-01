@@ -249,11 +249,11 @@ TurtleShepherd.prototype.moveTo= function(x1, y1, x2, y2, penState) {
         this.inJumpRun = false;
     }
 
-    // answer where the density limit was just exceeded, if anywhere
-    return warn;
-
 	this.lastX = x2;
 	this.lastY = y2;
+
+    // answer where the density limit was just exceeded, if anywhere
+    return warn;
 };
 
 TurtleShepherd.prototype.setDefaultColor= function(color) {
@@ -880,10 +880,26 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 		return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 	}
 
-	var extx1 = Math.round(this.maxX) - this.initX;
-	var exty1 = Math.round(this.maxY) - this.initY;
-	var extx2 = Math.round(this.minX) - this.initX;
-	var exty2 = Math.round(this.minY) - this.initY;
+	// the header extents and needle end must be relative to the same
+	// point the records are based on: the first point of the export
+	// cache (the record loop below derives it again as `origin`).
+	// initX/initY are the first stitch point, which after a leading
+	// jump is somewhere else than that record origin (#172)
+	var cache = this.getExportCache();
+	var originPt = null, lastPt = null;
+	for (var ii = 0; ii < cache.length; ii++) {
+		if (cache[ii].cmd == "move") {
+			if (!originPt) originPt = cache[ii];
+			lastPt = cache[ii];
+		}
+	}
+	if (!originPt) originPt = { x: 0, y: 0 };
+	if (!lastPt) lastPt = originPt;
+
+	var extx1 = Math.round(this.maxX) - originPt.x;
+	var exty1 = Math.round(this.maxY) - originPt.y;
+	var extx2 = Math.round(this.minX) - originPt.x;
+	var exty2 = Math.round(this.minY) - originPt.y;
 	writeHeader("LA:" + name.substr(0, 16), 20, true);
 	writeHeader("ST:" + pad(this.steps, 7), 11);
 	writeHeader("CO:" + pad(this.colors.length, 3), 7);
@@ -892,8 +908,8 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 	writeHeader("+Y:" + pad(Math.round(exty1 / this.pixels_per_millimeter) * 10, 5), 9); //Math.round(this.getMetricHeight()*10), 9);
 	writeHeader("-Y:" + pad(Math.abs(Math.round(exty2 / this.pixels_per_millimeter)) * 10, 5), 9);
 
-	var needle_end_x = this.lastX - this.initX;
-	var needle_end_y = this.lastY - this.initY;
+	var needle_end_x = lastPt.x - originPt.x;
+	var needle_end_y = lastPt.y - originPt.y;
 
 	writeHeader("AX:" + pad(Math.round(needle_end_x / this.pixels_per_millimeter) * 10, 6), 10);
 	writeHeader("AY:" + pad(Math.round(needle_end_y / this.pixels_per_millimeter) * 10, 6), 10);
@@ -969,7 +985,7 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 		}
 	}
 
-    var cache = this.getExportCache();
+    // cache was already fetched above for the header
     for (i=0; i < cache.length; i++) {
 
         if (cache[i].cmd == "color"  && !this.ignoreColors) {
