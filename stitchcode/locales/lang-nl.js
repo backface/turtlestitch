@@ -46,7 +46,7 @@ tempDict = {
   'Reset Password...':
     'Wachtwoord opnieuw instellen',
   'Export as SVG':
-    'Exporteren als SVG vectorafbeelding',
+    'Exporteren als SVG',
   'Export as PNG':
     'Exporteren als PNG',
   'Export as Melco/EXP':

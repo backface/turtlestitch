@@ -1428,11 +1428,13 @@ IDE_Morph.prototype.createStatusDisplay = function() {
       }
 
       if (element.newColumn) {
-        if (element.columns) {
-          x = ((max - start) / element.columns) * element.newColumn + start;
-        } else {
-          x = middle;
-        }
+        // never jump back left into a long (e.g. translated) label
+        x = Math.max(
+          x + 10,
+          element.columns ?
+            ((max - start) / element.columns) * element.newColumn + start
+            : middle
+        );
       }
     });
 
