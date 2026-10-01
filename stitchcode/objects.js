@@ -2948,8 +2948,10 @@ SpriteMorph.prototype.blockTemplates = function (
 		
 
 		var myself = this;
-		var ide = this.parentThatIsA(IDE_Morph);
-		
+		// the palette is built and cached before this sprite is part of
+		// the IDE at startup, resourceURL doesn't need an IDE instance
+		var ide = IDE_Morph.prototype;
+
 		if (ide) {
 			var playgroundListUrl = ide.resourceURL('stitchcode/Examples/playground/PLAYGROUND');
 			console.log(playgroundListUrl);
