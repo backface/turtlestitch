@@ -560,6 +560,11 @@ SpriteMorph.prototype.jumpStitch = function (on = true) {
     this.reRender();
 }
 
+// the playground's "jump stitch" block, which defaults to off
+SpriteMorph.prototype.jumpStitchOff = function (on = false) {
+	this.jumpStitch(on);
+}
+
 SpriteMorph.prototype.tieStitch = function () {
   var myself = this;
   var penState = myself.isDown;
