@@ -1154,6 +1154,7 @@ IDE_Morph.prototype.turtlestitchMenu = function() {
     'Tie off before trim',
     function() {
       StageMorph.prototype.tieBeforeTrim = !StageMorph.prototype.tieBeforeTrim;
+      stage.refreshAutoTrims();
       if (StageMorph.prototype.tieBeforeTrim) {
         myself.saveSetting('tieBeforeTrim', true);
       } else {
@@ -1168,6 +1169,7 @@ IDE_Morph.prototype.turtlestitchMenu = function() {
     'Tie in after trim',
     function() {
       StageMorph.prototype.tieAfterTrim = !StageMorph.prototype.tieAfterTrim;
+      stage.refreshAutoTrims();
       if (StageMorph.prototype.tieAfterTrim) {
         myself.saveSetting('tieAfterTrim', true);
       } else {
@@ -1182,6 +1184,7 @@ IDE_Morph.prototype.turtlestitchMenu = function() {
     'Trim before jumps on export',
     function() {
       StageMorph.prototype.autoTrimJumps = !StageMorph.prototype.autoTrimJumps;
+      stage.refreshAutoTrims();
       if (StageMorph.prototype.autoTrimJumps) {
         myself.saveSetting('autoTrimJumps', true);
       } else {
@@ -1534,7 +1537,9 @@ IDE_Morph.prototype.createStatusDisplay = function() {
   elements.push('Trims : ');
   element = new StringMorph();
   element.update = function() {
-    this.text = (stage.turtleShepherd.getTrimCount()).toString() + "        ";
+    var auto = stage.turtleShepherd.getAutoTrimCount();
+    this.text = (stage.turtleShepherd.getTrimCount()).toString() +
+      (auto ? " + " + auto + " auto" : "") + "        ";
   };
   element.newLines = 1;
   elements.push(element);

@@ -47,6 +47,9 @@ TurtleShepherd.prototype.clear = function() {
     this.jumpCount = 0;
     this.trimCount = 0;
     this.trimmed = false; // thread is cut, no stitch since
+    this.autoTrimCount = 0;
+    this.lastAutoTrim = null; // auto trim found by the latest stitch
+    this.inJumpRun = false;
     this.tooLongCount = 0;
     this.density = {};
     this.densityWarning = false;
@@ -96,6 +99,10 @@ TurtleShepherd.prototype.getJumpCount = function() {
 
 TurtleShepherd.prototype.getTrimCount = function() {
     return this.trimCount;
+};
+
+TurtleShepherd.prototype.getAutoTrimCount = function() {
+    return StageMorph.prototype.autoTrimJumps ? this.autoTrimCount : 0;
 };
 
 TurtleShepherd.prototype.getTooLongCount = function() {
@@ -221,11 +228,18 @@ TurtleShepherd.prototype.moveTo= function(x1, y1, x2, y2, penState) {
     this.w = this.maxX - this.minX;
     this.h = this.maxY - this.minY;
 
-    if (!penState)
+    this.lastAutoTrim = null;
+    if (!penState) {
         this.jumpCount++;
-    else {
+        this.inJumpRun = true;
+    } else {
         this.steps++;
         this.trimmed = false;
+        if (this.inJumpRun) {
+            this.lastAutoTrim = this.resolveJumpRun();
+            if (this.lastAutoTrim) this.autoTrimCount++;
+        }
+        this.inJumpRun = false;
     }
 
     if (warn) {
@@ -352,73 +366,110 @@ TurtleShepherd.prototype.addTrim = function() {
 
 TurtleShepherd.prototype.minTrimJump = 2; // mm
 
+TurtleShepherd.prototype.isAutoTrim = function(run) {
+	// with "trim before jumps" on, a run of jumps that follows a stitch
+	// gets a trim, unless it was trimmed already or it's shorter than
+	// minTrimJump mm, measured straight from the last stitch to where
+	// the jumps end
+	var dx = run.end.x - run.last.x, dy = run.end.y - run.last.y;
+	return StageMorph.prototype.autoTrimJumps && !run.trimmed && !!run.prev &&
+		Math.sqrt(dx * dx + dy * dy) >=
+			this.minTrimJump * this.pixels_per_millimeter;
+};
+
+TurtleShepherd.prototype.autoTrimRuns = function(from = 0) {
+	// answer the runs of jumps from cache index "from" on that get an
+	// automatic trim, each as {start, endIndex, prev, last, end, next}:
+	// cache indices of the first and last jump, the two moves before
+	// the jumps, the last jump and the first stitch after them
+	var runs = [], prev = null, last = null, trimmed = false,
+		run = null, i, entry;
+
+	for (i = from - 1; i >= 0 && !last; i--) {
+		if (this.cache[i].cmd == "move") last = this.cache[i];
+	}
+	for (i = from; i < this.cache.length; i++) {
+		entry = this.cache[i];
+		if (entry.cmd == "trim") {
+			trimmed = true;
+		} else if (entry.cmd == "move") {
+			if (!entry.penDown) {
+				if (last && last.penDown) {
+					run = {start: i, prev: prev, last: last, trimmed: trimmed};
+				}
+				if (run) {
+					run.endIndex = i;
+					run.end = entry;
+				}
+			} else {
+				if (run) {
+					run.next = entry;
+					if (this.isAutoTrim(run)) runs.push(run);
+					run = null;
+				}
+				if (last) trimmed = false;
+			}
+			prev = last;
+			last = entry;
+		}
+	}
+	if (run && this.isAutoTrim(run)) runs.push(run);
+	return runs;
+};
+
+TurtleShepherd.prototype.resolveJumpRun = function() {
+	// called with the first stitch after jumps: answer the run of
+	// jumps before it when it gets an automatic trim, else null
+	var i = this.cache.length - 2;
+	while (i >= 0 && !(this.cache[i].cmd == "move" && this.cache[i].penDown))
+		i--;
+	return i < 0 ? null : (this.autoTrimRuns(i)[0] || null);
+};
+
+TurtleShepherd.prototype.updateAutoTrims = function() {
+	// recount after the settings changed, answer the runs
+	var runs = this.autoTrimRuns();
+	this.autoTrimCount = runs.length;
+	return runs;
+};
+
+TurtleShepherd.prototype.tieStitchesAt = function(from, p) {
+	// three stitches 2 steps forward, back and forward again at p,
+	// along the direction from -> p (same as the tie stitch block)
+	var dx = p.x - from.x, dy = p.y - from.y,
+		len = Math.sqrt(dx * dx + dy * dy);
+	if (len === 0) return [];
+	dx = dx / len * 2;
+	dy = dy / len * 2;
+	return [[dx, dy], [-dx, -dy], [0, 0]].map(d =>
+		({"cmd":"move", "x":p.x + d[0], "y":p.y + d[1], "penDown":true})
+	);
+};
+
 TurtleShepherd.prototype.getExportCache = function() {
-	// answer the cache as it gets exported. with "trim before jumps"
-	// on, a trim is added in front of every jump that follows a stitch,
-	// with tie stitches as set for trims. consecutive jumps count as
-	// one, measured straight from the last stitch to where stitching
-	// goes on; shorter than minTrimJump mm is not trimmed
-	var cache = [], prev = null, last = null, stitched = false,
-		trimmed = false, tieIn = false, i, entry,
-		minLength = this.minTrimJump * this.pixels_per_millimeter,
-		myself = this;
+	// answer the cache as it gets exported, with automatic trims and
+	// their tie stitches added
+	var cache = [], starts = {}, last = null, tieIn = false, i, entry, run;
 
 	if (!StageMorph.prototype.autoTrimJumps)
 		return this.cache;
 
-	// three stitches 2 steps forward, back and forward again at p,
-	// along the direction from -> p (same as the tie stitch block)
-	function tie(from, p) {
-		var dx = p.x - from.x, dy = p.y - from.y,
-			len = Math.sqrt(dx * dx + dy * dy);
-		if (len === 0) return;
-		dx = dx / len * 2;
-		dy = dy / len * 2;
-		[[dx, dy], [-dx, -dy], [0, 0]].forEach(d => cache.push(
-			{"cmd":"move", "x":p.x + d[0], "y":p.y + d[1], "penDown":true}
-		));
-	}
-
-	// where the jumps starting at index i end
-	function jumpEnd(i) {
-		var end = myself.cache[i];
-		for (; i < myself.cache.length; i++) {
-			if (myself.cache[i].cmd == "move") {
-				if (myself.cache[i].penDown) break;
-				end = myself.cache[i];
-			}
-		}
-		return end;
-	}
-
-	function distance(a, b) {
-		return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
-	}
-
+	this.autoTrimRuns().forEach(run => starts[run.start] = run);
 	for (i = 0; i < this.cache.length; i++) {
 		entry = this.cache[i];
-		if (entry.cmd == "trim") {
-			trimmed = true;
-		} else if (entry.cmd == "move" && !entry.penDown) {
-			if (stitched && !trimmed && last.penDown &&
-					distance(last, jumpEnd(i)) >= minLength) {
-				if (StageMorph.prototype.tieBeforeTrim)
-					tie(prev, last);
-				cache.push({"cmd":"trim"});
-				trimmed = true;
-				tieIn = StageMorph.prototype.tieAfterTrim;
-			}
-		} else if (entry.cmd == "move" && last) {
-			stitched = true;
-			trimmed = false;
+		run = starts[i];
+		if (run) {
+			if (StageMorph.prototype.tieBeforeTrim)
+				cache.push(...this.tieStitchesAt(run.prev, run.last));
+			cache.push({"cmd":"trim"});
+			tieIn = StageMorph.prototype.tieAfterTrim;
 		}
 		cache.push(entry);
 		if (entry.cmd == "move") {
 			if (entry.penDown && tieIn && last) {
-				tie(last, entry);
+				cache.push(...this.tieStitchesAt(last, entry));
 				tieIn = false;
 			}
-			prev = last;
 			last = entry;
 		}
 	}

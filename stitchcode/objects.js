@@ -221,17 +221,23 @@ SpriteMorph.prototype.addJumpLine = function(x1, y1, x2, y2) {
 		material.transparent = true;
 		var mesh = new THREE.Mesh( g.geometry, material );
 		mesh.visible = !StageMorph.prototype.hideJumps;
+		mesh.userData = {
+			jump: true,
+			cacheIndex: stage.turtleShepherd.cache.length - 1,
+			trimmed: stage.turtleShepherd.trimmed
+		};
 		stage.myJumpLines.add(mesh);
 	}
 
     this.reRender();
 };
 
-// a small red cross where the thread gets cut, shown with the jumps
-SpriteMorph.prototype.addTrimMarker = function(x, y) {
+// a small cross where the thread gets cut, shown with the jumps:
+// red for a trim block, orange for a trim added on export
+SpriteMorph.prototype.addTrimMarker = function(x, y, auto = false) {
     var stage = this.parentThatIsA(StageMorph),
         size = 10, // 2 mm
-        color = new THREE.Color("rgb(255,0,0)"),
+        color = new THREE.Color(auto ? "rgb(255,140,0)" : "rgb(255,0,0)"),
         material = this.cache.findMaterial(color, 0.9),
         geometry = this.cache.findGeometry('trimMarker', [size]);
 
@@ -251,9 +257,68 @@ SpriteMorph.prototype.addTrimMarker = function(x, y) {
         bar.rotation.z = angle * Math.PI / 180;
         bar.position.set(x, y, 0.02);
         bar.visible = !StageMorph.prototype.hideJumps;
+        bar.userData = {autoTrim: auto};
         stage.myJumpLines.add(bar);
     });
     this.reRender();
+};
+
+// a small diamond at a tie stitch, shown with the jumps: red for a tie
+// in the design, orange for one added on export
+SpriteMorph.prototype.addTieMarker = function(x, y, auto = false) {
+    var stage = this.parentThatIsA(StageMorph),
+        size = 4,
+        color = new THREE.Color(auto ? "rgb(255,140,0)" : "rgb(255,0,0)"),
+        material = this.cache.findMaterial(color, 0.9),
+        geometry = this.cache.findGeometry('trimMarker', [size, size]),
+        mark;
+
+    if (!material) {
+        material = new THREE.MeshBasicMaterial(
+            { color: color, side: THREE.DoubleSide, opacity: 0.9 });
+        material.transparent = true;
+        this.cache.addMaterial(material);
+    }
+    if (!geometry) {
+        geometry = new THREE.PlaneGeometry(size, size, 1, 1);
+        this.cache.addGeometry('trimMarker', geometry, [size, size]);
+    }
+    mark = new THREE.Mesh(geometry, material);
+    mark.rotation.z = Math.PI / 4;
+    mark.position.set(x, y, 0.02);
+    mark.visible = !StageMorph.prototype.hideJumps;
+    mark.userData = {autoTrim: auto};
+    stage.myJumpLines.add(mark);
+    this.reRender();
+};
+
+// show a trim added on export: orange cross, tie marks as set and the
+// jumps after it grey. jumps are the run's jump meshes, by default
+// found among the latest ones
+SpriteMorph.prototype.showAutoTrim = function(run, jumps) {
+    var stage = this.parentThatIsA(StageMorph),
+        children = stage.myJumpLines.children,
+        grey = new THREE.Color("rgb(150,150,150)"),
+        i, data;
+
+    if (!jumps) {
+        jumps = [];
+        for (i = children.length - 1; i >= 0; i--) {
+            data = children[i].userData;
+            if (data.jump) {
+                if (data.cacheIndex < run.start) break;
+                if (data.cacheIndex <= run.endIndex) jumps.push(children[i]);
+            }
+        }
+    }
+    jumps.forEach(mesh => mesh.material.uniforms.color.value.copy(grey));
+    this.addTrimMarker(run.last.x, run.last.y, true);
+    if (StageMorph.prototype.tieBeforeTrim) {
+        this.addTieMarker(run.last.x, run.last.y, true);
+    }
+    if (StageMorph.prototype.tieAfterTrim && run.next) {
+        this.addTieMarker(run.next.x, run.next.y, true);
+    }
 };
 
 SpriteMorph.prototype.addStitchPoint = function(x2, y2) {
@@ -509,6 +574,9 @@ SpriteMorph.prototype.tieStitch = function () {
   myself.stitchtype = stitchState;
   myself.isDown = penState;
   myself.isRunning = runState;
+  if (myself.parentThatIsA(StageMorph)) {
+    myself.addTieMarker(myself.xPosition(), myself.yPosition());
+  }
 }
 
 SpriteMorph.prototype.tieInAfterTrim = function (direction) {
@@ -896,6 +964,7 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
 			oldx, oldy,
 			this.xPosition(), this.yPosition(),
 			this.isDown );
+		var autoTrim = stage.turtleShepherd.lastAutoTrim;
 
 		if (this.isDown) {
 			this.addStitch(oldx, oldy, this.xPosition(), this.yPosition(), this.heading);
@@ -912,6 +981,9 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
       this.lastJumped = true;
 		}
 		stage.moveTurtle(this.xPosition(), this.yPosition());
+		if (autoTrim) {
+			this.showAutoTrim(autoTrim);
+		}
 		if (tieIn) {
 			this.tieInAfterTrim(dist >= 0 ? this.heading : this.heading - 180);
 		}
@@ -995,11 +1067,13 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
       // if (!noShadow && dist > 1) {
       var tieIn = this.isDown && StageMorph.prototype.tieAfterTrim &&
         stage.turtleShepherd.trimmed && dist > 1;
+      var autoTrim = null;
       if (dist > 1) {
         warn = this.parentThatIsA(StageMorph).turtleShepherd.moveTo(
           oldx, oldy,
           this.xPosition(), this.yPosition(),
           this.isDown );
+        autoTrim = stage.turtleShepherd.lastAutoTrim;
       }
 
 			if (this.isDown) {
@@ -1017,6 +1091,9 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
 				this.lastJumped = true;
 			}
 			stage.moveTurtle(this.xPosition(), this.yPosition());
+			if (autoTrim) {
+				this.showAutoTrim(autoTrim);
+			}
 			if (tieIn) {
 				this.tieInAfterTrim(angle);
 			}
@@ -3170,6 +3247,34 @@ StageMorph.prototype.clearAll = function () {
     }
 
     this.renderer.clear();
+};
+
+StageMorph.prototype.refreshAutoTrims = function () {
+    // redraw the trims added on export after their settings changed
+    var sprite = this.children.find(c => c instanceof SpriteMorph),
+        red = new THREE.Color("rgb(255,0,0)"),
+        grey = new THREE.Color("rgb(150,150,150)"),
+        byIndex = {},
+        i, child;
+
+    for (i = this.myJumpLines.children.length - 1; i >= 0; i--) {
+        child = this.myJumpLines.children[i];
+        if (child.userData.autoTrim) {
+            this.myJumpLines.remove(child);
+        } else if (child.userData.jump) {
+            child.material.uniforms.color.value.copy(child.userData.trimmed ? grey : red);
+            (byIndex[child.userData.cacheIndex] =
+                byIndex[child.userData.cacheIndex] || []).push(child);
+        }
+    }
+    this.turtleShepherd.updateAutoTrims().forEach(run => {
+        var jumps = [], k;
+        for (k = run.start; k <= run.endIndex; k++) {
+            if (byIndex[k]) jumps.push(...byIndex[k]);
+        }
+        if (sprite) sprite.showAutoTrim(run, jumps);
+    });
+    this.reRender();
 };
 
 StageMorph.prototype.initRenderer = function () {
