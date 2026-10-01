@@ -189,9 +189,12 @@ SpriteMorph.prototype.addJumpLine = function(x1, y1, x2, y2) {
 		stage.myJumpLines.add(line);
     }
 
-	// draw as dashed smeshline
+	// draw as dashed smeshline, grey after a trim (the thread is cut,
+	// so the jump leaves no thread on the fabric)
     if (true) {
-		color = new THREE.Color("rgb(255,0,0)");
+		color = stage.turtleShepherd.trimmed
+			? new THREE.Color("rgb(150,150,150)")
+			: new THREE.Color("rgb(255,0,0)");
 		var geometry = this.cache.findGeometry('meshline', [x1,y1,x2,y2, color, 0.8]);
 		if (!geometry) {
 			geometry = new THREE.Geometry();
@@ -221,6 +224,35 @@ SpriteMorph.prototype.addJumpLine = function(x1, y1, x2, y2) {
 		stage.myJumpLines.add(mesh);
 	}
 
+    this.reRender();
+};
+
+// a small red cross where the thread gets cut, shown with the jumps
+SpriteMorph.prototype.addTrimMarker = function(x, y) {
+    var stage = this.parentThatIsA(StageMorph),
+        size = 10, // 2 mm
+        color = new THREE.Color("rgb(255,0,0)"),
+        material = this.cache.findMaterial(color, 0.9),
+        geometry = this.cache.findGeometry('trimMarker', [size]);
+
+    if (!material) {
+        material = new THREE.MeshBasicMaterial(
+            { color: color, side: THREE.DoubleSide, opacity: 0.9 });
+        material.transparent = true;
+        this.cache.addMaterial(material);
+    }
+    if (!geometry) {
+        geometry = new THREE.PlaneGeometry(size, size / 6, 1, 1);
+        this.cache.addGeometry('trimMarker', geometry, [size]);
+    }
+
+    [45, -45].forEach(function (angle) {
+        var bar = new THREE.Mesh(geometry, material);
+        bar.rotation.z = angle * Math.PI / 180;
+        bar.position.set(x, y, 0.02);
+        bar.visible = !StageMorph.prototype.hideJumps;
+        stage.myJumpLines.add(bar);
+    });
     this.reRender();
 };
 
@@ -436,19 +468,18 @@ SpriteMorph.prototype.tatamiStitch = function (width=100, interval=30, center=fa
 }
 
 SpriteMorph.prototype.trimStitch = function (on = true) {
-  var myself = this;
-	var penState = myself.isDown;
-  var runState = myself.isRunning;
-  var stitchState = myself.stitchtype;
-  myself.stitchtype = 0;
-	myself.isDown = false;
-  myself.isRunning = false;
-	myself.forward(2);
-	myself.forward(-4);
-	myself.forward(2);
-  myself.stitchtype = stitchState;
-	myself.isDown = penState;
-  myself.isRunning = runState;
+  // recorded as a trim command, each export format writes its own
+  // (DST: three consecutive jumps, EXP: trim record)
+  // optionally tie off first, so the cut thread can't unravel
+  var stage = this.parentThatIsA(StageMorph);
+  if (!stage) return;
+  if (StageMorph.prototype.tieBeforeTrim &&
+      stage.turtleShepherd.steps > 0 && !stage.turtleShepherd.trimmed) {
+    this.tieStitch();
+  }
+  if (stage.turtleShepherd.addTrim()) {
+    this.addTrimMarker(this.xPosition(), this.yPosition());
+  }
 }
 
 SpriteMorph.prototype.jumpStitch = function (on = true) {
@@ -478,6 +509,15 @@ SpriteMorph.prototype.tieStitch = function () {
   myself.stitchtype = stitchState;
   myself.isDown = penState;
   myself.isRunning = runState;
+}
+
+SpriteMorph.prototype.tieInAfterTrim = function (direction) {
+  // tie in along the first stitch after a trim, so the loose thread
+  // end gets locked
+  var heading = this.heading;
+  this.setHeading(direction);
+  this.tieStitch();
+  this.setHeading(heading);
 }
 
 SpriteMorph.prototype.origForward = SpriteMorph.prototype.forward;
@@ -850,6 +890,8 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
     // setTimeout(() => stage.reRender(), 10)
 
     var isFirst = this.parentThatIsA(StageMorph).turtleShepherd.isEmpty();
+    var tieIn = this.isDown && StageMorph.prototype.tieAfterTrim &&
+      stage.turtleShepherd.trimmed;
 		warn = stage.turtleShepherd.moveTo(
 			oldx, oldy,
 			this.xPosition(), this.yPosition(),
@@ -870,6 +912,9 @@ SpriteMorph.prototype.doMoveForward = function (steps) {
       this.lastJumped = true;
 		}
 		stage.moveTurtle(this.xPosition(), this.yPosition());
+		if (tieIn) {
+			this.tieInAfterTrim(dist >= 0 ? this.heading : this.heading - 180);
+		}
 	}
 }
 
@@ -948,6 +993,8 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
       // dont' stitch if is zero value length
       // - shoud we filter out all noShadows?
       // if (!noShadow && dist > 1) {
+      var tieIn = this.isDown && StageMorph.prototype.tieAfterTrim &&
+        stage.turtleShepherd.trimmed && dist > 1;
       if (dist > 1) {
         warn = this.parentThatIsA(StageMorph).turtleShepherd.moveTo(
           oldx, oldy,
@@ -970,6 +1017,9 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe, noShadow) {
 				this.lastJumped = true;
 			}
 			stage.moveTurtle(this.xPosition(), this.yPosition());
+			if (tieIn) {
+				this.tieInAfterTrim(angle);
+			}
 		}
 
 		this.setHeading(oldheading);
@@ -1088,12 +1138,9 @@ SpriteMorph.prototype.drawTextScale = function (text, scale, trim) {
 		var penState = myself.isDown;
 		myself.isDown = false;
     if (trim) {
-      myself.gotoXY(x+2, y+2);
-      myself.gotoXY(x-2, y-2);
-      myself.gotoXY(x, y);
-    } else {
-      myself.gotoXY(x, y);
+      myself.trimStitch();
     }
+    myself.gotoXY(x, y);
 
 		//lf.gotoXY(x+2, y+2);
 		//myself.gotoXY(x, y);
@@ -3759,7 +3806,7 @@ function Cache () {
 
 Cache.prototype.init = function () {
     this.materials = [];
-    this.geometries = { stitch: [], stitchPoint: [], densityPoint: [], circle: [], plane: [], meshline: [] };
+    this.geometries = { stitch: [], stitchPoint: [], densityPoint: [], circle: [], plane: [], meshline: [], trimMarker: [] };
 };
 
 Cache.prototype.clear = function () {

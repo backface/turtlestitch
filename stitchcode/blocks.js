@@ -160,3 +160,46 @@ BlockDialogMorph.prototype.fixCategoriesLayout = function () {
         );
     }
 };
+
+// help texts for embroidery primitives, shown instead of a help picture
+
+BlockMorph.prototype.embroideryHelp = {
+    trimStitch:
+        'Cuts the thread at the current position.\n\n' +
+        'Put it at the end of a part, before jumping to the next one,\n' +
+        'so the machine cuts the thread instead of dragging it along.\n' +
+        'A trim after the jump would cut at the new position and leave\n' +
+        'the connecting thread hanging. One trim per jump is enough.\n\n' +
+        'On stage a trim is shown as a red × and the jump after it is\n' +
+        'drawn grey. DST files have no trim command, a trim is written\n' +
+        'as three short jumps that most machines read as a cut.\n\n' +
+        'The TurtleStitch settings can add tie stitches before and\n' +
+        'after each trim, or a trim before every jump of 2 mm or\n' +
+        'more on export.',
+    tieStitch:
+        'Locks the thread with three tiny stitches (forward, back and\n' +
+        'forward again) along the current direction, so it can\'t\n' +
+        'unravel. Use it at the start of a part and before a trim.'
+};
+
+BlockMorph.prototype.originalShowHelp = BlockMorph.prototype.showHelp;
+BlockMorph.prototype.showHelp = function () {
+    var text = !this.isCustomBlock && this.embroideryHelp[this.selector],
+        block;
+    if (!text) {
+        return this.originalShowHelp();
+    }
+    block = SpriteMorph.prototype.blockForSelector(this.selector, true);
+    new DialogBoxMorph().inform(
+        'Help',
+        localize(text),
+        this.world(),
+        block.doWithAlpha(
+            1,
+            () => {
+                block.addShadow();
+                return block.fullImage();
+            }
+        )
+    );
+};

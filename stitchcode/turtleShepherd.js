@@ -45,6 +45,8 @@ TurtleShepherd.prototype.clear = function() {
     this.steps = 0;
     this.stitchCount = 0;
     this.jumpCount = 0;
+    this.trimCount = 0;
+    this.trimmed = false; // thread is cut, no stitch since
     this.tooLongCount = 0;
     this.density = {};
     this.densityWarning = false;
@@ -90,6 +92,10 @@ TurtleShepherd.prototype.getStepCount = function() {
 
 TurtleShepherd.prototype.getJumpCount = function() {
     return this.jumpCount;
+};
+
+TurtleShepherd.prototype.getTrimCount = function() {
+    return this.trimCount;
 };
 
 TurtleShepherd.prototype.getTooLongCount = function() {
@@ -219,6 +225,7 @@ TurtleShepherd.prototype.moveTo= function(x1, y1, x2, y2, penState) {
         this.jumpCount++;
     else {
         this.steps++;
+        this.trimmed = false;
     }
 
     if (warn) {
@@ -331,9 +338,99 @@ TurtleShepherd.prototype.pushPenSizeNow = function() {
     this.newPenSize = false;
 };
 
+TurtleShepherd.prototype.addTrim = function() {
+	// cut the thread at the current position; ignored before the
+	// first stitch and when nothing was stitched since the last trim.
+	// answer whether a trim was added
+	if (this.steps === 0 || this.trimmed)
+		return false;
+	this.cache.push({"cmd":"trim"});
+	this.trimCount++;
+	this.trimmed = true;
+	return true;
+};
+
+TurtleShepherd.prototype.minTrimJump = 2; // mm
+
+TurtleShepherd.prototype.getExportCache = function() {
+	// answer the cache as it gets exported. with "trim before jumps"
+	// on, a trim is added in front of every jump that follows a stitch,
+	// with tie stitches as set for trims. consecutive jumps count as
+	// one, measured straight from the last stitch to where stitching
+	// goes on; shorter than minTrimJump mm is not trimmed
+	var cache = [], prev = null, last = null, stitched = false,
+		trimmed = false, tieIn = false, i, entry,
+		minLength = this.minTrimJump * this.pixels_per_millimeter,
+		myself = this;
+
+	if (!StageMorph.prototype.autoTrimJumps)
+		return this.cache;
+
+	// three stitches 2 steps forward, back and forward again at p,
+	// along the direction from -> p (same as the tie stitch block)
+	function tie(from, p) {
+		var dx = p.x - from.x, dy = p.y - from.y,
+			len = Math.sqrt(dx * dx + dy * dy);
+		if (len === 0) return;
+		dx = dx / len * 2;
+		dy = dy / len * 2;
+		[[dx, dy], [-dx, -dy], [0, 0]].forEach(d => cache.push(
+			{"cmd":"move", "x":p.x + d[0], "y":p.y + d[1], "penDown":true}
+		));
+	}
+
+	// where the jumps starting at index i end
+	function jumpEnd(i) {
+		var end = myself.cache[i];
+		for (; i < myself.cache.length; i++) {
+			if (myself.cache[i].cmd == "move") {
+				if (myself.cache[i].penDown) break;
+				end = myself.cache[i];
+			}
+		}
+		return end;
+	}
+
+	function distance(a, b) {
+		return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+	}
+
+	for (i = 0; i < this.cache.length; i++) {
+		entry = this.cache[i];
+		if (entry.cmd == "trim") {
+			trimmed = true;
+		} else if (entry.cmd == "move" && !entry.penDown) {
+			if (stitched && !trimmed && last.penDown &&
+					distance(last, jumpEnd(i)) >= minLength) {
+				if (StageMorph.prototype.tieBeforeTrim)
+					tie(prev, last);
+				cache.push({"cmd":"trim"});
+				trimmed = true;
+				tieIn = StageMorph.prototype.tieAfterTrim;
+			}
+		} else if (entry.cmd == "move" && last) {
+			stitched = true;
+			trimmed = false;
+		}
+		cache.push(entry);
+		if (entry.cmd == "move") {
+			if (entry.penDown && tieIn && last) {
+				tie(last, entry);
+				tieIn = false;
+			}
+			prev = last;
+			last = entry;
+		}
+	}
+	return cache;
+};
+
 TurtleShepherd.prototype.undoStep = function() {
 	var last = this.cache.pop();
-	if (last.cmd == "move") {
+	if (last.cmd == "trim") {
+		this.trimCount--;
+		this.trimmed = false;
+	} else if (last.cmd == "move") {
 		if (last.penDown) {
 			this.steps--;
 		} else {
@@ -496,15 +593,22 @@ TurtleShepherd.prototype.toEXP = function() {
         expArr.push(Math.round(y));
     }
 
-    for (var i=0; i < this.cache.length; i++) {
-        if (this.cache[i].cmd == "color" && !this.ignoreColors) {
+    var cache = this.getExportCache();
+    for (var i=0; i < cache.length; i++) {
+        if (cache[i].cmd == "color" && !this.ignoreColors) {
             expArr.push(0x80);
             expArr.push(0x01);
             expArr.push(0x00);
             expArr.push(0x00);
             weJustChangedColors = true;
-        } else if (this.cache[i].cmd == "move") {
-            stitch = this.cache[i];
+        } else if (cache[i].cmd == "trim" && hasFirst) {
+            // EXP (Melco) trim record
+            expArr.push(0x80);
+            expArr.push(0x80);
+            expArr.push(0x07);
+            expArr.push(0x00);
+        } else if (cache[i].cmd == "move") {
+            stitch = cache[i];
             if (!hasFirst) {
                 origin.x = Math.round(stitch.x * scale);
                 origin.y = Math.round(stitch.y * scale);
@@ -759,75 +863,103 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 	origin = {}
 	hasFirst = false;
 	weJustChangedColors = false;
+	var afterJump = false,   // the last record written was a jump
+		pendingJump = null;  // consecutive jumps, merged into one
 
-    for (i=0; i < this.cache.length; i++) {
+	// write a straight move as stitch or jump records, split into
+	// pieces of at most 12.1 mm (DST's limit per record)
+	function writeMove(from, to, jump) {
+		var x0 = Math.round(from.x * scale) - origin.x,
+			y0 = Math.round(from.y * scale) - origin.y,
+			x1 = Math.round(to.x * scale) - origin.x,
+			y1 = Math.round(to.y * scale) - origin.y,
+			sum_x = 0,
+			sum_y = 0,
+			dmax = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)),
+			dsteps = Math.abs(dmax / 121);
 
-        if (this.cache[i].cmd == "color"  && !this.ignoreColors) {
+		if (dsteps <= 1) {
+			encodeTajimaStitch((x1 - x0), (y1 - y0), jump);
+			count_stitches++;
+		} else {
+			for (var j = 0; j < dsteps; j++) {
+				if (j < dsteps - 1) {
+					encodeTajimaStitch(
+						Math.round((x1 - x0) / dsteps),
+						Math.round((y1 - y0) / dsteps),
+						jump
+					);
+					sum_x += (x1 - x0) / dsteps;
+					sum_y += (y1 - y0) / dsteps;
+				} else {
+					encodeTajimaStitch(
+						Math.round((x1 - x0) - sum_x),
+						Math.round((y1 - y0) - sum_y),
+						jump
+					);
+				}
+				count_stitches++;
+			}
+		}
+		afterJump = jump;
+	}
+
+	// a run of pen-up moves becomes one straight jump: machines
+	// read several consecutive jump records as a trim, so the number
+	// of records must not depend on how many moves made up the path
+	function flushJump() {
+		if (pendingJump) {
+			writeMove(lastStitch, pendingJump, true);
+			lastStitch = pendingJump;
+			pendingJump = null;
+		}
+	}
+
+    var cache = this.getExportCache();
+    for (i=0; i < cache.length; i++) {
+
+        if (cache[i].cmd == "color"  && !this.ignoreColors) {
+			flushJump();
 			expArr.push(0x00);
 			expArr.push(0x00);
 			expArr.push(0xC3);
 			weJustChangedColors = true;
-        } else if (this.cache[i].cmd == "move") {
-            stitch = this.cache[i];
+        } else if (cache[i].cmd == "trim" && hasFirst) {
+			flushJump();
+			// DST has no trim command: three consecutive jumps that end
+			// where they started are read as one (same as pyembroidery)
+			encodeTajimaStitch(2, 2, true);
+			encodeTajimaStitch(-4, -4, true);
+			encodeTajimaStitch(2, 2, true);
+			afterJump = true;
+        } else if (cache[i].cmd == "move") {
+            stitch = cache[i];
 
             if (!hasFirst) { //  create a stitch at origin
                 origin.x = Math.round(stitch.x * scale);
                 origin.y = Math.round(stitch.y * scale);
-                
+
                 // zero stitch: Why is it here
                 encodeTajimaStitch(0, 0, !stitch.penDown);
-                lastStitch = {cmd: "move", x: 0, y:0, penDown: stitch.penDown}
-              hasFirst = true;
+                afterJump = !stitch.penDown;
+                lastStitch = stitch;
+                hasFirst = true;
+            } else if (!stitch.penDown) {
+                pendingJump = stitch;
             } else {
-                x1 = Math.round(stitch.x * scale) - origin.x;
-                y1 = Math.round(stitch.y * scale) - origin.y;
-                x0 = Math.round(lastStitch.x * scale) - origin.x;
-                y0 = Math.round(lastStitch.y * scale) - origin.y;
-
-                sum_x = 0;
-                sum_y = 0;
-                dmax = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
-                dsteps = Math.abs(dmax / 121);
-
-                if (!lastStitch.penDown)
-                  // zero stitch: Why is it here
-                  encodeTajimaStitch(0,0, false);
-
-                if (weJustChangedColors) {
-                  // zero stitch: Why is it here
-                  encodeTajimaStitch(0, 0, !stitch.penDown);
+                flushJump();
+                // needle down at the end of a jump before stitching on,
+                // but not between jumps, which would sew them as stitches
+                if (afterJump || weJustChangedColors) {
+                  encodeTajimaStitch(0, 0, false);
                   weJustChangedColors = false;
                 }
-
-                if (dsteps <= 1) {
-                    encodeTajimaStitch((x1 - x0), (y1 - y0), !stitch.penDown);
-                    count_stitches++;
-                } else {
-                    for(j=0;j<dsteps;j++) {
-                        if (j < dsteps -1) {
-                            encodeTajimaStitch(
-                                Math.round((x1 - x0)/dsteps),
-                                Math.round((y1 - y0)/dsteps),
-                                !stitch.penDown
-                            );
-                            count_stitches++;
-                            sum_x += (x1 - x0)/dsteps;
-                            sum_y += (y1 - y0)/dsteps;
-                        } else {
-                            encodeTajimaStitch(
-                                Math.round((x1 - x0) - sum_x),
-                                Math.round((y1 - y0) - sum_y),
-                                !stitch.penDown
-                            );
-                            count_stitches++;
-                        }
-                    }
-                }
+                writeMove(lastStitch, stitch, false);
+                lastStitch = stitch;
             }
-            lastStitch = stitch;
-            hasFirst = true;
         }
     }
+    flushJump();
 
 	// end pattern
     expArr.push(0x00);

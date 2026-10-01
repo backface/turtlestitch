@@ -245,6 +245,9 @@ IDE_Morph.prototype.applySavedTurtleStitchSettings = function() {
   hidestitches = this.getSetting('hidestitches');
   warnings = this.getSetting('ignoreWarning');
   isImperial = this.getSetting('isImperial');
+  StageMorph.prototype.tieBeforeTrim = !!this.getSetting('tieBeforeTrim');
+  StageMorph.prototype.tieAfterTrim = !!this.getSetting('tieAfterTrim');
+  StageMorph.prototype.autoTrimJumps = !!this.getSetting('autoTrimJumps');
   backgroundColor = this.getSetting('backgroundColor')
   defaultPenColor = this.getSetting('defaultPenColor')
 
@@ -1147,6 +1150,48 @@ IDE_Morph.prototype.turtlestitchMenu = function() {
     'uncheck to show embroidery specific warnings',
     'check to ignore embroidery specific warnings'
   );
+  addPreference(
+    'Tie off before trim',
+    function() {
+      StageMorph.prototype.tieBeforeTrim = !StageMorph.prototype.tieBeforeTrim;
+      if (StageMorph.prototype.tieBeforeTrim) {
+        myself.saveSetting('tieBeforeTrim', true);
+      } else {
+        myself.removeSetting('tieBeforeTrim');
+      }
+    },
+    StageMorph.prototype.tieBeforeTrim,
+    'uncheck to trim without a tie stitch',
+    'check to add a tie stitch before each trim'
+  );
+  addPreference(
+    'Tie in after trim',
+    function() {
+      StageMorph.prototype.tieAfterTrim = !StageMorph.prototype.tieAfterTrim;
+      if (StageMorph.prototype.tieAfterTrim) {
+        myself.saveSetting('tieAfterTrim', true);
+      } else {
+        myself.removeSetting('tieAfterTrim');
+      }
+    },
+    StageMorph.prototype.tieAfterTrim,
+    'uncheck to start stitching without a tie stitch after a trim',
+    'check to add a tie stitch after the first stitch following a trim'
+  );
+  addPreference(
+    'Trim before jumps on export',
+    function() {
+      StageMorph.prototype.autoTrimJumps = !StageMorph.prototype.autoTrimJumps;
+      if (StageMorph.prototype.autoTrimJumps) {
+        myself.saveSetting('autoTrimJumps', true);
+      } else {
+        myself.removeSetting('autoTrimJumps');
+      }
+    },
+    StageMorph.prototype.autoTrimJumps,
+    'uncheck to export jumps without adding trims',
+    'check to cut the thread before every jump of 2 mm or more\nin exported DST and EXP files'
+  );
   menu.addLine();
   menu.addItem('Default background color...', 'userSetBackgroundColor');
   menu.addItem('Default pen color...', 'userSetPenColor');
@@ -1484,6 +1529,14 @@ IDE_Morph.prototype.createStatusDisplay = function() {
   };
   element.columns = 3;
   element.newColumn = 2;
+  elements.push(element);
+
+  elements.push('Trims : ');
+  element = new StringMorph();
+  element.update = function() {
+    this.text = (stage.turtleShepherd.getTrimCount()).toString() + "        ";
+  };
+  element.newLines = 1;
   elements.push(element);
 
   elements.push('Size : ');
