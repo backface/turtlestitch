@@ -203,3 +203,7 @@ BlockMorph.prototype.showHelp = function () {
         )
     );
 };
+
+// don't accept dropped reporters in the variable slot of "change", like
+// "set", "show variable" and "hide variable" (#169)
+SyntaxElementMorph.prototype.labelParts['%hyperVar'].tags = 'read-only static';
