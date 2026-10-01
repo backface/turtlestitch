@@ -896,10 +896,12 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 	if (!originPt) originPt = { x: 0, y: 0 };
 	if (!lastPt) lastPt = originPt;
 
-	var extx1 = Math.round(this.maxX) - originPt.x;
-	var exty1 = Math.round(this.maxY) - originPt.y;
-	var extx2 = Math.round(this.minX) - originPt.x;
-	var exty2 = Math.round(this.minY) - originPt.y;
+	// the origin counts as part of the extents, so a design that lies
+	// entirely on one side of it gets 0 on the other side
+	var extx1 = Math.max(Math.round(this.maxX), originPt.x) - originPt.x;
+	var exty1 = Math.max(Math.round(this.maxY), originPt.y) - originPt.y;
+	var extx2 = Math.min(Math.round(this.minX), originPt.x) - originPt.x;
+	var exty2 = Math.min(Math.round(this.minY), originPt.y) - originPt.y;
 	writeHeader("LA:" + name.substr(0, 16), 20, true);
 	writeHeader("ST:" + pad(this.steps, 7), 11);
 	writeHeader("CO:" + pad(this.colors.length, 3), 7);
