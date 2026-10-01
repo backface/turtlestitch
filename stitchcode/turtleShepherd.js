@@ -939,8 +939,11 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
                 origin.x = Math.round(stitch.x * scale);
                 origin.y = Math.round(stitch.y * scale);
 
-                // zero stitch: Why is it here
-                encodeTajimaStitch(0, 0, !stitch.penDown);
+                // start with a zero jump: some viewers drop a zero stitch
+                // at the very start and with it the first real stitch
+                encodeTajimaStitch(0, 0, true);
+                if (stitch.penDown)
+                    encodeTajimaStitch(0, 0, false);
                 afterJump = !stitch.penDown;
                 lastStitch = stitch;
                 hasFirst = true;
